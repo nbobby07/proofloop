@@ -108,3 +108,7 @@ Release tests use explicitly synthetic driver doubles for persistence-before-del
 ambiguous insert replay, stable IDs, batching, fixture exclusion, secret projection,
 worker-thread execution and graceful outages. No live database credentials were
 available during release validation; no live connection or ingestion is claimed.
+
+Adapter unit tests pass, covering evidence admission, safe SQL boundaries and
+provider-error handling. No live SQL requests or ingestion checks have been
+executed. See frontend/VALIDATION.md for results and remaining access requirements.

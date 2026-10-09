@@ -11,15 +11,9 @@ export function IntegrationStatus({
     <>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">Integration readiness</p>
-          <h1>
-            Connected claims
-            <br />
-            <span>need receipts.</span>
-          </h1>
+          <h1>Integrations</h1>
           <p className="support">
-            Availability is shown only where the current contract provides
-            evidence.
+            Service availability and optional evidence tools.
           </p>
         </div>
       </div>
@@ -65,7 +59,7 @@ export function IntegrationStatus({
               <strong>{name}</strong>
               <small>{detail}</small>
             </div>
-            <span className="badge">Not verified</span>
+            <span className="badge">{name === "ElevenLabs" ? "See current briefing" : "Not verified"}</span>
           </div>
         ))}
       </section>

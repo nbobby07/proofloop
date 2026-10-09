@@ -90,3 +90,21 @@ before a POST reached FastAPI. No backend result was fabricated or inferred. The
 same final production UI completed the flow in Chrome with no console errors.
 The local API remains loopback-only and single-worker. No publicly exposed API or
 hosted deployment is claimed. Passing remains scoped to the frozen LedgerLite suite.
+
+## Dashboard follow-up integrated
+
+Developer B subsequently pushed `f9643d3c0b2bffb23784683a2272d13da61cd262`, which
+already contains release baseline f5d067a and adds the redesigned evidence workspace
+and adapter/frontend tests. That exact pushed commit was merged normally into the
+sponsor integration; the feature branch was not modified. Three overlapping files
+were resolved by preserving B's layout/lazy analytics and the working narration routes.
+The briefing is available on Integrations for the selected completed live run.
+
+The final Chrome production build restored the saved run, displayed real 6/6, 22/22,
+16/16 results, actual patch evidence, and the cached live briefing in the new design.
+An additional frontend test proves reload stores only the run ID and fetches current
+backend status, rather than caching a previously passing result.
+
+The full configured suite now includes B's adapter tests: **346 Python tests passed,
+8 opt-in skipped; 16 frontend tests passed**. Ruff, formatting, contract drift and
+production build passed. CI now runs these additional Python suites and frontend tests.

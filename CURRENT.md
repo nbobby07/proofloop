@@ -47,3 +47,9 @@ A fresh model-backed run again rejected its first patch and verified its second 
 ClickHouse service ownership is unverified: the prior claim was imported from B's
 handoff, not independently observed. No ClickHouse service was created in this chat.
 Human review was requested from boaaaat on PR #4. Submission remains out of scope.
+
+
+Latest pinned dashboard follow-up: `f9643d3c0b2bffb23784683a2272d13da61cd262`.
+It includes the redesigned workspace plus adapter/frontend tests, merged without
+modifying Developer B's branch. Final combined validation: 346 Python tests passed,
+8 skipped; 16 frontend tests passed. CI now includes all those suites.

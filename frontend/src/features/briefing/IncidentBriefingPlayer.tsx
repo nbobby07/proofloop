@@ -30,7 +30,7 @@ export function IncidentBriefingPlayer({ audio }: { audio?: BriefingAudio }) {
   return (
     <section className="panel sponsor-card">
       <p className="eyebrow">ElevenLabs · incident briefing</p>
-      <h2>Hear the evidence.</h2>
+      <h2>Incident briefing</h2>
       {audio ? (
         <>
           <audio

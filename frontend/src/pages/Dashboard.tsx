@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import fixtureJson from "../../../contracts/example-run.json";
 import { AppShell } from "../components/AppShell";
 import type { Page } from "../components/AppShell";
@@ -9,7 +9,6 @@ import { RunControls } from "../features/execution/RunControls";
 import { SecurityArena } from "../features/execution/SecurityArena";
 import { EventStream } from "../features/execution/EventStream";
 import { EvidenceReport } from "../features/evidence/EvidenceReport";
-import { AnalyticsDashboard } from "../features/analytics/AnalyticsDashboard";
 import { BriefingPanel } from "../features/briefing/BriefingPanel";
 import { IncidentBriefingPlayer } from "../features/briefing/IncidentBriefingPlayer";
 import { GuildAuditPanel } from "../features/audit/GuildAuditPanel";
@@ -19,6 +18,11 @@ import { IntegrationStatus } from "../features/integrations/IntegrationStatus";
 import { readSelection, saveSelection } from "../features/execution/session";
 
 const fixtureRun = runPayload(fixtureJson);
+const AnalyticsDashboard = lazy(() =>
+  import("../features/analytics/AnalyticsDashboard").then((module) => ({
+    default: module.AnalyticsDashboard,
+  })),
+);
 
 export function Dashboard() {
   const [fixture, updateFixture] = useState(() => readSelection("source") !== "execution");
@@ -77,13 +81,15 @@ export function Dashboard() {
         </>
       )}
       {page === "analytics" && (
-        <AnalyticsDashboard key={String(fixture)} fixture={fixture} />
+        <Suspense fallback={<p className="empty-copy">Loading analytics…</p>}>
+          <AnalyticsDashboard key={String(fixture)} fixture={fixture} />
+        </Suspense>
       )}
       {page === "history" && (
         <SecurityHistory history={live.history} open={openHistoryRun} />
       )}
       {page === "integrations" && <IntegrationStatus health={health} />}
-      {(page === "arena" || page === "integrations") && (
+      {page === "integrations" && (
         <div className="sponsor-grid">
           <GuildAuditPanel />
           {!fixture && live.report ? (

@@ -12,6 +12,7 @@ from backend.providers.patch_validation import validate_patch
 SOURCE = SourceSnapshot(snapshot_id="approved-1", files={"app.py": "query = 'unsafe'\n"})
 FINDING = Finding(id="sql-injection", title="SQL injection", severity="high")
 DIFF = "--- a/app.py\n+++ b/app.py\n@@ -1 +1 @@\n-query = 'unsafe'\n+query = 'bound'\n"
+REPLACEMENT = {"path": "app.py", "content": "query = 'bound'\n"}
 
 
 def completed(proposal=None):
@@ -25,7 +26,9 @@ def completed(proposal=None):
                     {
                         "type": "output_text",
                         "text": json.dumps(
-                            proposal if proposal is not None else {"attempt": 1, "diff": DIFF}
+                            proposal
+                            if proposal is not None
+                            else {"attempt": 1, "replacements": [REPLACEMENT]}
                         ),
                     }
                 ],
@@ -61,6 +64,10 @@ def test_valid_proposal_uses_strict_responses_and_preserves_snapshot():
     assert payload["reasoning"] == {"effort": "none"}
     assert payload["text"]["format"]["strict"] is True
     assert payload["text"]["format"]["schema"]["additionalProperties"] is False
+    assert payload["text"]["format"]["schema"]["required"] == ["attempt", "replacements"]
+    replacement_schema = payload["text"]["format"]["schema"]["$defs"]["FileReplacement"]
+    assert replacement_schema["additionalProperties"] is False
+    assert replacement_schema["properties"]["path"]["enum"] == ["app.py"]
     assert json.loads(payload["input"])["feedback"] == ["Previous security check failed"]
     assert headers["Authorization"] == "Bearer test-secret" and timeout == 30
     assert SOURCE.files["app.py"] == "query = 'unsafe'\n"
@@ -109,11 +116,16 @@ def test_deadline_configuration_sends_none_and_does_not_retry():
 @pytest.mark.parametrize(
     "proposal",
     [
-        {"attempt": 1, "diff": DIFF, "verdict": "verified"},
-        {"attempt": "1", "diff": DIFF},
-        {"attempt": 2, "diff": DIFF},
-        {"attempt": 1, "diff": ""},
-        {"diff": DIFF},
+        {"attempt": 1, "replacements": [REPLACEMENT], "verdict": "verified"},
+        {"attempt": "1", "replacements": [REPLACEMENT]},
+        {"attempt": 2, "replacements": [REPLACEMENT]},
+        {"attempt": 1, "replacements": []},
+        {"replacements": [REPLACEMENT]},
+        {"attempt": 1, "diff": DIFF},
+        {"attempt": 1, "replacements": [{"path": "app.py"}]},
+        {"attempt": 1, "replacements": [{"content": "x"}]},
+        {"attempt": 1, "replacements": [{**REPLACEMENT, "diff": DIFF}]},
+        {"attempt": 1, "replacements": [REPLACEMENT] * 21},
     ],
 )
 def test_invalid_structured_proposals(proposal):
@@ -231,3 +243,66 @@ def test_malformed_output_items_fail_safely(output):
     client, _ = defender({"status": "completed", "output": output})
     with pytest.raises(ProviderError, match="invalid_response"):
         client.generate_patch(SOURCE, FINDING, [])
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "other.py",
+        "new.py",
+        "tests/trusted.py",
+        "policies/security.py",
+        "backend/engine/verifier.py",
+        "../app.py",
+        "/app.py",
+        ".env",
+    ],
+)
+def test_unapproved_replacement_is_rejected(path):
+    client, _ = defender(
+        completed({"attempt": 1, "replacements": [{"path": path, "content": "query = 'bound'\n"}]})
+    )
+    with pytest.raises(ProviderError, match="unsafe_replacement"):
+        client.generate_patch(SOURCE, FINDING, [])
+    assert SOURCE.files == {"app.py": "query = 'unsafe'\n"}
+
+
+def test_duplicate_replacement_is_rejected():
+    client, _ = defender(completed({"attempt": 1, "replacements": [REPLACEMENT, REPLACEMENT]}))
+    with pytest.raises(ProviderError, match="duplicate_replacement"):
+        client.generate_patch(SOURCE, FINDING, [])
+
+
+def test_unchanged_replacements_cannot_produce_fake_patch():
+    client, _ = defender(
+        completed(
+            {"attempt": 1, "replacements": [{"path": "app.py", "content": SOURCE.files["app.py"]}]}
+        )
+    )
+    with pytest.raises(ProviderError, match="empty_patch"):
+        client.generate_patch(SOURCE, FINDING, [])
+
+
+@pytest.mark.parametrize("text", ["x" * 200_001, "é" * 100_001, "\ud800"])
+def test_replacement_text_bounds(text):
+    client, _ = defender(
+        completed({"attempt": 1, "replacements": [{"path": "app.py", "content": text}]})
+    )
+    with pytest.raises(ProviderError):
+        client.generate_patch(SOURCE, FINDING, [])
+
+
+def test_total_replacement_size_is_bounded():
+    response = completed(
+        {
+            "attempt": 1,
+            "replacements": [
+                {"path": path, "content": "x" * 100_001} for path in ["app.py", "other.py"]
+            ],
+        }
+    )
+    client, _ = defender(response)
+    client.allowed_files = frozenset({"app.py", "other.py"})
+    source = SourceSnapshot(snapshot_id="two", files={"app.py": "x = 1\n", "other.py": "x = 1\n"})
+    with pytest.raises(ProviderError, match="replacement_too_large"):
+        client.generate_patch(source, FINDING, [])

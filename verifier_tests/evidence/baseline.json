@@ -1,0 +1,1117 @@
+{
+  "baseline_reproduced": true,
+  "collected": [
+    "verifier_tests/test_ledgerlite.py::test_owner_access[inv-1001]",
+    "verifier_tests/test_ledgerlite.py::test_owner_access[inv-2047]",
+    "verifier_tests/test_ledgerlite.py::test_owner_access[inv-7319]",
+    "verifier_tests/test_ledgerlite.py::test_owner_access[inv-8523]",
+    "verifier_tests/test_ledgerlite.py::test_owner_access[inv-9013]",
+    "verifier_tests/test_ledgerlite.py::test_owner_access[inv-9907]",
+    "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-1001]",
+    "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-2047]",
+    "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-7319]",
+    "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-8523]",
+    "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-9013]",
+    "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-9907]",
+    "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-1001]",
+    "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-2047]",
+    "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-7319]",
+    "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-8523]",
+    "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-9013]",
+    "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-9907]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-missing-alice]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-missing-bob]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-missing-administrator]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-0000-alice]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-0000-bob]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-0000-administrator]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-1002-alice]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-1002-bob]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-1002-administrator]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-None]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-mallory]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-Administrator]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-alice ]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-None]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-mallory]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-Administrator]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-alice ]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-None]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-mallory]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-Administrator]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-alice ]",
+    "verifier_tests/test_ledgerlite.py::test_health",
+    "verifier_tests/test_ledgerlite.py::test_access_sequence_preserves_functionality"
+  ],
+  "complete": true,
+  "counts": {
+    "failed": 7,
+    "passed": 37,
+    "required": 44
+  },
+  "data_label": "SYNTHETIC FIXTURE",
+  "expectation_met": true,
+  "inputs_unchanged": true,
+  "isolation": "local subprocess and in-process TestClient; not a sandbox",
+  "probe": {
+    "request": {
+      "method": "GET",
+      "path": "/invoices/inv-2047",
+      "synthetic_identity": "alice"
+    },
+    "response": {
+      "body": {
+        "amount_cents": 48750,
+        "currency": "USD",
+        "id": "inv-2047",
+        "owner_id": "bob",
+        "source": "fixture",
+        "status": "paid"
+      },
+      "status_code": 200
+    },
+    "unauthorized_access_reproduced": true
+  },
+  "probe_exit_code": 0,
+  "pytest_exit_code": 1,
+  "pytest_stderr": "",
+  "pytest_stdout": "......FFFFFF...............................F                             [100%]\n=================================== FAILURES ===================================\n_____________________ test_cross_account_denied[inv-1001] ______________________\n\nclient = <starlette.testclient.TestClient object at 0x107547b60>\nrecord = ('inv-1001', 'alice', 12500, 'open')\n\n    @pytest.mark.parametrize(\"record\", RECORDS, ids=RECORD_IDS)\n    def test_cross_account_denied(client, record):\n        identity = \"bob\" if record[1] == \"alice\" else \"alice\"\n        response = client.get(f\"/invoices/{record[0]}\", headers=headers(identity))\n>       assert response.status_code == 403, (\n            f\"BOLA: {identity} accessing {record[0]} owned by {record[1]}: \"\n            f\"expected 403, observed {response.status_code}; body={response.json()}\"\n        )\nE       AssertionError: BOLA: bob accessing inv-1001 owned by alice: expected 403, observed 200; body={'id': 'inv-1001', 'owner_id': 'alice', 'amount_cents': 12500, 'currency': 'USD', 'status': 'open', 'source': 'fixture'}\nE       assert 200 == 403\nE        +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:47: AssertionError\n_____________________ test_cross_account_denied[inv-2047] ______________________\n\nclient = <starlette.testclient.TestClient object at 0x107547b60>\nrecord = ('inv-2047', 'bob', 48750, 'paid')\n\n    @pytest.mark.parametrize(\"record\", RECORDS, ids=RECORD_IDS)\n    def test_cross_account_denied(client, record):\n        identity = \"bob\" if record[1] == \"alice\" else \"alice\"\n        response = client.get(f\"/invoices/{record[0]}\", headers=headers(identity))\n>       assert response.status_code == 403, (\n            f\"BOLA: {identity} accessing {record[0]} owned by {record[1]}: \"\n            f\"expected 403, observed {response.status_code}; body={response.json()}\"\n        )\nE       AssertionError: BOLA: alice accessing inv-2047 owned by bob: expected 403, observed 200; body={'id': 'inv-2047', 'owner_id': 'bob', 'amount_cents': 48750, 'currency': 'USD', 'status': 'paid', 'source': 'fixture'}\nE       assert 200 == 403\nE        +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:47: AssertionError\n_____________________ test_cross_account_denied[inv-7319] ______________________\n\nclient = <starlette.testclient.TestClient object at 0x107547b60>\nrecord = ('inv-7319', 'alice', 9900, 'paid')\n\n    @pytest.mark.parametrize(\"record\", RECORDS, ids=RECORD_IDS)\n    def test_cross_account_denied(client, record):\n        identity = \"bob\" if record[1] == \"alice\" else \"alice\"\n        response = client.get(f\"/invoices/{record[0]}\", headers=headers(identity))\n>       assert response.status_code == 403, (\n            f\"BOLA: {identity} accessing {record[0]} owned by {record[1]}: \"\n            f\"expected 403, observed {response.status_code}; body={response.json()}\"\n        )\nE       AssertionError: BOLA: bob accessing inv-7319 owned by alice: expected 403, observed 200; body={'id': 'inv-7319', 'owner_id': 'alice', 'amount_cents': 9900, 'currency': 'USD', 'status': 'paid', 'source': 'fixture'}\nE       assert 200 == 403\nE        +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:47: AssertionError\n_____________________ test_cross_account_denied[inv-8523] ______________________\n\nclient = <starlette.testclient.TestClient object at 0x107547b60>\nrecord = ('inv-8523', 'bob', 30100, 'open')\n\n    @pytest.mark.parametrize(\"record\", RECORDS, ids=RECORD_IDS)\n    def test_cross_account_denied(client, record):\n        identity = \"bob\" if record[1] == \"alice\" else \"alice\"\n        response = client.get(f\"/invoices/{record[0]}\", headers=headers(identity))\n>       assert response.status_code == 403, (\n            f\"BOLA: {identity} accessing {record[0]} owned by {record[1]}: \"\n            f\"expected 403, observed {response.status_code}; body={response.json()}\"\n        )\nE       AssertionError: BOLA: alice accessing inv-8523 owned by bob: expected 403, observed 200; body={'id': 'inv-8523', 'owner_id': 'bob', 'amount_cents': 30100, 'currency': 'USD', 'status': 'open', 'source': 'fixture'}\nE       assert 200 == 403\nE        +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:47: AssertionError\n_____________________ test_cross_account_denied[inv-9013] ______________________\n\nclient = <starlette.testclient.TestClient object at 0x107547b60>\nrecord = ('inv-9013', 'alice', 100, 'open')\n\n    @pytest.mark.parametrize(\"record\", RECORDS, ids=RECORD_IDS)\n    def test_cross_account_denied(client, record):\n        identity = \"bob\" if record[1] == \"alice\" else \"alice\"\n        response = client.get(f\"/invoices/{record[0]}\", headers=headers(identity))\n>       assert response.status_code == 403, (\n            f\"BOLA: {identity} accessing {record[0]} owned by {record[1]}: \"\n            f\"expected 403, observed {response.status_code}; body={response.json()}\"\n        )\nE       AssertionError: BOLA: bob accessing inv-9013 owned by alice: expected 403, observed 200; body={'id': 'inv-9013', 'owner_id': 'alice', 'amount_cents': 100, 'currency': 'USD', 'status': 'open', 'source': 'fixture'}\nE       assert 200 == 403\nE        +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:47: AssertionError\n_____________________ test_cross_account_denied[inv-9907] ______________________\n\nclient = <starlette.testclient.TestClient object at 0x107547b60>\nrecord = ('inv-9907', 'bob', 725, 'paid')\n\n    @pytest.mark.parametrize(\"record\", RECORDS, ids=RECORD_IDS)\n    def test_cross_account_denied(client, record):\n        identity = \"bob\" if record[1] == \"alice\" else \"alice\"\n        response = client.get(f\"/invoices/{record[0]}\", headers=headers(identity))\n>       assert response.status_code == 403, (\n            f\"BOLA: {identity} accessing {record[0]} owned by {record[1]}: \"\n            f\"expected 403, observed {response.status_code}; body={response.json()}\"\n        )\nE       AssertionError: BOLA: alice accessing inv-9907 owned by bob: expected 403, observed 200; body={'id': 'inv-9907', 'owner_id': 'bob', 'amount_cents': 725, 'currency': 'USD', 'status': 'paid', 'source': 'fixture'}\nE       assert 200 == 403\nE        +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:47: AssertionError\n_________________ test_access_sequence_preserves_functionality _________________\n\nclient = <starlette.testclient.TestClient object at 0x107547b60>\n\n    def test_access_sequence_preserves_functionality(client):\n        # A denial must not poison later authorized requests or alter invoice content.\n        for identity, invoice_id, status in (\n            (\"alice\", \"inv-2047\", 403),\n            (\"bob\", \"inv-2047\", 200),\n            (\"administrator\", \"inv-2047\", 200),\n            (\"alice\", \"inv-1001\", 200),\n            (\"bob\", \"inv-1001\", 403),\n            (\"alice\", \"inv-1001\", 200),\n        ):\n            response = client.get(f\"/invoices/{invoice_id}\", headers=headers(identity))\n>           assert response.status_code == status\nE           assert 200 == 403\nE            +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:96: AssertionError\n=========================== short test summary info ============================\nFAILED verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-1001]\nFAILED verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-2047]\nFAILED verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-7319]\nFAILED verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-8523]\nFAILED verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-9013]\nFAILED verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-9907]\nFAILED verifier_tests/test_ledgerlite.py::test_access_sequence_preserves_functionality\n7 failed, 37 passed in 0.14s\n",
+  "results": [
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.05080666599678807,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0016561250085942447,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.00010291699436493218,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_owner_access[inv-1001]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00016387499636039138,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008789579733274877,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.691698894836009e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_owner_access[inv-2047]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013954099267721176,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008960840059444308,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 7.67079764045775e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_owner_access[inv-7319]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00012883299496024847,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0009050410008057952,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.366699330508709e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_owner_access[inv-8523]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00014279098832048476,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0007665409939363599,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.858402048237622e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_owner_access[inv-9013]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001188750029541552,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.000726041995221749,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.04169976618141e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_owner_access[inv-9907]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013712499639950693,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008929170144256204,
+          "failure": "client = <starlette.testclient.TestClient object at 0x107547b60>\nrecord = ('inv-1001', 'alice', 12500, 'open')\n\n    @pytest.mark.parametrize(\"record\", RECORDS, ids=RECORD_IDS)\n    def test_cross_account_denied(client, record):\n        identity = \"bob\" if record[1] == \"alice\" else \"alice\"\n        response = client.get(f\"/invoices/{record[0]}\", headers=headers(identity))\n>       assert response.status_code == 403, (\n            f\"BOLA: {identity} accessing {record[0]} owned by {record[1]}: \"\n            f\"expected 403, observed {response.status_code}; body={response.json()}\"\n        )\nE       AssertionError: BOLA: bob accessing inv-1001 owned by alice: expected 403, observed 200; body={'id': 'inv-1001', 'owner_id': 'alice', 'amount_cents': 12500, 'currency': 'USD', 'status': 'open', 'source': 'fixture'}\nE       assert 200 == 403\nE        +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:47: AssertionError",
+          "outcome": "failed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.00013558301725424826,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-1001]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00016850000247359276,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0009525000059511513,
+          "failure": "client = <starlette.testclient.TestClient object at 0x107547b60>\nrecord = ('inv-2047', 'bob', 48750, 'paid')\n\n    @pytest.mark.parametrize(\"record\", RECORDS, ids=RECORD_IDS)\n    def test_cross_account_denied(client, record):\n        identity = \"bob\" if record[1] == \"alice\" else \"alice\"\n        response = client.get(f\"/invoices/{record[0]}\", headers=headers(identity))\n>       assert response.status_code == 403, (\n            f\"BOLA: {identity} accessing {record[0]} owned by {record[1]}: \"\n            f\"expected 403, observed {response.status_code}; body={response.json()}\"\n        )\nE       AssertionError: BOLA: alice accessing inv-2047 owned by bob: expected 403, observed 200; body={'id': 'inv-2047', 'owner_id': 'bob', 'amount_cents': 48750, 'currency': 'USD', 'status': 'paid', 'source': 'fixture'}\nE       assert 200 == 403\nE        +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:47: AssertionError",
+          "outcome": "failed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.30409990157932e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-2047]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013729199417866766,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008807080157566816,
+          "failure": "client = <starlette.testclient.TestClient object at 0x107547b60>\nrecord = ('inv-7319', 'alice', 9900, 'paid')\n\n    @pytest.mark.parametrize(\"record\", RECORDS, ids=RECORD_IDS)\n    def test_cross_account_denied(client, record):\n        identity = \"bob\" if record[1] == \"alice\" else \"alice\"\n        response = client.get(f\"/invoices/{record[0]}\", headers=headers(identity))\n>       assert response.status_code == 403, (\n            f\"BOLA: {identity} accessing {record[0]} owned by {record[1]}: \"\n            f\"expected 403, observed {response.status_code}; body={response.json()}\"\n        )\nE       AssertionError: BOLA: bob accessing inv-7319 owned by alice: expected 403, observed 200; body={'id': 'inv-7319', 'owner_id': 'alice', 'amount_cents': 9900, 'currency': 'USD', 'status': 'paid', 'source': 'fixture'}\nE       assert 200 == 403\nE        +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:47: AssertionError",
+          "outcome": "failed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.670901297591627e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-7319]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013683398719877005,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008682090265210718,
+          "failure": "client = <starlette.testclient.TestClient object at 0x107547b60>\nrecord = ('inv-8523', 'bob', 30100, 'open')\n\n    @pytest.mark.parametrize(\"record\", RECORDS, ids=RECORD_IDS)\n    def test_cross_account_denied(client, record):\n        identity = \"bob\" if record[1] == \"alice\" else \"alice\"\n        response = client.get(f\"/invoices/{record[0]}\", headers=headers(identity))\n>       assert response.status_code == 403, (\n            f\"BOLA: {identity} accessing {record[0]} owned by {record[1]}: \"\n            f\"expected 403, observed {response.status_code}; body={response.json()}\"\n        )\nE       AssertionError: BOLA: alice accessing inv-8523 owned by bob: expected 403, observed 200; body={'id': 'inv-8523', 'owner_id': 'bob', 'amount_cents': 30100, 'currency': 'USD', 'status': 'open', 'source': 'fixture'}\nE       assert 200 == 403\nE        +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:47: AssertionError",
+          "outcome": "failed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 7.629202445968986e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-8523]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00012708298163488507,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0007745419861748815,
+          "failure": "client = <starlette.testclient.TestClient object at 0x107547b60>\nrecord = ('inv-9013', 'alice', 100, 'open')\n\n    @pytest.mark.parametrize(\"record\", RECORDS, ids=RECORD_IDS)\n    def test_cross_account_denied(client, record):\n        identity = \"bob\" if record[1] == \"alice\" else \"alice\"\n        response = client.get(f\"/invoices/{record[0]}\", headers=headers(identity))\n>       assert response.status_code == 403, (\n            f\"BOLA: {identity} accessing {record[0]} owned by {record[1]}: \"\n            f\"expected 403, observed {response.status_code}; body={response.json()}\"\n        )\nE       AssertionError: BOLA: bob accessing inv-9013 owned by alice: expected 403, observed 200; body={'id': 'inv-9013', 'owner_id': 'alice', 'amount_cents': 100, 'currency': 'USD', 'status': 'open', 'source': 'fixture'}\nE       assert 200 == 403\nE        +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:47: AssertionError",
+          "outcome": "failed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.770799518562853e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-9013]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001161250111181289,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0007214999932330102,
+          "failure": "client = <starlette.testclient.TestClient object at 0x107547b60>\nrecord = ('inv-9907', 'bob', 725, 'paid')\n\n    @pytest.mark.parametrize(\"record\", RECORDS, ids=RECORD_IDS)\n    def test_cross_account_denied(client, record):\n        identity = \"bob\" if record[1] == \"alice\" else \"alice\"\n        response = client.get(f\"/invoices/{record[0]}\", headers=headers(identity))\n>       assert response.status_code == 403, (\n            f\"BOLA: {identity} accessing {record[0]} owned by {record[1]}: \"\n            f\"expected 403, observed {response.status_code}; body={response.json()}\"\n        )\nE       AssertionError: BOLA: alice accessing inv-9907 owned by bob: expected 403, observed 200; body={'id': 'inv-9907', 'owner_id': 'bob', 'amount_cents': 725, 'currency': 'USD', 'status': 'paid', 'source': 'fixture'}\nE       assert 200 == 403\nE        +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:47: AssertionError",
+          "outcome": "failed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 7.949999417178333e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-9907]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013316600234247744,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0006944580236449838,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.387499161064625e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-1001]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00011275001452304423,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0006407079927157611,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 5.949998740106821e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-2047]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00010462501086294651,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005800409999210387,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 5.7792000006884336e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-7319]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00010479200864210725,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0006287499854806811,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.916598067618906e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-8523]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00012025001342408359,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0006032499950379133,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.0125021263957024e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-9013]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00010741699952632189,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.000599041988607496,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 5.875001079402864e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-9907]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013712499639950693,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0006061659951228648,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.291602039709687e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-missing-alice]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013916598982177675,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.000604125001700595,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.279200897552073e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-missing-bob]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00014162500156089664,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005934999790042639,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.212500738911331e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-missing-administrator]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013825000496581197,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.000578042003326118,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.18330086581409e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-0000-alice]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013445899821817875,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005797079938929528,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.104199565015733e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-0000-bob]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013695898815058172,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0009049999935086817,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.383299478329718e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-0000-administrator]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001364579948130995,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005886669969186187,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 5.974998930469155e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-1002-alice]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001315839763265103,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005803329986520112,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.191697320900857e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-1002-bob]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013670799671672285,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0006032500241417438,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.150000263005495e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-1002-administrator]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013383300392888486,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005929580074734986,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.0999998822808266e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-None]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013129200669936836,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005789999850094318,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.125000072643161e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001373340201098472,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005804589891340584,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.220801151357591e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-mallory]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001340000017080456,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005897500086575747,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.370898336172104e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-Administrator]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013562498497776687,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005725410010199994,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.208298145793378e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-alice ]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013291701907292008,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0006350000039674342,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.241700612008572e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-None]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013387500075623393,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0006282080139499158,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.262498209252954e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013054200098849833,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.000570832984521985,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.558300810866058e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-mallory]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013558397768065333,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0009872080117929727,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.195800960995257e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-Administrator]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001305829791817814,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005833750183228403,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 5.966698518022895e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-alice ]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001298749994020909,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005621669988613576,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.024999311193824e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-None]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001325419871136546,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.000570082978811115,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.1166996601969e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013079101336188614,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005590830114670098,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.19589991401881e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-mallory]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00013087497791275382,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005782920052297413,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.479199510067701e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-Administrator]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001352909894194454,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0005702500056941062,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 6.237500929273665e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-alice ]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 6.554101128131151e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0006799999973736703,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 5.495801451615989e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_health"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 6.637501064687967e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.00065441700280644,
+          "failure": "client = <starlette.testclient.TestClient object at 0x107547b60>\n\n    def test_access_sequence_preserves_functionality(client):\n        # A denial must not poison later authorized requests or alter invoice content.\n        for identity, invoice_id, status in (\n            (\"alice\", \"inv-2047\", 403),\n            (\"bob\", \"inv-2047\", 200),\n            (\"administrator\", \"inv-2047\", 200),\n            (\"alice\", \"inv-1001\", 200),\n            (\"bob\", \"inv-1001\", 403),\n            (\"alice\", \"inv-1001\", 200),\n        ):\n            response = client.get(f\"/invoices/{invoice_id}\", headers=headers(identity))\n>           assert response.status_code == status\nE           assert 200 == 403\nE            +  where 200 = <Response [200 OK]>.status_code\n\nverifier_tests/test_ledgerlite.py:96: AssertionError",
+          "outcome": "failed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.0007312500092666596,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_access_sequence_preserves_functionality"
+    }
+  ],
+  "runtime": {
+    "packages": {
+      "fastapi": "0.143.0",
+      "httpx2": "2.13.1",
+      "pydantic": "2.14.0",
+      "pytest": "9.1.1",
+      "starlette": "1.7.0"
+    },
+    "python": "3.13.0 (v3.13.0:60403a5409f, Oct  7 2024, 00:37:40) [Clang 15.0.0 (clang-1500.3.9.4)]"
+  },
+  "schema_version": 1,
+  "scope": "frozen LedgerLite suite only; no platform security verdict",
+  "source": "execution",
+  "suite_manifest_sha256": "a962a7322491c872a921e9f43c82b2a5ef67c02fa65afc47ab805ff91c487c2f",
+  "suite_passed": false,
+  "target": "LedgerLite",
+  "target_file_sha256": {
+    "demo_target/ledgerlite/app.py": "81128c0e287eff79de240b4c54f415ba92d4bb255c0af0d89899365f21c8c4ca",
+    "demo_target/ledgerlite/data.py": "6a7ab82c5adb2bb2e2d88aaa4a22a08a4ae6003dd7fae4d8adb85e9807ad7a31"
+  },
+  "variant": "baseline"
+}

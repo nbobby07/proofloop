@@ -160,3 +160,65 @@ def test_partially_ignored_sources_cannot_appear_complete(workspace):
     report = client.scan_with_details(workspace)
     assert not report.result.complete
     assert "required_sources_not_scanned" in report.diagnostics
+
+
+LEDGERLITE_PATH = "demo_target/ledgerlite/app.py"
+LEDGERLITE_RULE = "proofloop.ledgerlite.invoice-missing-ownership"
+
+
+def test_ledgerlite_result_location_matches_patch_allowlist(tmp_path):
+    root = tmp_path.resolve()
+    app = root / LEDGERLITE_PATH
+    app.parent.mkdir(parents=True)
+    app.write_text("# Synthetic scanner normalization fixture\n")
+    raw = raw_scan()
+    raw["results"][0].update(
+        {
+            "check_id": LEDGERLITE_RULE,
+            "path": LEDGERLITE_PATH,
+            "start": {"line": 28},
+            "end": {"line": 28},
+        }
+    )
+    raw["paths"]["scanned"] = [LEDGERLITE_PATH]
+    client, _ = scanner(root, raw)
+    report = client.scan_with_details(root)
+    assert report.result.complete
+    assert report.locations[0].path == LEDGERLITE_PATH
+    assert report.locations[0].rule_id == LEDGERLITE_RULE
+
+
+@pytest.mark.skipif(not os.getenv("PROOFLOOP_RUN_LOCAL_SEMGREP"), reason="Opt-in local CLI check")
+def test_real_ledgerlite_missing_ownership_rule(tmp_path):
+    from pathlib import Path
+
+    root = tmp_path.resolve()
+    fixtures = Path(__file__).parent / "fixtures" / "ledgerlite"
+    vulnerable = (fixtures / "vulnerable.txt").read_text()
+    secure = (fixtures / "secure.txt").read_text()
+    # Both canonical fixture sources are scanned at the same allowlisted app.py path.
+    cases = {
+        "vulnerable": vulnerable,
+        "secure": secure,
+        "extra_statement": vulnerable.replace(
+            '        return {"id":', '        pass\n        return {"id":'
+        ),
+        "wrong_owner_field": secure.replace('record["owner_id"]', 'record["invoice_id"]'),
+        "non_denial_guard": secure.replace("status_code=403", "status_code=200"),
+        "out_of_scope": vulnerable,
+    }
+    for name, source in cases.items():
+        path = root / name / ("other/app.py" if name == "out_of_scope" else LEDGERLITE_PATH)
+        path.parent.mkdir(parents=True)
+        path.write_text(source)
+    client = SemgrepScanner(
+        approved_roots=[root], executable=os.getenv("SEMGREP_EXECUTABLE", "semgrep")
+    )
+    report = client.scan_with_details(root)
+    assert report.result.complete, report.diagnostics
+    locations = [loc for loc in report.locations if loc.rule_id == LEDGERLITE_RULE]
+    assert {loc.path for loc in locations} == {
+        f"{name}/{LEDGERLITE_PATH}"
+        for name in ["vulnerable", "extra_statement", "wrong_owner_field", "non_denial_guard"]
+    }
+    assert all(loc.path.endswith(LEDGERLITE_PATH) and loc.line > 1 for loc in locations)

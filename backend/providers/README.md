@@ -41,7 +41,8 @@ from backend.providers.senso_client import SensoPolicyStore, ApprovedPolicyDocum
   `ProviderError`. Do not turn either into a clean scan. Preserve known findings on partial
   scans. Freeze source outside this adapter; it is not a source immutability manager.
   Metrics/version checks are disabled; no Guardian, registry fetch, account or autofix is used.
-  The bundled rule set covers direct SQL string construction and dynamic Python evaluation;
+  The bundled rule set covers direct SQL string construction, dynamic Python evaluation, and
+  the specific LedgerLite invoice handler without its canonical owner/admin denial guard;
   it is deliberately limited and is not proof of complete security coverage.
 - `AkashAttacker(approved_targets={"LedgerLite": [ChallengeTemplate(...)]},
   max_challenges=2)` reads `AKASH_API_KEY` and `AKASH_MODEL`. Select an account-available
@@ -148,3 +149,23 @@ Ruff check/format: passed. Generated API contract drift check: current.
 
 The CLI cases used disposable generated adapter-test source, not an application security
 verdict. None of these results is an OpenAI/AkashML/Senso credentialed execution claim.
+
+LedgerLite discovery follow-up:
+
+The added `proofloop.ledgerlite.invoice-missing-ownership` rule is restricted to
+`**/demo_target/ledgerlite/app.py`, the exact trusted patch-allowlist file suffix.
+It finds the synthetic invoice route returning its selected record without the canonical
+owner-or-administrator HTTP 403 denial guard before that return. This is a narrow syntactic
+rule: alternate authorization implementations may still require review, and matching guard
+syntax is never proof that its runtime authorization is correct.
+
+Real Semgrep 1.180.0 scanned copied original and secure-reference text at the same approved
+`demo_target/ledgerlite/app.py` path. The vulnerable original returned one real finding at
+line 28 (`sg_540ef20e6788d914722c79c57bfe7168`, rule ID above); the reference completed with
+no findings. Using the same path ensures the reference is not hidden by the path filter.
+Regression cases also cover a no-op before return, the wrong ownership field, a non-403
+guard, and an out-of-scope file. These are scanner tests on synthetic fixture source, not
+executable authorization-verification evidence.
+
+Current bundled ruleset hash: `2fc65390bf13034cb1b78f96dd19c604e5454ae4bbf505e6b5e74d11dd1115a3`.
+The earlier hash in the initial validation record identifies the pre-LedgerLite rule set.

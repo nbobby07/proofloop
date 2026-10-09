@@ -1,53 +1,47 @@
 # ProofLoop current state
 
-Updated: October 9, 2026. Submission deadline: **4:30 PM America/Los_Angeles**.
+Updated: October 9, 2026. Deadline: 4:30 PM America/Los_Angeles.
 
 ## Objective
 
-Establish a reproducible shared foundation for a two-person team. Next, demonstrate authorized vulnerability reproduction, isolated remediation, and independent adversarial verification. A passing suite is scoped evidence, never universal security.
+Complete an authorized end-to-end LedgerLite remediation demonstration, preserving real evidence
+and frozen API v1. Passing covers the executed suite only.
 
-## Architecture
+## Integration branch
 
-React/TypeScript/Vite/Tailwind dashboard → FastAPI/Pydantic API → PLANNED bounded orchestration → immutable target plus disposable Docker copies → trusted verification suites → evidence/events. External integrations are PLANNED. `source: fixture` is mandatory for preview data.
+`feat/security-engine` in `proofloop-integration` contains reviewed completed LedgerLite, verifier,
+orchestrator and provider branches. Workers retain their own branches. Ownership checks passed;
+no Developer B production files were changed. See docs/INTEGRATION.md for commits and gate results.
 
-## Ownership
+## Verified milestones
 
-- A (`feat/security-engine`): engine, providers, API, storage, backend tests, demo target, verifier tests, sandbox.
-- B (`feat/product-dashboard`): frontend, ClickHouse telemetry, narration, Guild integration.
-- Shared files: coordinate before editing contracts, docs, scripts, root configuration, and `.github/`.
+- All frozen execution API routes, bounded scheduling/retries/rechallenge, atomic local persistence.
+- Real Semgrep discovery of LedgerLite BOLA, complete source coverage and version/rule identities.
+- Frozen v2 suite: 44 checks, baseline 37 pass/seven BOLA failures, secure reference 44 pass.
+- Real hardened Docker acceptance/rejection, restrictions, timeout and cleanup checks passed.
+- Actual v2 fixture/reference executed in separate Docker target/test containers and accepted
+  by the deterministic reducer. Reference validation is separate from model-generated acceptance.
+- Backend tests, Ruff, API drift, frontend contracts/lint/build pass at integration gates.
+- Key-free CI now collects all integrated provider and sandbox unit suites.
 
-## Completed milestones
+## Active acceptance
 
-- Framework scaffold, live health route, local CORS, dashboard with explicit fixture labels.
-- Typed provider contracts without external calls; planned routes return 501.
-- Canonical Pydantic models, generated schemas/OpenAPI/TypeScript, representative fixture.
-- Ownership rules, security boundaries, installation guidance, and key-free CI workflow.
-- Private GitHub repository created; both feature branches pushed; main protection configured for CI checks and one review.
-- Validation and GitHub publication details are recorded in `docs/SETUP-RESULTS.md` after setup checks.
+Real API flow reaches discovery and reproduced Docker baseline. Local Python CA configuration
+was corrected with trusted SSL_CERT_FILE, never by disabling TLS. GPT-6 Luna account access is
+confirmed. Model diff formatting failed strict admission; A3 is supplying a reviewed internal
+replacement-output adapter to derive exact diffs without weakening verification. No model patch
+has been accepted yet. Failures and raw execution evidence remain in ignored runs/ storage.
 
-## Active tasks
+## Developer B coordination
 
-- A: implement allowlisted LedgerLite target and trusted baseline/functional tests first; then isolate execution and add deterministic verdicts.
-- B: evolve the dashboard against frozen contracts; add loading/error/lifecycle displays and execution-source separation.
+Completed dashboard/optional adapter commits fcb6617 and 942607b inspected read-only. Frozen API
+v1 retained; no new sponsor routes or schema changes. Coordination record: GitHub issue 2.
+B-owned changes remain separate for their own review and integration.
 
-## Blockers
+## Limits and next steps
 
-- Runtime provider credentials/models, Docker runner availability, and sponsor product access need separate configuration before real integrations.
-- Team member names/emails, second developer GitHub handle, and demo-video URL have not been provided.
-- Repository collaboration access and hackathon judge access must be configured manually once identities are known.
-
-## Decisions
-
-- No full engine, paid API requests, scanning, or attack execution in setup.
-- Use a private GitHub repository initially; visibility changes require explicit authorization.
-- Keep framework dependencies small. Docker is required only when implementing the runner.
-- Pydantic is the wire-contract authority; generated artifacts are checked for drift.
-- Semgrep runtime scanning and Guardian development review are separate integrations.
-- Senso development memory is distinct from authoritative application policy; Git remains the code source of truth.
-
-## Next steps
-
-1. Each developer clones separately, selects their feature branch, and validates local startup.
-2. Coordinate the first target, policies, event semantics, and frozen test manifest.
-3. Ship a deterministic local verification loop before adding model calls or sponsor analytics.
-4. Record actual sponsor evidence and prepare submission before 4:30 PM Pacific.
+- Finish live model patch, independent verification, fresh challenge and rechallenge acceptance.
+- Optional AkashML/Senso credentialed calls, telemetry, Guild and narration are unverified/deferred.
+- Push security-engine and open main PR after acceptance and final checks.
+- Main requires backend/frontend CI and one approving review. Do not merge before both.
+- Credentials are backend-only, ignored and never copied into scanner or target/test containers.

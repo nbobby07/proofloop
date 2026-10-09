@@ -20,9 +20,15 @@ export function useRun(enabled: boolean) {
   const [error, setError] = useState<string | null>(null);
   const [reportError, setReportError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [busyAction, setBusyAction] = useState<"start" | "challenge" | null>(
+    null,
+  );
   const [polling, setPolling] = useState(false);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
-  const [selection, setSelection] = useState(() => ({ id: savedRunId(), revision: 0 }));
+  const [selection, setSelection] = useState(() => ({
+    id: savedRunId(),
+    revision: 0,
+  }));
   const [history, setHistory] = useState<RunResponse[]>([]);
   const mutation = useRef<AbortController | null>(null);
   const pendingChallenge = useRef<Set<string> | null>(null);
@@ -141,6 +147,7 @@ export function useRun(enabled: boolean) {
     setReportError(null);
     setUpdatedAt(null);
     setBusy(false);
+    setBusyAction(null);
     setSelection((previous) => ({
       id: id.trim(),
       revision: previous.revision + 1,
@@ -152,6 +159,7 @@ export function useRun(enabled: boolean) {
     mutation.current?.abort();
     mutation.current = controller;
     setBusy(true);
+    setBusyAction("start");
     setError(null);
     try {
       const result = await createRun(
@@ -166,7 +174,10 @@ export function useRun(enabled: boolean) {
     } catch (reason) {
       if (!controller.signal.aborted) setError(errorMessage(reason));
     } finally {
-      if (mutation.current === controller) setBusy(false);
+      if (mutation.current === controller) {
+        setBusy(false);
+        setBusyAction(null);
+      }
     }
   };
   const challenge = async () => {
@@ -175,6 +186,7 @@ export function useRun(enabled: boolean) {
     mutation.current?.abort();
     mutation.current = controller;
     setBusy(true);
+    setBusyAction("challenge");
     setError(null);
     try {
       const result = await challengeRun(
@@ -196,7 +208,10 @@ export function useRun(enabled: boolean) {
     } catch (reason) {
       if (!controller.signal.aborted) setError(errorMessage(reason));
     } finally {
-      if (mutation.current === controller) setBusy(false);
+      if (mutation.current === controller) {
+        setBusy(false);
+        setBusyAction(null);
+      }
     }
   };
   return {
@@ -206,6 +221,7 @@ export function useRun(enabled: boolean) {
     error,
     reportError,
     busy,
+    busyAction,
     polling,
     updatedAt,
     history,

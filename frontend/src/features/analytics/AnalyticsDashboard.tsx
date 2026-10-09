@@ -47,18 +47,26 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
       clearTimeout(timer);
     };
   }, [fixture, attempt]);
-  const patterns = [...(data?.failure_patterns ?? [])].sort(
-    (a, b) =>
-      b.failures / Math.max(1, b.executions) -
-      a.failures / Math.max(1, a.executions),
-  );
+  const patterns = [...(data?.failure_patterns ?? [])]
+    .map((pattern) => ({
+      ...pattern,
+      rate: pattern.executions
+        ? (pattern.failures / pattern.executions) * 100
+        : 0,
+    }))
+    .sort(
+      (a, b) =>
+        b.failures / Math.max(1, b.executions) -
+        a.failures / Math.max(1, a.executions),
+    );
   return (
     <>
       <div className="page-heading">
         <div>
           <h1>Security analytics</h1>
           <p className="support">
-            Persisted execution outcomes, including unsuccessful and incomplete verification rounds.
+            Persisted execution outcomes, including unsuccessful and incomplete
+            verification rounds.
           </p>
         </div>
         <button
@@ -120,6 +128,12 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
           </span>
         </div>
         {patterns.length > 0 && !fixture && (
+          <div className="chart-legend">
+            <span>Unsuccessful / incomplete rounds</span>
+            <span>Rate per challenge family · 0–100%</span>
+          </div>
+        )}
+        {patterns.length > 0 && !fixture && (
           <div
             className="analytics-chart"
             role="img"
@@ -129,12 +143,14 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
               <BarChart
                 data={patterns}
                 layout="vertical"
-                margin={{ top: 10, right: 20, bottom: 5, left: 0 }}
+                margin={{ top: 10, right: 25, bottom: 5, left: 0 }}
               >
                 <CartesianGrid horizontal={false} stroke="#303846" />
                 <XAxis
                   type="number"
-                  allowDecimals={false}
+                  domain={[0, 100]}
+                  ticks={[0, 25, 50, 75, 100]}
+                  tickFormatter={(value: number) => `${value}%`}
                   tick={{ fill: "#b7c2d5", fontSize: 10 }}
                   axisLine={false}
                   tickLine={false}
@@ -148,18 +164,30 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
                   tickLine={false}
                 />
                 <Tooltip
-                  cursor={{ fill: "#ffffff05" }}
-                  contentStyle={{
-                    background: "#252c38",
-                    border: "1px solid #485469",
-                    borderRadius: 5,
-                    color: "#dae1ef",
-                    fontSize: 11,
+                  cursor={{ fill: "#ffffff04" }}
+                  content={({ active, payload }) => {
+                    if (!active || !payload?.length) return null;
+                    const pattern = payload[0]
+                      .payload as (typeof patterns)[number];
+                    return (
+                      <div className="chart-tooltip">
+                        <b>{pattern.challenge_family}</b>
+                        <p>
+                          <strong>{pattern.failures}</strong> unsuccessful /
+                          incomplete of {pattern.executions} rounds
+                        </p>
+                        <p>
+                          {pattern.executions
+                            ? `${pattern.rate.toFixed(1)}% unsuccessful`
+                            : "Rate unavailable · no rounds"}
+                        </p>
+                      </div>
+                    );
                   }}
                 />
                 <Bar
-                  dataKey="failures"
-                  name="Unsuccessful / incomplete"
+                  dataKey="rate"
+                  name="Unsuccessful rate"
                   fill="#ce8f8b"
                   radius={[0, 3, 3, 0]}
                   maxBarSize={22}
@@ -212,7 +240,7 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
           </p>
         )}
         <div className="evidence-note">
-          <span>↗</span>
+          <Icon name="info" />
           <p>
             Optional ClickHouse delivery is separate from these local results.
             Recorded rounds include timeouts, skipped checks and incomplete

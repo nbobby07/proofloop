@@ -1,5 +1,11 @@
-import type { RunResponse, RunStatus, SecurityEvent } from "../../types";
-import { StatusBadge } from "../../components/StatusBadge";
+import { motion, useReducedMotion } from "motion/react";
+import { motionTokens } from "../../components/motion";
+import type {
+  ReportResponse,
+  RunResponse,
+  RunStatus,
+  SecurityEvent,
+} from "../../types";
 import { Icon } from "../../components/Icon";
 import { labels } from "./lifecycle";
 import { terminal } from "./lifecycle";
@@ -10,45 +16,82 @@ const stages: { label: string; states: RunStatus[] }[] = [
   { label: "Patch", states: ["generating_patch", "applying_patch"] },
   { label: "Verify", states: ["verifying"] },
   { label: "Challenge", states: ["challenging"] },
-  { label: "Retry", states: ["retrying"] },
+  {
+    label: "Report",
+    states: ["verified", "rejected", "inconclusive", "error"],
+  },
 ];
 function PipelineTimeline({
   run,
   events,
+  report,
 }: {
+  report: ReportResponse | null;
   run: RunResponse;
   events: SecurityEvent[];
 }) {
+  const reduced = useReducedMotion();
+  // A terminal stage is completed when a fresh challenge invalidates that verdict.
+  let cycleStart = 0;
+  events.forEach((event, index) => {
+    if (event.event_type === "stage_completed" && terminal(event.stage))
+      cycleStart = index + 1;
+  });
+  const currentEvents = events.slice(cycleStart);
   return (
     <section className="pipeline-card">
       <div className="section-heading">
         <div className="heading-with-icon">
-          <Icon name="terminal" />
+          <span className="section-index">01</span>
           <h2>Execution pipeline</h2>
         </div>
-        <StatusBadge status={run.status} />
+        <span className="pipeline-source">
+          {run.source === "fixture"
+            ? "ILLUSTRATIVE PIPELINE"
+            : "BACKEND EXECUTION"}
+        </span>
       </div>
       <ol className="pipeline-list">
         {stages.map((stage, i) => {
-          const active = stage.states.includes(run.status);
-          const completed = events.some(
-            (e) =>
-              stage.states.includes(e.stage) &&
-              e.event_type === "stage_completed",
+          const isReport = stage.label === "Report";
+          const active =
+            !isReport &&
+            (stage.states.includes(run.status) ||
+              (stage.label === "Patch" && run.status === "retrying"));
+          const completed = isReport
+            ? !!report
+            : currentEvents.some(
+                (e) =>
+                  stage.states.includes(e.stage) &&
+                  e.event_type === "stage_completed",
+              );
+          const seen = currentEvents.some((e) =>
+            stage.states.includes(e.stage),
           );
-          const seen = events.some((e) => stage.states.includes(e.stage));
+          const historical =
+            cycleStart > 0 &&
+            events
+              .slice(0, cycleStart)
+              .some((e) => stage.states.includes(e.stage));
           return (
             <li
               key={stage.label}
               className={active ? "active" : completed ? "complete" : ""}
             >
-              <span className="stage-number">
+              <motion.span
+                className="stage-number"
+                animate={{
+                  backgroundColor: active ? "#27374a" : "#191e24",
+                  borderColor: active ? "#8eafd3" : "#39434f",
+                }}
+                transition={{ duration: reduced ? 0 : motionTokens.state }}
+              >
                 {completed && !active ? (
                   <Icon name="check" />
                 ) : (
                   String(i + 1).padStart(2, "0")
                 )}
-              </span>
+              </motion.span>
               <div>
                 <strong>{stage.label}</strong>
                 <small>
@@ -56,30 +99,68 @@ function PipelineTimeline({
                     ? "In progress"
                     : completed
                       ? "Recorded"
-                      : seen
-                        ? "Events recorded"
-                        : terminal(run.status)
-                          ? "Not recorded"
-                          : "Pending"}
+                      : isReport
+                        ? run.source === "fixture"
+                          ? "Preview only"
+                          : terminal(run.status)
+                            ? "Awaiting report"
+                            : "Pending"
+                        : historical && !seen
+                          ? "Earlier cycle"
+                          : seen
+                            ? "Events recorded"
+                            : terminal(run.status)
+                              ? "Not recorded"
+                              : "Pending"}
                 </small>
               </div>
             </li>
           );
         })}
       </ol>
-      <div className={`verdict verdict-${run.status}`}>
-        <span className="verdict-label">Verdict</span>
-        <strong>{labels[run.status]}</strong>
+      <div
+        className={`verdict verdict-${run.source === "fixture" ? "fixture" : run.status}`}
+      >
+        <span className="verdict-emblem">
+          <Icon
+            name={
+              run.status === "verified" && run.source === "execution"
+                ? "check"
+                : "shield"
+            }
+            size={21}
+          />
+        </span>
+        <div className="verdict-state">
+          <span className="verdict-label">
+            {run.source === "fixture"
+              ? "ILLUSTRATIVE VERDICT"
+              : "INDEPENDENT VERDICT"}
+          </span>
+          <motion.strong
+            key={run.status}
+            initial={reduced ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: reduced ? 0 : motionTokens.micro }}
+            role="status"
+          >
+            {run.source === "fixture"
+              ? `Preview · ${labels[run.status]}`
+              : labels[run.status]}
+          </motion.strong>
+        </div>
         <span>
-          {run.status === "verified"
-            ? "Passed the executed suite. See report for scope and limitations."
-            : run.status === "rejected"
-              ? "Required checks failed. Review the recorded evidence."
-              : run.status === "inconclusive"
-                ? "Required evidence is incomplete."
-                : run.status === "error"
-                  ? "Execution did not complete."
-                  : "Awaiting independent verification."}
+          {run.source === "fixture"
+            ? "Illustrative state. No independent verification has executed."
+            : run.status === "verified"
+              ? "Passed the executed suite. See report for scope and limitations."
+              : run.status === "rejected"
+                ? "Required checks failed. Review the recorded evidence."
+                : run.status === "inconclusive"
+                  ? "Required evidence is incomplete."
+                  : run.status === "error"
+                    ? "Execution did not complete."
+                    : "Awaiting independent verification."}
         </span>
       </div>
     </section>
@@ -88,10 +169,13 @@ function PipelineTimeline({
 export function SecurityArena({
   run,
   events,
+  report = null,
 }: {
+  report?: ReportResponse | null;
   run: RunResponse | null;
   events: SecurityEvent[];
 }) {
+  const reduced = useReducedMotion();
   if (!run)
     return (
       <section className="panel run-empty">
@@ -105,10 +189,8 @@ export function SecurityArena({
         </p>
       </section>
     );
-  const attacks = events.filter(
-    (e) =>
-      ["baseline_reproduced", "challenge_proposed"].includes(e.event_type) ||
-      e.stage === "challenging",
+  const attacks = events.filter((e) =>
+    ["baseline_reproduced", "challenge_proposed"].includes(e.event_type),
   );
   const defense = events.filter((e) =>
     ["patch_proposed", "patch_applied", "retry_scheduled"].includes(
@@ -117,7 +199,7 @@ export function SecurityArena({
   );
   return (
     <>
-      <PipelineTimeline run={run} events={events} />
+      <PipelineTimeline run={run} events={events} report={report} />
       <div className="arena-grid">
         <section className="team-panel red-team">
           <div className="team-heading">
@@ -141,11 +223,19 @@ export function SecurityArena({
             <h3 className="finding-title">
               {run.finding?.title ?? "Awaiting discovery"}
             </h3>
-            <div className="request-trace">
+            <motion.div
+              className={`request-trace ${run.baseline?.reproduced ? "boundary-reproduced" : ""}`}
+              animate={{
+                borderColor: run.baseline?.reproduced ? "#7c4846" : "#343d48",
+              }}
+              transition={{ duration: reduced ? 0 : motionTokens.state }}
+            >
               <div>
-                <span className="avatar">A</span>
+                <span className="avatar">
+                  <Icon name="fingerprint" />
+                </span>
                 <div>
-                  <strong>Alice</strong>
+                  <strong>Principal</strong>
                   <small>Authenticated principal</small>
                 </div>
               </div>
@@ -156,16 +246,16 @@ export function SecurityArena({
               <div>
                 <Icon name="file" />
                 <div>
-                  <strong>Invoice #2001</strong>
-                  <small>Owned by Bob</small>
+                  <strong>Protected object</strong>
+                  <small>Other owner</small>
                 </div>
               </div>
-            </div>
+            </motion.div>
             <span className="trace-caption">
-              LedgerLite authorization scenario
+              {run.target} ownership model · schematic
             </span>
             <div className="observation">
-              <span>Baseline response</span>
+              <span>Recorded baseline</span>
               <div>
                 <code className={run.baseline?.reproduced ? "danger-text" : ""}>
                   {run.baseline?.observed_status
@@ -219,7 +309,13 @@ export function SecurityArena({
                 ? "Authorization patch proposed"
                 : "Awaiting remediation"}
             </h3>
-            <div className={`patch-summary ${run.patch ? "has-code" : ""}`}>
+            <motion.div
+              key={run.patch?.attempt ?? "waiting"}
+              className={`patch-summary ${run.patch ? "has-code" : ""}`}
+              initial={reduced ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: reduced ? 0 : motionTokens.panel }}
+            >
               <Icon name="code" size={22} />
               <div>
                 <strong>
@@ -245,13 +341,13 @@ export function SecurityArena({
                   </code>
                 </pre>
               )}
-            </div>
+            </motion.div>
             <div className="observation">
-              <span>Patched response</span>
+              <span>Proposal status</span>
               <div>
-                <code>Not recorded</code>
+                <code>{run.patch ? "Diff recorded" : "Not recorded"}</code>
                 <span className="observation-note">
-                  Not included in current evidence
+                  Independent verification required
                 </span>
               </div>
             </div>

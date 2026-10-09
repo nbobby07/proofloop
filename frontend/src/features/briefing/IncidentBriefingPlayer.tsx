@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Icon } from "../../components/Icon";
 
 export type BriefingAudio = {
   runId: string;
@@ -28,9 +29,14 @@ export function IncidentBriefingPlayer({ audio }: { audio?: BriefingAudio }) {
     }
   };
   return (
-    <section className="panel sponsor-card">
-      <p className="eyebrow">ElevenLabs · incident briefing</p>
-      <h2>Incident briefing</h2>
+    <section className="panel sponsor-card briefing-card">
+      <div className="briefing-heading">
+        <Icon name="volume" size={24} />
+        <div>
+          <p className="eyebrow">ELEVENLABS / REPORT NARRATION</p>
+          <h2>Incident briefing</h2>
+        </div>
+      </div>
       {audio ? (
         <>
           <audio
@@ -56,8 +62,12 @@ export function IncidentBriefingPlayer({ audio }: { audio?: BriefingAudio }) {
               {loading ? "Loading audio…" : playing ? "Pause" : "Play briefing"}
             </button>
             <button disabled={loading} onClick={() => void play(true)}>
-              Replay ↻
+              Replay
             </button>
+          </div>
+          <div className="briefing-binding">
+            <p className="fine-print">Bound to current report</p>
+            <code>{audio.runId}</code>
           </div>
           <details>
             <summary>Read transcript</summary>
@@ -77,8 +87,8 @@ export function IncidentBriefingPlayer({ audio }: { audio?: BriefingAudio }) {
           </p>
           <button disabled>Play incident briefing</button>
           <p className="fine-print">
-            Open a completed live report to generate narration. Previous audio is
-            unavailable while a fresh verification is running.
+            Open a completed live report to generate narration. Previous audio
+            is unavailable while a fresh verification is running.
           </p>
         </>
       )}

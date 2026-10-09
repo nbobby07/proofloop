@@ -1,3 +1,13 @@
+# Current UI polish validation — 2026-10-09
+
+On `feat/ui-motion-polish`, frontend lint/typecheck/build and all 21 frontend tests
+pass; generated contracts have no drift. Actual browser execution rejected patch 1,
+verified patch 2 on 44/44 checks, then verified a fresh challenge on another 44/44.
+Old narration returned 409 after invalidation. All four requested viewport widths
+were checked without page overflow. Detailed results, screenshots, bundle impact
+and reduced-motion browser limits are in [UI-MOTION-POLISH.md](UI-MOTION-POLISH.md).
+The historical Developer B record below is preserved as prior evidence.
+
 # Developer B validation — 2026-10-09
 
 Branch: feat/product-dashboard. Integrated origin/feat/security-engine through

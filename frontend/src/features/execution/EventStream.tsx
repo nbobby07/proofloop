@@ -1,8 +1,48 @@
-import { useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { useId, useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { SecurityEvent } from "../../types";
 import { Icon } from "../../components/Icon";
-import { labels } from "./lifecycle";
+import { motionTokens } from "../../components/motion";
+import { labels, recordedOutcome } from "./lifecycle";
+
+function EventMetadata({ event }: { event: SecurityEvent }) {
+  const [expanded, setExpanded] = useState(false);
+  const id = useId();
+  const reduced = useReducedMotion();
+  if (!Object.keys(event.metadata ?? {}).length) return null;
+  return (
+    <div className="event-details">
+      <button
+        aria-expanded={expanded}
+        aria-controls={id}
+        onClick={() => setExpanded((value) => !value)}
+      >
+        {expanded ? "Hide metadata" : "Recorded metadata"}
+        <Icon name="chevron" size={11} />
+      </button>
+      <AnimatePresence initial={false}>
+        {expanded && (
+          <motion.div
+            id={id}
+            key="metadata"
+            initial={{ height: reduced ? "auto" : 0, opacity: reduced ? 1 : 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: reduced ? "auto" : 0, opacity: 0 }}
+            transition={{
+              duration: reduced ? 0 : motionTokens.panel,
+              ease: motionTokens.ease,
+            }}
+            style={{ overflow: "hidden" }}
+          >
+            <pre>
+              <code>{JSON.stringify(event.metadata, null, 2)}</code>
+            </pre>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export function EventStream({
   events,
@@ -20,7 +60,7 @@ export function EventStream({
     <section className="panel event-panel">
       <div className="section-heading">
         <div className="heading-with-icon">
-          <Icon name="terminal" />
+          <span className="section-index">03</span>
           <h2>Event stream</h2>
           <span className="count-badge">{events.length}</span>
         </div>
@@ -45,8 +85,11 @@ export function EventStream({
               key={e.event_id}
               initial={reduced ? false : { opacity: 0, y: 3 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.15 }}
-              className={`event-${e.severity}`}
+              transition={{
+                duration: reduced ? 0 : motionTokens.micro,
+                ease: motionTokens.ease,
+              }}
+              className={`event-${e.severity} ${e.event_type === "test_completed" ? `event-outcome-${recordedOutcome(e).tone}` : ""}`}
             >
               <span className="event-dot" />
               <div className="event-content">
@@ -63,6 +106,7 @@ export function EventStream({
                   {e.event_type.replaceAll("_", " ")}
                 </span>
                 <span className="event-source">{e.source}</span>
+                <EventMetadata event={e} />
               </div>
             </motion.li>
           ))}

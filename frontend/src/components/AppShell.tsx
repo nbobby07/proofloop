@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import { LayoutGroup, motion, useReducedMotion } from "motion/react";
+import { motionTokens } from "./motion";
 import { Tooltip } from "radix-ui";
 import type { ConnectionStatus } from "../hooks/useBackendHealth";
 import { ConnectionBadge } from "./ConnectionBadge";
@@ -27,9 +29,13 @@ export function AppShell({
   status: ConnectionStatus;
   children: ReactNode;
 }) {
+  const reduced = useReducedMotion();
   return (
     <Tooltip.Provider delayDuration={300}>
       <div className="app-shell">
+        <a className="skip-link" href="#main-content">
+          Skip to workspace
+        </a>
         <aside className="sidebar">
           <a className="brand" href="#arena" onClick={() => navigate("arena")}>
             <ProofLoopMark />
@@ -39,23 +45,35 @@ export function AppShell({
             <span className="workspace-avatar">P</span>
             <div>
               <strong>ProofLoop workspace</strong>
-              <small>Cyberdefense Hackathon</small>
+              <small>Local security environment</small>
             </div>
           </div>
           <span className="workspace-label">WORKSPACE</span>
-          <nav aria-label="Main navigation">
-            {pages.map((item) => (
-              <button
-                key={item.id}
-                className={`nav-item ${page === item.id ? "nav-active" : ""}`}
-                aria-current={page === item.id ? "page" : undefined}
-                onClick={() => navigate(item.id)}
-              >
-                <Icon name={item.icon} />
-                {item.label}
-              </button>
-            ))}
-          </nav>
+          <LayoutGroup id="workspace-nav">
+            <nav aria-label="Main navigation">
+              {pages.map((item) => (
+                <button
+                  key={item.id}
+                  className={`nav-item ${page === item.id ? "nav-active" : ""}`}
+                  aria-current={page === item.id ? "page" : undefined}
+                  onClick={() => navigate(item.id)}
+                >
+                  {page === item.id && (
+                    <motion.span
+                      className="nav-selection"
+                      layoutId={reduced ? undefined : "active-page"}
+                      transition={{
+                        duration: reduced ? 0 : motionTokens.panel,
+                        ease: motionTokens.ease,
+                      }}
+                    />
+                  )}
+                  <Icon name={item.icon} />
+                  <span>{item.label}</span>
+                </button>
+              ))}
+            </nav>
+          </LayoutGroup>
           <div className="sidebar-target">
             <span className="workspace-label">TARGET APPLICATION</span>
             <div className="target-entry">
@@ -75,7 +93,7 @@ export function AppShell({
             </div>
           </div>
         </aside>
-        <main>
+        <main id="main-content">
           <header className="topbar">
             <div className="breadcrumbs">
               <span>Workspace</span>

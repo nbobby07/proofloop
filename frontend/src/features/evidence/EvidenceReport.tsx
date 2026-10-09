@@ -1,6 +1,10 @@
 import { useState } from "react";
+import { LayoutGroup, motion, useReducedMotion } from "motion/react";
+import { motionTokens } from "../../components/motion";
+import { RecordedRounds } from "../execution/RecordedRounds";
+import { labels } from "../execution/lifecycle";
 import { Tabs, Tooltip } from "radix-ui";
-import type { ReportResponse, RunResponse } from "../../types";
+import type { ReportResponse, RunResponse, SecurityEvent } from "../../types";
 import { Icon } from "../../components/Icon";
 
 function parseDiff(diff: string) {
@@ -97,12 +101,16 @@ export function EvidenceReport({
   report,
   reportError,
   fixture,
+  events = [],
 }: {
+  events?: SecurityEvent[];
   run: RunResponse | null;
   report: ReportResponse | null;
   reportError: string | null;
   fixture: boolean;
 }) {
+  const [tab, setTab] = useState("results");
+  const reduced = useReducedMotion();
   const summary = run?.verification;
   const download = () => {
     if (!report || report.source !== "execution") return;
@@ -119,140 +127,204 @@ export function EvidenceReport({
     <section className="panel evidence-panel">
       <div className="section-heading">
         <div className="heading-with-icon">
-          <Icon name="file" />
+          <span className="section-index">02</span>
           <h2>Security evidence</h2>
         </div>
         <span className="subtle-label">
           {fixture ? "Fixture" : "Run evidence"}
         </span>
       </div>
-      <Tabs.Root defaultValue="results">
-        <Tabs.List className="tabs" aria-label="Evidence views">
-          <Tabs.Trigger value="results">Verification</Tabs.Trigger>
-          <Tabs.Trigger value="diff">Code changes</Tabs.Trigger>
-          <Tabs.Trigger value="report">Evidence report</Tabs.Trigger>
-        </Tabs.List>
-        <Tabs.Content value="results" className="evidence-content">
-          <div className="results-heading">
-            <span>Test suite</span>
-            <span>Passed / total</span>
-          </div>
-          {(["security", "functional", "adversarial"] as const).map((suite) => {
-            const passed = summary?.[`${suite}_passed`],
-              total = summary?.[`${suite}_total`];
-            return (
-              <div className="suite-row" key={suite}>
-                <div className="suite-name">
-                  <Icon
-                    name={
-                      suite === "security"
-                        ? "shield"
-                        : suite === "functional"
-                          ? "code"
-                          : "attack"
-                    }
+      <LayoutGroup id="evidence-tabs">
+        <Tabs.Root value={tab} onValueChange={setTab}>
+          <Tabs.List className="tabs" aria-label="Evidence views">
+            {[
+              ["results", "Verification"],
+              ["diff", "Code changes"],
+              ["report", "Evidence report"],
+            ].map(([value, label]) => (
+              <Tabs.Trigger value={value} key={value}>
+                {label}
+                {tab === value && (
+                  <motion.span
+                    className="tab-indicator"
+                    layoutId={reduced ? undefined : "evidence-active"}
+                    transition={{
+                      duration: reduced ? 0 : motionTokens.panel,
+                      ease: motionTokens.ease,
+                    }}
                   />
-                  <span>
-                    {suite}
-                    <small>
-                      {suite === "security"
-                        ? "Authorization boundaries"
-                        : suite === "functional"
-                          ? "Legitimate application behavior"
-                          : "Additional attack cases"}
-                    </small>
-                  </span>
-                </div>
-                <div className="suite-count">
-                  <div className="suite-progress">
-                    <span
-                      style={{
-                        width: total ? `${(passed! / total) * 100}%` : "0%",
-                      }}
-                    />
-                  </div>
-                  <strong>
-                    {passed ?? "—"}
-                    <span> / {total ?? "—"}</span>
-                  </strong>
-                </div>
+                )}
+              </Tabs.Trigger>
+            ))}
+          </Tabs.List>
+          <Tabs.Content value="results" className="evidence-content" forceMount>
+            <div
+              className={`verification-context context-${fixture ? "fixture" : (run?.status ?? "pending")}`}
+            >
+              <Icon name="shield" size={22} />
+              <div>
+                <strong>
+                  {fixture
+                    ? "Illustrative test results"
+                    : run
+                      ? labels[run.status]
+                      : "Awaiting independent execution"}
+                </strong>
+                <p>
+                  {fixture
+                    ? "Fixture preview · no checks executed"
+                    : run?.status === "challenging"
+                      ? "Previous counts cleared. Fresh verification is required."
+                      : summary
+                        ? `Patch attempt ${run?.patch?.attempt ?? "—"} · recorded suite counts`
+                        : "Results will appear when the backend records them."}
+                </p>
               </div>
-            );
-          })}
-          <div className="evidence-note">
-            <Icon name="info" />
-            <p>
-              {fixture
-                ? "Illustrative counts. These tests have not been executed."
-                : summary
-                  ? "Counts summarize recorded tests. The independent verifier determines the verdict."
-                  : "Waiting for independently executed verification results."}
-            </p>
-          </div>
-          <Tooltip.Root>
-            <Tooltip.Trigger asChild>
-              <button className="scope-explanation">
-                <Icon name="shield" />
-                About verification scope
-                <Icon name="info" size={13} />
-              </button>
-            </Tooltip.Trigger>
-            <Tooltip.Portal>
-              <Tooltip.Content className="tooltip-content" sideOffset={6}>
-                Only the frozen executed suite is covered. Missing, skipped and
-                timed-out checks cannot count as passing.
-                <Tooltip.Arrow />
-              </Tooltip.Content>
-            </Tooltip.Portal>
-          </Tooltip.Root>
-        </Tabs.Content>
-        <Tabs.Content value="diff" className="diff-content">
-          <PatchDiffViewer patch={run?.patch} />
-        </Tabs.Content>
-        <Tabs.Content value="report" className="evidence-content">
-          {report ? (
-            <>
-              <div className="report-actions">
-                <span className="subtle-label">Saved report</span>
-                <button className="small-button" onClick={download}>
-                  <Icon name="download" />
-                  Download JSON
-                </button>
-              </div>
-              <p className="report-summary">{report.summary}</p>
-              <h3>Evidence references</h3>
-              {report.evidence?.length ? (
-                report.evidence.map((e, index) => (
-                  <div className="artifact" key={`${e.artifact_id}-${index}`}>
-                    <strong>{e.description}</strong>
-                    <code>{e.artifact_id}</code>
-                    <small>SHA-256 {e.sha256}</small>
+            </div>
+            <div className="results-heading">
+              <span>Test suite</span>
+              <span>Passed / total</span>
+            </div>
+            {(["security", "functional", "adversarial"] as const).map(
+              (suite) => {
+                const passed = summary?.[`${suite}_passed`],
+                  total = summary?.[`${suite}_total`];
+                return (
+                  <div
+                    className={`suite-row ${passed !== undefined && total && passed < total ? "suite-incomplete" : ""}`}
+                    key={suite}
+                  >
+                    <div className="suite-name">
+                      <Icon
+                        name={
+                          suite === "security"
+                            ? "shield"
+                            : suite === "functional"
+                              ? "code"
+                              : "attack"
+                        }
+                      />
+                      <span>
+                        {suite}
+                        <small>
+                          {suite === "security"
+                            ? "Authorization boundaries"
+                            : suite === "functional"
+                              ? "Legitimate application behavior"
+                              : "Additional attack cases"}
+                        </small>
+                      </span>
+                    </div>
+                    <div className="suite-count">
+                      <span className="suite-outcome">
+                        {fixture
+                          ? "Preview"
+                          : passed === undefined || total === undefined
+                            ? "Pending"
+                            : !total
+                              ? "No checks"
+                              : passed < total
+                                ? "Not all passing"
+                                : "Recorded passing"}
+                      </span>
+                      <div className="suite-progress">
+                        <motion.span
+                          initial={false}
+                          animate={{
+                            width: total ? `${(passed! / total) * 100}%` : "0%",
+                          }}
+                          transition={{
+                            duration: reduced ? 0 : motionTokens.state,
+                          }}
+                        />
+                      </div>
+                      <strong>
+                        {passed ?? "—"}
+                        <span> / {total ?? "—"}</span>
+                      </strong>
+                    </div>
                   </div>
-                ))
-              ) : (
-                <p className="empty-copy">No artifact references supplied.</p>
-              )}
-              <h3>Scope & limitations</h3>
-              <ul className="limitations">
-                {report.limitations.map((text, i) => (
-                  <li key={i}>{text}</li>
-                ))}
-              </ul>
-            </>
-          ) : (
-            <div className="empty-state">
-              <Icon name="file" size={24} />
-              <h3>{reportError ? "Report unavailable" : "No saved report"}</h3>
+                );
+              },
+            )}
+            <div className="evidence-note">
+              <Icon name="info" />
               <p>
                 {fixture
-                  ? "Fixture previews contain no executed evidence report."
-                  : (reportError ??
-                    "The completed run’s saved report will appear here.")}
+                  ? "Illustrative counts. These tests have not been executed."
+                  : summary
+                    ? "Counts summarize recorded tests. The independent verifier determines the verdict."
+                    : "Waiting for independently executed verification results."}
               </p>
             </div>
-          )}
-        </Tabs.Content>
-      </Tabs.Root>
+            <RecordedRounds events={events} />
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <button className="scope-explanation">
+                  <Icon name="shield" />
+                  About verification scope
+                  <Icon name="info" size={13} />
+                </button>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content className="tooltip-content" sideOffset={6}>
+                  Only the frozen executed suite is covered. Missing, skipped
+                  and timed-out checks cannot count as passing.
+                  <Tooltip.Arrow />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tabs.Content>
+          <Tabs.Content value="diff" className="diff-content" forceMount>
+            <PatchDiffViewer patch={run?.patch} />
+          </Tabs.Content>
+          <Tabs.Content value="report" className="evidence-content" forceMount>
+            {report ? (
+              <>
+                <div className="report-actions">
+                  <span className="subtle-label">Saved report</span>
+                  <button className="small-button" onClick={download}>
+                    <Icon name="download" />
+                    Download JSON
+                  </button>
+                </div>
+                <p className="report-summary">{report.summary}</p>
+                <h3>Evidence references</h3>
+                {report.evidence?.length ? (
+                  report.evidence.map((e, index) => (
+                    <div className="artifact" key={`${e.artifact_id}-${index}`}>
+                      <strong>{e.description}</strong>
+                      <code>{e.artifact_id}</code>
+                      <small>SHA-256 {e.sha256}</small>
+                    </div>
+                  ))
+                ) : (
+                  <p className="empty-copy">No artifact references supplied.</p>
+                )}
+                <h3>Scope & limitations</h3>
+                <ul className="limitations">
+                  {report.limitations.map((text, i) => (
+                    <li key={i}>{text}</li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <div className="empty-state">
+                <Icon name="file" size={24} />
+                <h3>
+                  {reportError ? "Report unavailable" : "No saved report"}
+                </h3>
+                <p>
+                  {fixture
+                    ? "Fixture previews contain no executed evidence report."
+                    : (reportError ??
+                      "The completed run’s saved report will appear here.")}
+                </p>
+              </div>
+            )}
+          </Tabs.Content>
+        </Tabs.Root>
+      </LayoutGroup>
     </section>
   );
 }

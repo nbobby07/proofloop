@@ -12,11 +12,14 @@ with approved_for_export=True only after redaction and deliberate export approva
 Calls are blocking: schedule through A's bounded worker/threadpool, not the async
 event loop. Provider errors are optional-feature failures and cannot affect verdicts.
 
-Only terminal source=execution reports are accepted. The deterministic transcript
-quotes the saved summary and verification counts, includes all supplied limitations,
-and never invents reproduction/patch details missing from ReportResponse v1.
-Do not send arbitrary browser text to the provider. The upstream producer is
-responsible for redacting the saved report summary and limitations.
+Only terminal source=execution reports are accepted. The v2 deterministic transcript
+leads with the actual verdict, gives concise recorded counts, states the security
+scope and offers the next action. It never reads run IDs, hashes, paths, raw summaries
+or error codes aloud. Additional report limitations trigger a spoken reminder to
+review the full written report; the underlying report is not changed. No reproduction
+or patch details missing from ReportResponse v1 are invented. No arbitrary browser
+text is sent to the provider. The script version changes the audio cache identity,
+so old verbose clips are not reused for the new briefing.
 
 MP3s are cached by report digest, voice, model and script version. Adjacent JSON
 stores transcript, report/audio hashes and run identity; serving routes use opaque
@@ -37,3 +40,22 @@ are verified in docs/SPONSOR-ACTIVATION.md. The temporary key has a one-day expi
 The server owns bounded jobs through backend/reports/briefings.py. Opt in with
 PROOFLOOP_NARRATION_ENABLED=1 and backend-only credentials; no narration is performed
 on startup or by tests. Existing terminal reports remain available if narration fails.
+
+## Concise briefing validation — October 9, 2026
+
+Script v2 was generated through the real ElevenLabs API using the existing voice and
+model. Browser playback and pause succeeded; the audio element measured 16.532608
+seconds for a 34-word transcript. No run ID, hash, path or raw summary is spoken.
+The same verified report produces a new cache identity, preserving the full original
+report and all stale-report protections. Receipt and screenshot are under
+`frontend/design/redesign/briefing-v2-*`. Raw audio remains in ignored storage.
+
+Validation: 352 Python tests passed, 8 opt-in skipped; 26 frontend tests passed;
+Ruff, schema drift, frontend lint and production build passed. New tests cover all
+four terminal statuses, no spoken technical identifiers, a bounded script, partial
+counts, written limitation guidance and cache separation from v1.
+
+The local redesign preview on port 5192 now proxies to its isolated backend on
+8002, using a byte-preserving copy of existing release run storage. The release
+backend on 8001 and other worktrees are untouched. The audio validation did not
+rerun security checks or relabel historical execution as new.

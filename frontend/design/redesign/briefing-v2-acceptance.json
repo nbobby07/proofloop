@@ -1,0 +1,18 @@
+{
+  "artifact_id": "briefing_b40b322eb017079dd2c5c7f7254cd8acc16ec7c6129d65344132bd21ea08a9e9",
+  "run_id": "run_b79f04fcd8114bf7b215a49e4286175e",
+  "source": "execution",
+  "report_sha256": "70ca3052a49a2346b9f748aef23413fd2ef752cd3d240dc80b80ae0af38e3864",
+  "audio_sha256": "3dd273819d620fe33d01ad7576e22116f9d93f2dc33ac14a752699c6659fbc4e",
+  "script_version": "v2",
+  "transcript": "The patch passed independent verification. All 44 recorded checks passed: 6 security, 22 functional, and 16 adversarial. Passing these checks does not prove universal security. You can inspect the evidence or run another challenge.",
+  "date": "2026-10-09",
+  "duration_seconds": 16.532608,
+  "word_count": 34,
+  "browser_playback_verified": true,
+  "browser_pause_verified": true,
+  "voice_and_model_unchanged": true,
+  "validation_frontend": "http://127.0.0.1:5192",
+  "validation_backend": "http://127.0.0.1:8002",
+  "evidence_origin": "Byte-preserving copy of existing release run storage; no new security execution claimed for audio validation."
+}

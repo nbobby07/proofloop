@@ -1,58 +1,97 @@
 import { useState } from "react";
+import { Tabs, Tooltip } from "radix-ui";
 import type { ReportResponse, RunResponse } from "../../types";
-import { StatusBadge } from "../../components/StatusBadge";
+import { Icon } from "../../components/Icon";
+
+function parseDiff(diff: string) {
+  let oldLine = 0,
+    newLine = 0;
+  return diff.split("\n").map((text, index) => {
+    const hunk = /^@@ -(\d+)(?:,\d+)? \+(\d+)(?:,\d+)? @@/.exec(text);
+    const kind =
+      text.startsWith("+++") ||
+      text.startsWith("---") ||
+      text.startsWith("@@") ||
+      text.startsWith("diff ") ||
+      text.startsWith("index ") ||
+      text.startsWith("\\ No newline")
+        ? "header"
+        : text.startsWith("+")
+          ? "added"
+          : text.startsWith("-")
+            ? "removed"
+            : "context";
+    if (hunk) {
+      oldLine = Number(hunk[1]);
+      newLine = Number(hunk[2]);
+    }
+    const oldNumber =
+      kind !== "header" && kind !== "added" && oldLine ? oldLine++ : "";
+    const newNumber =
+      kind !== "header" && kind !== "removed" && newLine ? newLine++ : "";
+    return { text, kind, index, oldNumber, newNumber };
+  });
+}
 
 function PatchDiffViewer({ patch }: { patch: RunResponse["patch"] }) {
   const [changesOnly, setChangesOnly] = useState(false);
-  if (!patch) return <p className="empty-copy">No patch has been supplied.</p>;
-  const lines = patch.diff.split("\n");
+  if (!patch)
+    return (
+      <div className="empty-state">
+        <Icon name="code" size={24} />
+        <h3>No code changes yet</h3>
+        <p>
+          The patch will be available after the defender generates a proposal.
+        </p>
+      </div>
+    );
+  const lines = parseDiff(patch.diff);
   return (
     <>
       <div className="diff-toolbar">
-        <span>Unified diff · attempt {patch.attempt}</span>
+        <div>
+          <Icon name="code" />
+          <strong>Patch {String(patch.attempt).padStart(2, "0")}</strong>
+          <span className="diff-added">
+            +{lines.filter((l) => l.kind === "added").length}
+          </span>
+          <span className="diff-removed">
+            −{lines.filter((l) => l.kind === "removed").length}
+          </span>
+        </div>
         <label>
           <input
             type="checkbox"
             checked={changesOnly}
             onChange={(e) => setChangesOnly(e.target.checked)}
-          />{" "}
+          />
           Changes only
         </label>
       </div>
       <pre className="diff-code" tabIndex={0} aria-label="Patch code changes">
         <code>
-          {lines.map((line, i) => {
-            const kind =
-              line.startsWith("+++") ||
-              line.startsWith("---") ||
-              line.startsWith("@@")
-                ? "header"
-                : line.startsWith("+")
-                  ? "added"
-                  : line.startsWith("-")
-                    ? "removed"
-                    : "context";
-            if (changesOnly && kind === "context") return null;
-            return (
-              <span key={i} className={`diff-line ${kind}`}>
+          {lines
+            .filter((l) => !changesOnly || l.kind !== "context")
+            .map((l) => (
+              <span key={l.index} className={`diff-line ${l.kind}`}>
                 <span className="line-number" aria-hidden="true">
-                  {i + 1}
+                  {l.oldNumber}
                 </span>
-                {line || " "}
-                <br />
+                <span className="line-number" aria-hidden="true">
+                  {l.newNumber}
+                </span>
+                <span>{l.text || " "}</span>
               </span>
-            );
-          })}
+            ))}
         </code>
       </pre>
-      <p className="fine-print">
-        + Added · − Removed · Full original and patched files are not supplied
-        by API v1.
+      <p className="fine-print diff-caption">
+        Exact unified diff supplied by the backend. Full source files are not
+        included.
       </p>
     </>
   );
 }
-
 export function EvidenceReport({
   run,
   report,
@@ -64,7 +103,6 @@ export function EvidenceReport({
   reportError: string | null;
   fixture: boolean;
 }) {
-  const [tab, setTab] = useState("results");
   const summary = run?.verification;
   const download = () => {
     if (!report || report.source !== "execution") return;
@@ -80,98 +118,108 @@ export function EvidenceReport({
   return (
     <section className="panel evidence-panel">
       <div className="section-heading">
-        <div>
-          <p className="eyebrow">Security evidence</p>
-          <h2>Show the work.</h2>
+        <div className="heading-with-icon">
+          <Icon name="file" />
+          <h2>Security evidence</h2>
         </div>
-        <StatusBadge status={run?.status} />
+        <span className="subtle-label">
+          {fixture ? "Fixture" : "Run evidence"}
+        </span>
       </div>
-      <div className="tabs" role="tablist" aria-label="Evidence views">
-        {[
-          ["results", "Verification"],
-          ["diff", "Code changes"],
-          ["report", "Evidence report"],
-        ].map(([id, name]) => (
-          <button
-            key={id}
-            id={`tab-${id}`}
-            role="tab"
-            aria-selected={tab === id}
-            tabIndex={tab === id ? 0 : -1}
-            aria-controls="evidence-content"
-            onKeyDown={(event) => {
-              const ids = ["results", "diff", "report"];
-              const index = ids.indexOf(id);
-              const next =
-                event.key === "ArrowRight"
-                  ? ids[(index + 1) % ids.length]
-                  : event.key === "ArrowLeft"
-                    ? ids[(index + ids.length - 1) % ids.length]
-                    : event.key === "Home"
-                      ? ids[0]
-                      : event.key === "End"
-                        ? ids[ids.length - 1]
-                        : null;
-              if (next) {
-                event.preventDefault();
-                setTab(next);
-                document.getElementById(`tab-${next}`)?.focus();
-              }
-            }}
-            onClick={() => setTab(id)}
-          >
-            {name}
-          </button>
-        ))}
-      </div>
-      <div role="tabpanel" id="evidence-content" aria-labelledby={`tab-${tab}`}>
-        {tab === "results" && (
-          <>
-            <div className="suite-grid">
-              {(["security", "functional", "adversarial"] as const).map(
-                (suite) => (
-                  <div className="suite" key={suite}>
-                    <span>{suite}</span>
-                    <strong>
-                      {summary ? summary[`${suite}_passed`] : "—"}
-                      <small>
-                        {" "}
-                        / {summary ? summary[`${suite}_total`] : "—"}
-                      </small>
-                    </strong>
-                    <p>
-                      {fixture
-                        ? "Illustrative counts · not executed"
-                        : summary
-                          ? "Backend-reported passed / total"
-                          : "Awaiting verifier results"}
-                    </p>
+      <Tabs.Root defaultValue="results">
+        <Tabs.List className="tabs" aria-label="Evidence views">
+          <Tabs.Trigger value="results">Verification</Tabs.Trigger>
+          <Tabs.Trigger value="diff">Code changes</Tabs.Trigger>
+          <Tabs.Trigger value="report">Evidence report</Tabs.Trigger>
+        </Tabs.List>
+        <Tabs.Content value="results" className="evidence-content">
+          <div className="results-heading">
+            <span>Test suite</span>
+            <span>Passed / total</span>
+          </div>
+          {(["security", "functional", "adversarial"] as const).map((suite) => {
+            const passed = summary?.[`${suite}_passed`],
+              total = summary?.[`${suite}_total`];
+            return (
+              <div className="suite-row" key={suite}>
+                <div className="suite-name">
+                  <Icon
+                    name={
+                      suite === "security"
+                        ? "shield"
+                        : suite === "functional"
+                          ? "code"
+                          : "attack"
+                    }
+                  />
+                  <span>
+                    {suite}
+                    <small>
+                      {suite === "security"
+                        ? "Authorization boundaries"
+                        : suite === "functional"
+                          ? "Legitimate application behavior"
+                          : "Additional attack cases"}
+                    </small>
+                  </span>
+                </div>
+                <div className="suite-count">
+                  <div className="suite-progress">
+                    <span
+                      style={{
+                        width: total ? `${(passed! / total) * 100}%` : "0%",
+                      }}
+                    />
                   </div>
-                ),
-              )}
-            </div>
-            <div className="evidence-note">
-              <span>◇</span>
-              <p>
-                Counts do not establish a verdict. The independent verifier must
-                bind required checks to the exact patch. Timeouts, skipped
-                checks, and missing evidence cannot count as passing.
-              </p>
-            </div>
-            <p className="fine-print">
-              Individual test records and Semgrep scan details require an
-              approved contract extension.
+                  <strong>
+                    {passed ?? "—"}
+                    <span> / {total ?? "—"}</span>
+                  </strong>
+                </div>
+              </div>
+            );
+          })}
+          <div className="evidence-note">
+            <Icon name="info" />
+            <p>
+              {fixture
+                ? "Illustrative counts. These tests have not been executed."
+                : summary
+                  ? "Counts summarize recorded tests. The independent verifier determines the verdict."
+                  : "Waiting for independently executed verification results."}
             </p>
-          </>
-        )}
-        {tab === "diff" && <PatchDiffViewer patch={run?.patch} />}
-        {tab === "report" &&
-          (report ? (
-            <>
-              <p className="report-summary">{report.summary}</p>
-              <button className="small-button" onClick={download}>
-                Download saved report JSON ↓
+          </div>
+          <Tooltip.Root>
+            <Tooltip.Trigger asChild>
+              <button className="scope-explanation">
+                <Icon name="shield" />
+                About verification scope
+                <Icon name="info" size={13} />
               </button>
+            </Tooltip.Trigger>
+            <Tooltip.Portal>
+              <Tooltip.Content className="tooltip-content" sideOffset={6}>
+                Only the frozen executed suite is covered. Missing, skipped and
+                timed-out checks cannot count as passing.
+                <Tooltip.Arrow />
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          </Tooltip.Root>
+        </Tabs.Content>
+        <Tabs.Content value="diff" className="diff-content">
+          <PatchDiffViewer patch={run?.patch} />
+        </Tabs.Content>
+        <Tabs.Content value="report" className="evidence-content">
+          {report ? (
+            <>
+              <div className="report-actions">
+                <span className="subtle-label">Saved report</span>
+                <button className="small-button" onClick={download}>
+                  <Icon name="download" />
+                  Download JSON
+                </button>
+              </div>
+              <p className="report-summary">{report.summary}</p>
               <h3>Evidence references</h3>
               {report.evidence?.length ? (
                 report.evidence.map((e) => (
@@ -192,14 +240,19 @@ export function EvidenceReport({
               </ul>
             </>
           ) : (
-            <p className="empty-copy">
-              {fixture
-                ? "This preview has no executed evidence report."
-                : (reportError ??
-                  "A completed, saved run report will appear here.")}
-            </p>
-          ))}
-      </div>
+            <div className="empty-state">
+              <Icon name="file" size={24} />
+              <h3>{reportError ? "Report unavailable" : "No saved report"}</h3>
+              <p>
+                {fixture
+                  ? "Fixture previews contain no executed evidence report."
+                  : (reportError ??
+                    "The completed run’s saved report will appear here.")}
+              </p>
+            </div>
+          )}
+        </Tabs.Content>
+      </Tabs.Root>
     </section>
   );
 }

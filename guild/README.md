@@ -39,4 +39,5 @@ Obtain the URL from Guild UI/API; the adapter does not fabricate a share link.
 The frontend accepts a verified app.guild.ai review URL once that contract exists.
 
 Mark Active only after a hosted completion and an accessible execution record.
-No Guild deployment, hosted request, tests or smoke tests have run in this work.
+Unit tests pass for evidence packets, citation/digest validation and export approval.
+No Guild deployment or hosted request has run in this work.

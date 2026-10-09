@@ -67,4 +67,6 @@ families ranked by observed failure rate. Missing context returns an empty list.
 A controls admission, challenge budget, policy and verdict. Record query results
 and selection rationale in A's evidence store.
 
-No tests, smoke tests, live SQL requests, or ingestion checks have been executed.
+Adapter unit tests pass, covering evidence admission, safe SQL boundaries and
+provider-error handling. No live SQL requests or ingestion checks have been
+executed. See frontend/VALIDATION.md for results and remaining access requirements.

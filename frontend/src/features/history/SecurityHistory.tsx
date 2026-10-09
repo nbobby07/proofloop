@@ -12,11 +12,9 @@ export function SecurityHistory({
     <>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">Security history</p>
-          <h1>Keep the evidence.</h1>
+          <h1>Run history</h1>
           <p className="support">
-            Live runs observed in this browser session. Persistent listing
-            requires an API extension.
+            Verification runs opened in this browser session.
           </p>
         </div>
       </div>

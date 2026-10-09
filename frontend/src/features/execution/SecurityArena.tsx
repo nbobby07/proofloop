@@ -1,6 +1,8 @@
 import type { RunResponse, RunStatus, SecurityEvent } from "../../types";
 import { StatusBadge } from "../../components/StatusBadge";
+import { Icon } from "../../components/Icon";
 import { labels } from "./lifecycle";
+import { terminal } from "./lifecycle";
 
 const stages: { label: string; states: RunStatus[] }[] = [
   { label: "Discover", states: ["discovering"] },
@@ -14,20 +16,21 @@ function PipelineTimeline({
   run,
   events,
 }: {
-  run: RunResponse | null;
+  run: RunResponse;
   events: SecurityEvent[];
 }) {
   return (
     <section className="pipeline-card">
       <div className="section-heading">
-        <span className="eyebrow">Independent execution</span>
-        <StatusBadge status={run?.status} />
+        <div className="heading-with-icon">
+          <Icon name="terminal" />
+          <h2>Execution pipeline</h2>
+        </div>
+        <StatusBadge status={run.status} />
       </div>
-      <h2>The proof loop</h2>
-      <p className="support">Every verdict needs evidence.</p>
       <ol className="pipeline-list">
         {stages.map((stage, i) => {
-          const active = !!run && stage.states.includes(run.status);
+          const active = stage.states.includes(run.status);
           const completed = events.some(
             (e) =>
               stage.states.includes(e.stage) &&
@@ -40,7 +43,11 @@ function PipelineTimeline({
               className={active ? "active" : completed ? "complete" : ""}
             >
               <span className="stage-number">
-                {completed ? "✓" : String(i + 1).padStart(2, "0")}
+                {completed && !active ? (
+                  <Icon name="check" />
+                ) : (
+                  String(i + 1).padStart(2, "0")
+                )}
               </span>
               <div>
                 <strong>{stage.label}</strong>
@@ -48,36 +55,36 @@ function PipelineTimeline({
                   {active
                     ? "In progress"
                     : completed
-                      ? "Completion recorded"
+                      ? "Recorded"
                       : seen
                         ? "Events recorded"
-                        : "No evidence yet"}
+                        : terminal(run.status)
+                          ? "Not recorded"
+                          : "Pending"}
                 </small>
               </div>
-              <span className="stage-indicator" />
             </li>
           );
         })}
       </ol>
-      <div className={`verdict verdict-${run?.status ?? "pending"}`}>
-        <span className="eyebrow">Backend verdict</span>
-        <strong>{run ? labels[run.status] : "Waiting for execution"}</strong>
-        <p>
-          {run?.status === "verified"
-            ? "Passed the executed suite. Scope and limitations remain in the report."
-            : run?.status === "rejected"
-              ? "Required executed checks failed. Inspect the evidence below."
-              : run?.status === "inconclusive"
-                ? "Required evidence is incomplete. This is not a passing result."
-                : run?.status === "error"
-                  ? "Execution could not complete. No passing verdict is established."
-                  : "Agents propose. Independent checks decide."}
-        </p>
+      <div className={`verdict verdict-${run.status}`}>
+        <span className="verdict-label">Verdict</span>
+        <strong>{labels[run.status]}</strong>
+        <span>
+          {run.status === "verified"
+            ? "Passed the executed suite. See report for scope and limitations."
+            : run.status === "rejected"
+              ? "Required checks failed. Review the recorded evidence."
+              : run.status === "inconclusive"
+                ? "Required evidence is incomplete."
+                : run.status === "error"
+                  ? "Execution did not complete."
+                  : "Awaiting independent verification."}
+        </span>
       </div>
     </section>
   );
 }
-
 export function SecurityArena({
   run,
   events,
@@ -85,6 +92,19 @@ export function SecurityArena({
   run: RunResponse | null;
   events: SecurityEvent[];
 }) {
+  if (!run)
+    return (
+      <section className="panel run-empty">
+        <span className="empty-icon">
+          <Icon name="shield" size={26} />
+        </span>
+        <h2>No run selected</h2>
+        <p>
+          Start a verification run or open a saved run to inspect its attack,
+          patch, and test evidence.
+        </p>
+      </section>
+    );
   const attacks = events.filter(
     (e) =>
       ["baseline_reproduced", "challenge_proposed"].includes(e.event_type) ||
@@ -96,118 +116,160 @@ export function SecurityArena({
     ),
   );
   return (
-    <div className="arena-grid">
-      <section className="team-panel red-team">
-        <div className="team-heading">
-          <span className="team-symbol">↗</span>
-          <div>
-            <p className="eyebrow">Red team</p>
-            <h2>Challenge the boundary.</h2>
-          </div>
-          <span className="team-label">ATTACK</span>
-        </div>
-        <p className="support">Controlled reproduction & adversarial cases</p>
-        <div className="finding-card">
-          <span className="eyebrow">
-            {run?.finding?.id ?? "Finding pending"}
-          </span>
-          <h3>{run?.finding?.title ?? "Awaiting vulnerability discovery"}</h3>
-          <span className="badge danger">
-            {run?.finding?.severity ?? "No severity recorded"}
-          </span>
-        </div>
-        <div className="boundary-demo">
-          <div>
-            <span className="avatar">A</span>
-            <strong>Alice</strong>
-            <small>Authenticated user</small>
-          </div>
-          <span className="boundary-arrow">→</span>
-          <div>
-            <span className="invoice">#2001</span>
-            <strong>Bob’s invoice</strong>
-            <small>LedgerLite demo scenario</small>
-          </div>
-        </div>
-        <div className="observation">
-          <span>Baseline response</span>
-          <strong>
-            {run?.baseline?.observed_status
-              ? `HTTP ${run.baseline.observed_status}`
-              : "Not recorded"}
-          </strong>
-          <small>
-            {run?.baseline
-              ? run.baseline.reproduced
-                ? "Vulnerability reproduced"
-                : "Not reproduced"
-              : "Awaiting actual baseline evidence"}
-          </small>
-        </div>
-        <div className="team-events">
-          {attacks.length ? (
-            attacks.slice(-3).map((e) => (
-              <p key={e.event_id}>
-                <span>↗</span>
-                {e.message}
-              </p>
-            ))
-          ) : (
-            <p className="empty-copy">
-              Attack and challenge evidence will appear here.
-            </p>
-          )}
-        </div>
-      </section>
+    <>
       <PipelineTimeline run={run} events={events} />
-      <section className="team-panel blue-team">
-        <div className="team-heading">
-          <span className="team-symbol">⌘</span>
-          <div>
-            <p className="eyebrow">Blue team</p>
-            <h2>Defend with evidence.</h2>
+      <div className="arena-grid">
+        <section className="team-panel red-team">
+          <div className="team-heading">
+            <span className="team-symbol">
+              <Icon name="attack" />
+            </span>
+            <h2>Attack reproduction</h2>
+            <span className="team-label">RED TEAM</span>
           </div>
-          <span className="team-label">DEFEND</span>
-        </div>
-        <p className="support">Remediation proposals & verification feedback</p>
-        <div className="patch-card">
-          <span className="eyebrow">Remediation</span>
-          <div className="attempt-number">
-            {run?.patch ? String(run.patch.attempt).padStart(2, "0") : "—"}
-            <small>patch attempt</small>
+          <div className="team-body">
+            <div className="finding-heading">
+              <span className="eyebrow">
+                {run.finding?.id ?? "Vulnerability"}
+              </span>
+              {run.finding && (
+                <span className={`badge severity-${run.finding.severity}`}>
+                  {run.finding.severity}
+                </span>
+              )}
+            </div>
+            <h3 className="finding-title">
+              {run.finding?.title ?? "Awaiting discovery"}
+            </h3>
+            <div className="request-trace">
+              <div>
+                <span className="avatar">A</span>
+                <div>
+                  <strong>Alice</strong>
+                  <small>Authenticated principal</small>
+                </div>
+              </div>
+              <div className="authorization-boundary">
+                <span /> <Icon name="arrow" />
+                <small>Ownership boundary</small>
+              </div>
+              <div>
+                <Icon name="file" />
+                <div>
+                  <strong>Invoice #2001</strong>
+                  <small>Owned by Bob</small>
+                </div>
+              </div>
+            </div>
+            <span className="trace-caption">
+              LedgerLite authorization scenario
+            </span>
+            <div className="observation">
+              <span>Baseline response</span>
+              <div>
+                <code className={run.baseline?.reproduced ? "danger-text" : ""}>
+                  {run.baseline?.observed_status
+                    ? `HTTP ${run.baseline.observed_status}`
+                    : "Not recorded"}
+                </code>
+                <span className="observation-note">
+                  {run.baseline
+                    ? run.baseline.reproduced
+                      ? "Vulnerability reproduced"
+                      : "Not reproduced"
+                    : "Awaiting evidence"}
+                </span>
+              </div>
+            </div>
+            <div className="team-events">
+              {attacks.length ? (
+                attacks.slice(-2).map((e) => (
+                  <p key={e.event_id}>
+                    <span className="dot" />
+                    {e.message}
+                  </p>
+                ))
+              ) : (
+                <p className="empty-copy">
+                  No attack or challenge events recorded.
+                </p>
+              )}
+            </div>
           </div>
-          <p>
-            {run?.patch
-              ? "A patch proposal is available. Inspect its exact changes below."
-              : "The defender has not supplied a patch."}
-          </p>
-        </div>
-        <div className="observation">
-          <span>Patched HTTP response</span>
-          <strong>Not supplied</strong>
-          <small>
-            The current contract provides baseline HTTP status only.
-          </small>
-        </div>
-        <div className="team-events">
-          {defense.length ? (
-            defense.slice(-3).map((e) => (
-              <p key={e.event_id}>
-                <span>⌘</span>
-                {e.message}
-              </p>
-            ))
-          ) : (
-            <p className="empty-copy">
-              Patch and retry feedback will appear here.
-            </p>
-          )}
-        </div>
-        <div className="trust-note">
-          <span>◇</span> A generated patch is a proposal until independently
-          verified.
-        </div>
-      </section>
-    </div>
+        </section>
+        <section className="team-panel blue-team">
+          <div className="team-heading">
+            <span className="team-symbol">
+              <Icon name="shield" />
+            </span>
+            <h2>Patch & remediation</h2>
+            <span className="team-label">BLUE TEAM</span>
+          </div>
+          <div className="team-body">
+            <div className="finding-heading">
+              <span className="eyebrow">DEFENDER PROPOSAL</span>
+              <span className="badge">
+                {run.patch
+                  ? `Attempt ${String(run.patch.attempt).padStart(2, "0")}`
+                  : "Pending"}
+              </span>
+            </div>
+            <h3 className="finding-title">
+              {run.patch
+                ? "Authorization patch proposed"
+                : "Awaiting remediation"}
+            </h3>
+            <div className={`patch-summary ${run.patch ? "has-code" : ""}`}>
+              <Icon name="code" size={22} />
+              <div>
+                <strong>
+                  {run.patch ? "Code changes available" : "No patch generated"}
+                </strong>
+                <p>
+                  {run.patch
+                    ? "Review added and removed lines in the code changes tab."
+                    : "The defender’s proposal will appear after generation."}
+                </p>
+              </div>
+              {run.patch && (
+                <pre className="patch-preview">
+                  <code>
+                    {run.patch.diff
+                      .split("\n")
+                      .filter(
+                        (line) =>
+                          line.startsWith("+") && !line.startsWith("+++"),
+                      )
+                      .slice(0, 2)
+                      .join("\n") || "Unified diff available below"}
+                  </code>
+                </pre>
+              )}
+            </div>
+            <div className="observation">
+              <span>Patched response</span>
+              <div>
+                <code>Not recorded</code>
+                <span className="observation-note">
+                  Not included in current evidence
+                </span>
+              </div>
+            </div>
+            <div className="team-events">
+              {defense.length ? (
+                defense.slice(-2).map((e) => (
+                  <p key={e.event_id}>
+                    <span className="dot" />
+                    {e.message}
+                  </p>
+                ))
+              ) : (
+                <p className="empty-copy">No patch or retry events recorded.</p>
+              )}
+            </div>
+          </div>
+        </section>
+      </div>
+    </>
   );
 }

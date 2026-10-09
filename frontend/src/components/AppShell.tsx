@@ -1,14 +1,16 @@
 import type { ReactNode } from "react";
+import { Tooltip } from "radix-ui";
 import type { ConnectionStatus } from "../hooks/useBackendHealth";
 import { ConnectionBadge } from "./ConnectionBadge";
-import { SourceBadge } from "./StatusBadge";
+import { Icon, ProofLoopMark } from "./Icon";
+import type { IconName } from "./Icon";
 
 export type Page = "arena" | "analytics" | "history" | "integrations";
-const pages: { id: Page; label: string; icon: string }[] = [
-  { id: "arena", label: "Security arena", icon: "◈" },
-  { id: "analytics", label: "Analytics", icon: "▥" },
-  { id: "history", label: "Run history", icon: "◷" },
-  { id: "integrations", label: "Integrations", icon: "⌘" },
+const pages: { id: Page; label: string; icon: IconName }[] = [
+  { id: "arena", label: "Verification", icon: "arena" },
+  { id: "analytics", label: "Analytics", icon: "analytics" },
+  { id: "history", label: "Run history", icon: "history" },
+  { id: "integrations", label: "Integrations", icon: "integrations" },
 ];
 export function AppShell({
   page,
@@ -26,93 +28,117 @@ export function AppShell({
   children: ReactNode;
 }) {
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
-        <a className="brand" href="#arena" onClick={() => navigate("arena")}>
-          <span className="brand-mark">↻</span>proofloop
-          <span className="brand-period">.</span>
-        </a>
-        <span className="workspace-label">SECURITY WORKSPACE</span>
-        <nav aria-label="Main navigation">
-          {pages.map((item) => (
-            <button
-              key={item.id}
-              className={`nav-item ${page === item.id ? "nav-active" : ""}`}
-              aria-current={page === item.id ? "page" : undefined}
-              onClick={() => navigate(item.id)}
-            >
-              <span aria-hidden="true">{item.icon}</span>
-              {item.label}
-              {page === item.id && <span className="nav-marker" />}
-            </button>
-          ))}
-        </nav>
-        <div className="sidebar-target">
-          <span className="eyebrow">Authorized target</span>
-          <strong>
-            <span className="target-logo">L</span>LedgerLite
-          </strong>
-          <small>Financial API · BOLA scenario</small>
-        </div>
-        <div className="sidebar-footer">
-          <span className="sidebar-shield">◇</span>
-          <strong>Evidence over confidence.</strong>
-          <p>Passing an executed suite does not prove universal security.</p>
-          <span className="badge">Cyberdefense · 2026</span>
-        </div>
-      </aside>
-      <main>
-        <header className="topbar">
-          <span>
-            <span className="muted">Workspace / </span>
-            {pages.find((p) => p.id === page)?.label}
-          </span>
-          <div className="topbar-right">
-            <ConnectionBadge status={status} />
-            <span className="topbar-divider" />
-            <span className="user-avatar">PL</span>
-          </div>
-        </header>
-        <div className="content">
-          <div className="mode-toolbar">
-            <div className="mode-switch" role="group" aria-label="Data source">
-              <button
-                aria-pressed={fixture}
-                className={fixture ? "selected" : ""}
-                onClick={() => setFixture(true)}
-              >
-                Fixture preview
-              </button>
-              <button
-                aria-pressed={!fixture}
-                className={!fixture ? "selected" : ""}
-                onClick={() => setFixture(false)}
-              >
-                Live backend
-              </button>
+    <Tooltip.Provider delayDuration={300}>
+      <div className="app-shell">
+        <aside className="sidebar">
+          <a className="brand" href="#arena" onClick={() => navigate("arena")}>
+            <ProofLoopMark />
+            <span>ProofLoop</span>
+          </a>
+          <div className="workspace-selector">
+            <span className="workspace-avatar">P</span>
+            <div>
+              <strong>ProofLoop workspace</strong>
+              <small>Cyberdefense Hackathon</small>
             </div>
-            <SourceBadge fixture={fixture} />
           </div>
-          {fixture && (
-            <div className="notice">
-              <span>◇</span>
+          <span className="workspace-label">WORKSPACE</span>
+          <nav aria-label="Main navigation">
+            {pages.map((item) => (
+              <button
+                key={item.id}
+                className={`nav-item ${page === item.id ? "nav-active" : ""}`}
+                aria-current={page === item.id ? "page" : undefined}
+                onClick={() => navigate(item.id)}
+              >
+                <Icon name={item.icon} />
+                {item.label}
+              </button>
+            ))}
+          </nav>
+          <div className="sidebar-target">
+            <span className="workspace-label">TARGET APPLICATION</span>
+            <div className="target-entry">
+              <span className="target-logo">L</span>
               <div>
-                <strong>Fixture preview</strong> — illustrative data from the
-                frozen contract. No attacks, tests, patches, or sponsor calls
-                were executed.
+                <strong>LedgerLite</strong>
+                <small>Financial API</small>
+              </div>
+              <span className="target-scope">Local</span>
+            </div>
+          </div>
+          <div className="sidebar-footer">
+            <Icon name="shield" />
+            <div>
+              <strong>Independent verification</strong>
+              <p>Verdicts come from executed tests.</p>
+            </div>
+          </div>
+        </aside>
+        <main>
+          <header className="topbar">
+            <div className="breadcrumbs">
+              <span>Workspace</span>
+              <Icon name="chevron" />
+              <strong>{pages.find((p) => p.id === page)?.label}</strong>
+            </div>
+            <div className="topbar-right">
+              <ConnectionBadge status={status} />
+              <span className="topbar-divider" />
+              <span className="environment-label">Development</span>
+            </div>
+          </header>
+          <div className="content">
+            <div className="workspace-toolbar">
+              <div className="workspace-location">
+                <Icon name="target" />
+                <span>LedgerLite</span>
+                <span className="muted">/</span>
+                <span className="muted">Authorization</span>
+              </div>
+              <div
+                className="mode-switch"
+                role="group"
+                aria-label="Data source"
+              >
+                <button
+                  aria-pressed={fixture}
+                  className={fixture ? "selected" : ""}
+                  onClick={() => setFixture(true)}
+                >
+                  Fixture preview
+                </button>
+                <button
+                  aria-pressed={!fixture}
+                  className={!fixture ? "selected" : ""}
+                  onClick={() => setFixture(false)}
+                >
+                  <span className="dot" />
+                  Live
+                </button>
               </div>
             </div>
-          )}
-          {children}
-          <footer className="page-footer">
-            <span>
-              <span className="brand-period">↻</span> ProofLoop · Autonomous
-              Adversarial Security Verification
-            </span>
-            <span>Executed evidence defines the scope.</span>
-          </footer>
-        </div>
-      </main>
-    </div>
+            {fixture && (
+              <div className="fixture-banner">
+                <Icon name="info" />
+                <strong>Fixture preview</strong>
+                <span>
+                  Illustrative contract data. No attacks or tests have been
+                  executed.
+                </span>
+              </div>
+            )}
+            {children}
+            <footer className="page-footer">
+              <span>ProofLoop</span>
+              <span>
+                Verification is scoped to the executed suite. It does not
+                establish universal security.
+              </span>
+            </footer>
+          </div>
+        </main>
+      </div>
+    </Tooltip.Provider>
   );
 }

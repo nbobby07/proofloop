@@ -30,4 +30,5 @@ GET reports queued/generating/ready/error with AudioArtifact, transcript and rep
 digest; an approved media route serves audio/mpeg. None of these routes exists yet.
 The frontend player already accepts a resolved same-origin/approved media URL.
 
-No tests, smoke tests, live generation, audio playback checks or paid calls ran.
+Unit tests pass for evidence-bound scripts, digests, caching and export approval.
+No live generation, audio playback checks or paid calls ran.

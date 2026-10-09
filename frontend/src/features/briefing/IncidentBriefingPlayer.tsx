@@ -30,7 +30,7 @@ export function IncidentBriefingPlayer({ audio }: { audio?: BriefingAudio }) {
   return (
     <section className="panel sponsor-card">
       <p className="eyebrow">ElevenLabs · incident briefing</p>
-      <h2>Hear the evidence.</h2>
+      <h2>Incident briefing</h2>
       {audio ? (
         <>
           <audio
@@ -77,8 +77,8 @@ export function IncidentBriefingPlayer({ audio }: { audio?: BriefingAudio }) {
           </p>
           <button disabled>Play incident briefing</button>
           <p className="fine-print">
-            PLANNED connection · A must expose generation status and an
-            allowlisted audio URL. No provider execution is claimed.
+            Not connected. Audio will become available after the narration
+            service is configured.
           </p>
         </>
       )}

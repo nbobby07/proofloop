@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import type { AnalyticsResponse } from "../../types";
 import { errorMessage, getAnalytics } from "../../services/api";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
+import { Icon } from "../../components/Icon";
 
 export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
   const [data, setData] = useState<AnalyticsResponse | null>(null);
@@ -46,22 +56,17 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
     <>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">ClickHouse · security observability</p>
-          <h1>
-            History informs
-            <br />
-            <span>the next challenge.</span>
-          </h1>
+          <h1>Security analytics</h1>
           <p className="support">
-            SQL-derived outcomes. Traceable recommendations. No synthetic
-            totals.
+            Recorded run outcomes and failure patterns across verification runs.
           </p>
         </div>
         <button
           disabled={fixture || loading}
           onClick={() => setAttempt((v) => v + 1)}
         >
-          Refresh analytics ↻
+          <Icon name="refresh" />
+          Refresh analytics
         </button>
       </div>
       {fixture && (
@@ -95,7 +100,7 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
               {fixture
                 ? "Live data only"
                 : data
-                  ? "API v1 · SQL-backed adapter required"
+                  ? "Recorded backend outcomes"
                   : loading
                     ? "Loading…"
                     : "No data available"}
@@ -103,19 +108,68 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
           </div>
         ))}
       </div>
-      <section className="panel">
+      <section className="panel analytics-panel">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Adaptive testing</p>
-            <h2>Where checks fail.</h2>
+            <h2>Failures by challenge family</h2>
           </div>
           <span className="badge">
             {updated
               ? `Fetched ${updated.toLocaleTimeString()}`
-              : "Awaiting SQL results"}
+              : "Awaiting results"}
           </span>
         </div>
-        {patterns.length && !fixture ? (
+        {patterns.length > 0 && !fixture && (
+          <div
+            className="analytics-chart"
+            role="img"
+            aria-label="Recorded failures by challenge family; exact values are in the table below."
+          >
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={patterns}
+                layout="vertical"
+                margin={{ top: 10, right: 20, bottom: 5, left: 0 }}
+              >
+                <CartesianGrid horizontal={false} stroke="#303846" />
+                <XAxis
+                  type="number"
+                  allowDecimals={false}
+                  tick={{ fill: "#b7c2d5", fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="challenge_family"
+                  width={125}
+                  tick={{ fill: "#c5cfe0", fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  cursor={{ fill: "#ffffff05" }}
+                  contentStyle={{
+                    background: "#252c38",
+                    border: "1px solid #485469",
+                    borderRadius: 5,
+                    color: "#dae1ef",
+                    fontSize: 11,
+                  }}
+                />
+                <Bar
+                  dataKey="failures"
+                  name="Recorded failures"
+                  fill="#ce8f8b"
+                  radius={[0, 3, 3, 0]}
+                  maxBarSize={22}
+                  isAnimationActive={false}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+        {patterns.length > 0 && !fixture ? (
           <div className="pattern-table">
             <table>
               <thead>
@@ -162,14 +216,13 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
           <p>
             ClickHouse recommendations can prioritize allowlisted challenges.
             Recorded outcomes include timeouts, skipped checks and incomplete
-            results. The orchestrator controls selection and budgets;
-            analytics never determine security verdicts.
+            results. The orchestrator controls selection and budgets; analytics
+            never determine security verdicts.
           </p>
         </div>
       </section>
       <section className="panel planned-metrics">
-        <p className="eyebrow">Awaiting coordinated API fields</p>
-        <h2>More detail, when evidence supports it.</h2>
+        <h2>Additional telemetry</h2>
         <div>
           {[
             "Executed test totals",
@@ -185,9 +238,9 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
           ))}
         </div>
         <p className="fine-print">
-          The frozen analytics response does not expose these metrics. The
-          telemetry adapter can compute extended SQL results for A to expose
-          through an approved contract.
+          These measurements are not available in the current analytics feed.
+          ClickHouse ingestion and adaptive recommendations remain unverified
+          until the telemetry service is connected.
         </p>
       </section>
     </>

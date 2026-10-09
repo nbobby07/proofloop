@@ -9,7 +9,7 @@ export function GuildAuditPanel({ review }: { review?: GuildReview }) {
   return (
     <section className="panel sponsor-card">
       <p className="eyebrow">Guild · hosted evidence auditor</p>
-      <h2>A second look at the claims.</h2>
+      <h2>Evidence audit</h2>
       {review ? (
         <>
           <p>{review.summary}</p>
@@ -34,7 +34,7 @@ export function GuildAuditPanel({ review }: { review?: GuildReview }) {
             Reviews supported claims, missing evidence, and remaining
             limitations.
           </p>
-          <span className="badge">PLANNED · hosted execution not observed</span>
+          <span className="badge">Not connected</span>
           <p className="fine-print">
             An agent opinion cannot override deterministic verification.
           </p>

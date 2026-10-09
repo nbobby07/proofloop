@@ -26,7 +26,14 @@ Direct Uvicorn startup requires those variables already present in the process e
 API modules do not evaluate shell text or load arbitrary dotenv keys. Use one API worker.
 Missing/invalid configured inputs produce safe codes such as `defender_configuration_missing`,
 `invalid_execution_pins`, `approved_inputs_unavailable`, or `approved_inputs_invalid`, never
-exception text or configuration values. A manifest pin must be reviewed out of band; deriving
+exception text or configuration values. Defender `ProviderError` codes are explicitly allowlisted
+and mapped to fixed `defender_*` failure codes (for example `defender_http_400`,
+`defender_missing_model`, `defender_timeout`, or `defender_invalid_patch`). Unknown codes map to
+`defender_provider_failure`. The exact safe code appears in terminal events and report summaries;
+raw error strings, HTTP responses, and credentials are never persisted. These failures terminate
+the run without an automatic model retry, preserving diagnostic visibility and the call budget.
+TLS verification remains enabled; certificate setup belongs to the trusted runtime configuration.
+A manifest pin must be reviewed out of band; deriving
 approval from whichever files happen to be present defeats the trust boundary.
 
 The reviewed HTTP-compatible A1 suite v2 is integrated. Its `suite_version` is read from the

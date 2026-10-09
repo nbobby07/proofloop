@@ -242,3 +242,71 @@ def test_configuration_absent_or_invalid_is_fail_closed(tmp_path, monkeypatch):
     assert isinstance(
         composition.configured_engine(RunStore(tmp_path)), composition.UnavailableEngine
     )
+
+
+@pytest.mark.parametrize(
+    "provider_code,expected",
+    [
+        ("http_400", "defender_http_400"),
+        ("http_404", "defender_http_404"),
+        ("http_503", "defender_http_503"),
+        ("missing_model", "defender_missing_model"),
+        ("missing_credentials", "defender_missing_credentials"),
+        ("timeout", "defender_timeout"),
+        ("unsafe_patch", "defender_invalid_patch"),
+        ("authentication_failed", "defender_authentication_failed"),
+        ("rate_limited", "defender_rate_limited"),
+        ("incomplete_response", "defender_incomplete_response"),
+        ("unit-secret", "defender_provider_failure"),
+        ("http_400_unit-secret", "defender_provider_failure"),
+    ],
+)
+def test_safe_defender_failure_reaches_report_without_retry(
+    engine, monkeypatch, provider_code, expected
+):
+    from fastapi.testclient import TestClient
+
+    from backend.api.main import create_app
+    from backend.providers.errors import ProviderError
+
+    calls = []
+
+    class UnitFailingDefender:
+        """Fault-injection double: never makes provider requests."""
+
+        def __init__(self, **kwargs):
+            assert kwargs["retries"] == 0
+            assert kwargs["timeout"] == 30
+
+        def generate_patch(self, *args):
+            calls.append("generate")
+            error = ProviderError("unit-secret", provider_code)
+            error.args = ("Authorization: Bearer unit-secret; raw sensitive response",)
+            raise error
+
+    async def scenario():
+        runner = install_unit_dependencies(engine, monkeypatch)
+        monkeypatch.setattr(composition, "OpenAIDefender", UnitFailingDefender)
+        service = Orchestrator(engine.store, engine)
+        response = service.create(CreateRunRequest(target="LedgerLite", max_attempts=3))
+        await asyncio.gather(*list(service.tasks.values()))
+        record = engine.store.get(response.run_id)
+        assert record.run.status == RunStatus.ERROR
+        assert record.failure_code == expected
+        assert record.run.patch is None
+        assert runner.calls == ["baseline"]
+        assert calls == ["generate"]
+        assert expected in record.run.events[-1].message
+        return service, response.run_id
+
+    service, run_id = asyncio.run(scenario())
+    with TestClient(create_app(orchestrator=service)) as client:
+        report = client.get(f"/api/runs/{run_id}/report")
+        assert report.status_code == 200
+        assert expected in report.json()["summary"]
+        assert "unit-secret" not in report.text
+        assert "raw sensitive response" not in report.text
+    for path in engine.store.root.rglob("*.json"):
+        contents = path.read_text()
+        assert "unit-secret" not in contents
+        assert "raw sensitive response" not in contents

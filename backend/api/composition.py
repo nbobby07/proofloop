@@ -38,6 +38,7 @@ from backend.engine.patcher import (
 from backend.engine.verifier import baseline_reproduced, evaluate_patch
 from backend.providers.contracts import ChallengeSpec, PolicySource, SecurityPolicy
 from backend.providers.contracts import SourceSnapshot as ProviderSnapshot
+from backend.providers.errors import ProviderError
 from backend.providers.openai_client import OpenAIDefender
 from backend.providers.policy_validation import validate_policy
 from backend.providers.semgrep_client import SemgrepScanner
@@ -55,6 +56,39 @@ POLICY_TEXT = (
     "All frozen security, functional, and adversarial tests must execute. Only app.py is mutable."
 )
 CONTEXT_DESCRIPTION = "Pinned LedgerLite execution context."
+
+# ProviderError is internal, but still never concatenate an arbitrary upstream code.
+DEFENDER_ERROR_CODES = {
+    code: f"defender_{code}"
+    for code in (
+        "missing_credentials",
+        "missing_model",
+        "invalid_input",
+        "invalid_configuration",
+        "request_too_large",
+        "response_too_large",
+        "timeout",
+        "network_error",
+        "authentication_failed",
+        "access_denied",
+        "credits_required",
+        "rate_limited",
+        "invalid_json",
+        "invalid_response",
+        "incomplete_response",
+        "unexpected_output",
+        "refused",
+        "invalid_attempt",
+    )
+}
+DEFENDER_ERROR_CODES["unsafe_patch"] = "defender_invalid_patch"
+DEFENDER_ERROR_CODES.update(
+    {f"http_{status}": f"defender_http_{status}" for status in range(400, 600)}
+)
+
+
+def defender_failure_code(code: str) -> str:
+    return DEFENDER_ERROR_CODES.get(code, "defender_provider_failure")
 
 
 def local_policy() -> SecurityPolicy:
@@ -307,7 +341,10 @@ class LedgerLiteEngine:
             )
             return defender.generate_patch(source, finding, (feedback + list(ctx.feedback))[-20:])
 
-        return await self._offload(generate)
+        try:
+            return await self._offload(generate)
+        except ProviderError as exc:
+            raise ExecutionFailure(defender_failure_code(exc.code)) from None
 
     async def apply_patch(self, run_id, patch):
         def apply():

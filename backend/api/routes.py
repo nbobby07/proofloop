@@ -107,7 +107,7 @@ def get_report(run_id: RunId, http_request: Request) -> ReportResponse:
         source=run.source,
         status=run.status,
         summary=f"Run {run.status}."
-        + (f" {record.failure_message}." if record.failure_message else ""),
+        + (f" Failure code: {record.failure_code}." if record.failure_code else ""),
         verification=run.verification,
         evidence=record.evidence,
         limitations=["Results cover only the frozen executed suites; not universal security."],

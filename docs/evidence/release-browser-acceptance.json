@@ -1,0 +1,965 @@
+{
+  "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+  "source": "execution",
+  "backend_commit": "bb5eddf1c413a96557c5c2c25c30bbe9c4ea3f98",
+  "dashboard_commit": "942607b6026fe7dc1de6f6c10c68ce8211036c05",
+  "model": "gpt-6-luna",
+  "browser": "Codex in-app browser",
+  "baseline": {
+    "reproduced": true,
+    "observed_status": 200
+  },
+  "attempts": [
+    {
+      "attempt": 1,
+      "verdict": "rejected",
+      "verification": {
+        "security_passed": 0,
+        "security_total": 6,
+        "functional_passed": 16,
+        "functional_total": 22,
+        "adversarial_passed": 15,
+        "adversarial_total": 16
+      },
+      "rounds": [
+        {
+          "phase": "verification",
+          "challenge_generation": 0,
+          "verdict": "rejected",
+          "summary": {
+            "security_passed": 0,
+            "security_total": 6,
+            "functional_passed": 16,
+            "functional_total": 22,
+            "adversarial_passed": 15,
+            "adversarial_total": 16
+          }
+        }
+      ]
+    },
+    {
+      "attempt": 2,
+      "verdict": "verified",
+      "verification": {
+        "security_passed": 6,
+        "security_total": 6,
+        "functional_passed": 22,
+        "functional_total": 22,
+        "adversarial_passed": 16,
+        "adversarial_total": 16
+      },
+      "rounds": [
+        {
+          "phase": "verification",
+          "challenge_generation": 0,
+          "verdict": "verified",
+          "summary": {
+            "security_passed": 6,
+            "security_total": 6,
+            "functional_passed": 22,
+            "functional_total": 22,
+            "adversarial_passed": 16,
+            "adversarial_total": 16
+          }
+        },
+        {
+          "phase": "challenge",
+          "challenge_generation": 0,
+          "verdict": "verified",
+          "summary": {
+            "security_passed": 6,
+            "security_total": 6,
+            "functional_passed": 22,
+            "functional_total": 22,
+            "adversarial_passed": 16,
+            "adversarial_total": 16
+          }
+        },
+        {
+          "phase": "challenge",
+          "challenge_generation": 1,
+          "verdict": "verified",
+          "summary": {
+            "security_passed": 6,
+            "security_total": 6,
+            "functional_passed": 22,
+            "functional_total": 22,
+            "adversarial_passed": 16,
+            "adversarial_total": 16
+          }
+        }
+      ]
+    }
+  ],
+  "report": {
+    "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+    "source": "execution",
+    "status": "verified",
+    "summary": "Run verified.",
+    "verification": {
+      "security_passed": 6,
+      "security_total": 6,
+      "functional_passed": 22,
+      "functional_total": 22,
+      "adversarial_passed": 16,
+      "adversarial_total": 16
+    },
+    "evidence": [
+      {
+        "artifact_id": "evidence_3719cd2917ef573329403d4c7d76d5306c37a33f514cdba7a56d65fc55f43af7",
+        "sha256": "3719cd2917ef573329403d4c7d76d5306c37a33f514cdba7a56d65fc55f43af7",
+        "description": "Pinned LedgerLite execution context."
+      },
+      {
+        "artifact_id": "evidence_6b2281d4471d82cb24e70fa8f6b70724923304f2b4e8369fd5c7c762d7888f4a",
+        "sha256": "6b2281d4471d82cb24e70fa8f6b70724923304f2b4e8369fd5c7c762d7888f4a",
+        "description": "Complete scanner diagnostics and source coverage."
+      },
+      {
+        "artifact_id": "evidence_bdcf55450814063453ffb161bf7c8e7e09ac96d3015da6e0208081740aebc1ff",
+        "sha256": "bdcf55450814063453ffb161bf7c8e7e09ac96d3015da6e0208081740aebc1ff",
+        "description": "Independent baseline execution evidence."
+      },
+      {
+        "artifact_id": "evidence_af3ebeea2a430419d05fa7ad8d9ac5d19d9d5790e1fd41631a83f5d5bdff71f9",
+        "sha256": "af3ebeea2a430419d05fa7ad8d9ac5d19d9d5790e1fd41631a83f5d5bdff71f9",
+        "description": "Complete scanner diagnostics and source coverage."
+      },
+      {
+        "artifact_id": "evidence_c7e2586e1c771fb22679d4d510fc496e31aecb537f47a24c761944f68f73fda7",
+        "sha256": "c7e2586e1c771fb22679d4d510fc496e31aecb537f47a24c761944f68f73fda7",
+        "description": "Independent patched execution evidence."
+      },
+      {
+        "artifact_id": "evidence_12e1fd5e48fc9b277dff4d558baf19facaca36c9bfe777e0841fec51602acfe9",
+        "sha256": "12e1fd5e48fc9b277dff4d558baf19facaca36c9bfe777e0841fec51602acfe9",
+        "description": "Independent patch verdict and bound evidence."
+      },
+      {
+        "artifact_id": "evidence_b1d08877e7ac8e95ed70f6e31f782ca44f180a182e917864744a4ac55eeb0cba",
+        "sha256": "b1d08877e7ac8e95ed70f6e31f782ca44f180a182e917864744a4ac55eeb0cba",
+        "description": "Complete scanner diagnostics and source coverage."
+      },
+      {
+        "artifact_id": "evidence_90ae0f90575905f419dce3d78a0b2b36e0697fe3509ff521eb86bc846fb024a9",
+        "sha256": "90ae0f90575905f419dce3d78a0b2b36e0697fe3509ff521eb86bc846fb024a9",
+        "description": "Independent patched execution evidence."
+      },
+      {
+        "artifact_id": "evidence_78b8ef29c2fa9ef27a4b4f02e12aafa704da0da6edfd2b9339405b03cea376a1",
+        "sha256": "78b8ef29c2fa9ef27a4b4f02e12aafa704da0da6edfd2b9339405b03cea376a1",
+        "description": "Independent patch verdict and bound evidence."
+      },
+      {
+        "artifact_id": "evidence_e9ff3b79480f26f7c87b43ec9f9c1e5488eaaf3db12e555311e9dcd7be41448c",
+        "sha256": "e9ff3b79480f26f7c87b43ec9f9c1e5488eaaf3db12e555311e9dcd7be41448c",
+        "description": "Admitted frozen deterministic challenge; no sponsor inference."
+      },
+      {
+        "artifact_id": "evidence_26e937b76fb3c38d578531f2eacfd8406eeb213bc0c6fc1b6afaedb5197216ce",
+        "sha256": "26e937b76fb3c38d578531f2eacfd8406eeb213bc0c6fc1b6afaedb5197216ce",
+        "description": "Independent baseline execution evidence."
+      },
+      {
+        "artifact_id": "evidence_b1d08877e7ac8e95ed70f6e31f782ca44f180a182e917864744a4ac55eeb0cba",
+        "sha256": "b1d08877e7ac8e95ed70f6e31f782ca44f180a182e917864744a4ac55eeb0cba",
+        "description": "Complete scanner diagnostics and source coverage."
+      },
+      {
+        "artifact_id": "evidence_9d907baf6ffd6275dc00f8b0f330f3f971b8e933199bf68de7c0fa6ea11c2fac",
+        "sha256": "9d907baf6ffd6275dc00f8b0f330f3f971b8e933199bf68de7c0fa6ea11c2fac",
+        "description": "Independent patched execution evidence."
+      },
+      {
+        "artifact_id": "evidence_90cda589f9127a1930d92327eec70514648512ee8c920fe6b8227b06fd36a2ae",
+        "sha256": "90cda589f9127a1930d92327eec70514648512ee8c920fe6b8227b06fd36a2ae",
+        "description": "Independent patch verdict and bound evidence."
+      },
+      {
+        "artifact_id": "evidence_e9ff3b79480f26f7c87b43ec9f9c1e5488eaaf3db12e555311e9dcd7be41448c",
+        "sha256": "e9ff3b79480f26f7c87b43ec9f9c1e5488eaaf3db12e555311e9dcd7be41448c",
+        "description": "Admitted frozen deterministic challenge; no sponsor inference."
+      },
+      {
+        "artifact_id": "evidence_0a490d43b3454daa893251c73a54ffdefe2b43f2101801f769033dc5f67948db",
+        "sha256": "0a490d43b3454daa893251c73a54ffdefe2b43f2101801f769033dc5f67948db",
+        "description": "Independent baseline execution evidence."
+      },
+      {
+        "artifact_id": "evidence_b1d08877e7ac8e95ed70f6e31f782ca44f180a182e917864744a4ac55eeb0cba",
+        "sha256": "b1d08877e7ac8e95ed70f6e31f782ca44f180a182e917864744a4ac55eeb0cba",
+        "description": "Complete scanner diagnostics and source coverage."
+      },
+      {
+        "artifact_id": "evidence_c96cb078d3d24731e5ee22e174f90d92d559d8238ebdb77b0df3b7e86dda1a3c",
+        "sha256": "c96cb078d3d24731e5ee22e174f90d92d559d8238ebdb77b0df3b7e86dda1a3c",
+        "description": "Independent patched execution evidence."
+      },
+      {
+        "artifact_id": "evidence_f82c731a64b137383e53aaa384a85762c93a406f7c4ea72982af138de5eb8f96",
+        "sha256": "f82c731a64b137383e53aaa384a85762c93a406f7c4ea72982af138de5eb8f96",
+        "description": "Independent patch verdict and bound evidence."
+      }
+    ],
+    "limitations": [
+      "Results cover only the frozen executed suites; not universal security."
+    ]
+  },
+  "events": [
+    {
+      "event_id": "event_00000001",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:40.926209Z",
+      "stage": "pending",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Run scheduled.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 1,
+        "target": "LedgerLite",
+        "attempt": 0
+      }
+    },
+    {
+      "event_id": "event_00000002",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:40.947652Z",
+      "stage": "pending",
+      "event_type": "stage_completed",
+      "severity": "info",
+      "message": "Stage pending finished.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 2,
+        "target": "LedgerLite",
+        "attempt": 0
+      }
+    },
+    {
+      "event_id": "event_00000003",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:40.969151Z",
+      "stage": "discovering",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Stage discovering started.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 3,
+        "target": "LedgerLite",
+        "attempt": 0
+      }
+    },
+    {
+      "event_id": "event_00000004",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:49.216354Z",
+      "stage": "discovering",
+      "event_type": "finding_discovered",
+      "severity": "info",
+      "message": "Scanner finding selected.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 4,
+        "target": "LedgerLite",
+        "attempt": 0
+      }
+    },
+    {
+      "event_id": "event_00000005",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:49.217932Z",
+      "stage": "discovering",
+      "event_type": "stage_completed",
+      "severity": "info",
+      "message": "Stage discovering finished.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 5,
+        "target": "LedgerLite",
+        "attempt": 0
+      }
+    },
+    {
+      "event_id": "event_00000006",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:49.219084Z",
+      "stage": "reproducing",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Stage reproducing started.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 6,
+        "target": "LedgerLite",
+        "attempt": 0
+      }
+    },
+    {
+      "event_id": "event_00000007",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:54.224683Z",
+      "stage": "reproducing",
+      "event_type": "baseline_reproduced",
+      "severity": "info",
+      "message": "Independent baseline reproduced.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 7,
+        "target": "LedgerLite",
+        "attempt": 0
+      }
+    },
+    {
+      "event_id": "event_00000008",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:54.225515Z",
+      "stage": "reproducing",
+      "event_type": "stage_completed",
+      "severity": "info",
+      "message": "Stage reproducing finished.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 8,
+        "target": "LedgerLite",
+        "attempt": 0
+      }
+    },
+    {
+      "event_id": "event_00000009",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:54.226032Z",
+      "stage": "generating_patch",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Stage generating_patch started.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 9,
+        "target": "LedgerLite",
+        "attempt": 0
+      }
+    },
+    {
+      "event_id": "event_00000010",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:58.352231Z",
+      "stage": "generating_patch",
+      "event_type": "patch_proposed",
+      "severity": "info",
+      "message": "Patch attempt 1 proposed.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 10,
+        "target": "LedgerLite",
+        "attempt": 1,
+        "patch_hash": "c9790adfd0769036937e1aeb5f66a594c3e33a2483387e4aa6255f925287eb5f"
+      }
+    },
+    {
+      "event_id": "event_00000011",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:58.353464Z",
+      "stage": "generating_patch",
+      "event_type": "stage_completed",
+      "severity": "info",
+      "message": "Stage generating_patch finished.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 11,
+        "target": "LedgerLite",
+        "attempt": 1,
+        "patch_hash": "c9790adfd0769036937e1aeb5f66a594c3e33a2483387e4aa6255f925287eb5f"
+      }
+    },
+    {
+      "event_id": "event_00000012",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:58.354344Z",
+      "stage": "applying_patch",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Stage applying_patch started.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 12,
+        "target": "LedgerLite",
+        "attempt": 1,
+        "patch_hash": "c9790adfd0769036937e1aeb5f66a594c3e33a2483387e4aa6255f925287eb5f"
+      }
+    },
+    {
+      "event_id": "event_00000013",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:58.357528Z",
+      "stage": "applying_patch",
+      "event_type": "patch_applied",
+      "severity": "info",
+      "message": "Patch applied in isolated workspace.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 13,
+        "target": "LedgerLite",
+        "attempt": 1,
+        "patch_hash": "c9790adfd0769036937e1aeb5f66a594c3e33a2483387e4aa6255f925287eb5f"
+      }
+    },
+    {
+      "event_id": "event_00000014",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:58.358279Z",
+      "stage": "applying_patch",
+      "event_type": "stage_completed",
+      "severity": "info",
+      "message": "Stage applying_patch finished.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 14,
+        "target": "LedgerLite",
+        "attempt": 1,
+        "patch_hash": "c9790adfd0769036937e1aeb5f66a594c3e33a2483387e4aa6255f925287eb5f"
+      }
+    },
+    {
+      "event_id": "event_00000015",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:34:58.358917Z",
+      "stage": "verifying",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Stage verifying started.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 15,
+        "target": "LedgerLite",
+        "attempt": 1,
+        "patch_hash": "c9790adfd0769036937e1aeb5f66a594c3e33a2483387e4aa6255f925287eb5f"
+      }
+    },
+    {
+      "event_id": "event_00000016",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:10.027982Z",
+      "stage": "verifying",
+      "event_type": "test_completed",
+      "severity": "info",
+      "message": "Independent verification returned rejected.",
+      "source": "execution",
+      "metadata": {
+        "test_execution_id": "run_2cd6645e223d4febb9e3c3b8d75293d4_round_16",
+        "suite": "required_suites",
+        "challenge_family": "required_suites",
+        "outcome": "fail",
+        "executed": true,
+        "sequence": 16,
+        "target": "LedgerLite",
+        "attempt": 1,
+        "patch_hash": "c9790adfd0769036937e1aeb5f66a594c3e33a2483387e4aa6255f925287eb5f"
+      }
+    },
+    {
+      "event_id": "event_00000017",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:10.029155Z",
+      "stage": "verifying",
+      "event_type": "stage_completed",
+      "severity": "info",
+      "message": "Stage verifying finished.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 17,
+        "target": "LedgerLite",
+        "attempt": 1,
+        "patch_hash": "c9790adfd0769036937e1aeb5f66a594c3e33a2483387e4aa6255f925287eb5f"
+      }
+    },
+    {
+      "event_id": "event_00000018",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:10.030029Z",
+      "stage": "retrying",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Stage retrying started.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 18,
+        "target": "LedgerLite",
+        "attempt": 1,
+        "patch_hash": "c9790adfd0769036937e1aeb5f66a594c3e33a2483387e4aa6255f925287eb5f"
+      }
+    },
+    {
+      "event_id": "event_00000019",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:10.030775Z",
+      "stage": "retrying",
+      "event_type": "retry_scheduled",
+      "severity": "info",
+      "message": "Retry scheduled within attempt budget.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 19,
+        "target": "LedgerLite",
+        "attempt": 1,
+        "patch_hash": "c9790adfd0769036937e1aeb5f66a594c3e33a2483387e4aa6255f925287eb5f"
+      }
+    },
+    {
+      "event_id": "event_00000020",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:10.031456Z",
+      "stage": "retrying",
+      "event_type": "stage_completed",
+      "severity": "info",
+      "message": "Stage retrying finished.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 20,
+        "target": "LedgerLite",
+        "attempt": 1,
+        "patch_hash": "c9790adfd0769036937e1aeb5f66a594c3e33a2483387e4aa6255f925287eb5f"
+      }
+    },
+    {
+      "event_id": "event_00000021",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:10.032402Z",
+      "stage": "generating_patch",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Stage generating_patch started.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 21,
+        "target": "LedgerLite",
+        "attempt": 1,
+        "patch_hash": "c9790adfd0769036937e1aeb5f66a594c3e33a2483387e4aa6255f925287eb5f"
+      }
+    },
+    {
+      "event_id": "event_00000022",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:13.535360Z",
+      "stage": "generating_patch",
+      "event_type": "patch_proposed",
+      "severity": "info",
+      "message": "Patch attempt 2 proposed.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 22,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000023",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:13.536751Z",
+      "stage": "generating_patch",
+      "event_type": "stage_completed",
+      "severity": "info",
+      "message": "Stage generating_patch finished.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 23,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000024",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:13.537771Z",
+      "stage": "applying_patch",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Stage applying_patch started.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 24,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000025",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:13.540759Z",
+      "stage": "applying_patch",
+      "event_type": "patch_applied",
+      "severity": "info",
+      "message": "Patch applied in isolated workspace.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 25,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000026",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:13.542042Z",
+      "stage": "applying_patch",
+      "event_type": "stage_completed",
+      "severity": "info",
+      "message": "Stage applying_patch finished.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 26,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000027",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:13.542900Z",
+      "stage": "verifying",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Stage verifying started.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 27,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000028",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:20.441295Z",
+      "stage": "verifying",
+      "event_type": "test_completed",
+      "severity": "info",
+      "message": "Independent verification returned verified.",
+      "source": "execution",
+      "metadata": {
+        "test_execution_id": "run_2cd6645e223d4febb9e3c3b8d75293d4_round_28",
+        "suite": "required_suites",
+        "challenge_family": "required_suites",
+        "outcome": "pass",
+        "executed": true,
+        "sequence": 28,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000029",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:20.443724Z",
+      "stage": "verifying",
+      "event_type": "stage_completed",
+      "severity": "info",
+      "message": "Stage verifying finished.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 29,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000030",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:20.444764Z",
+      "stage": "challenging",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Stage challenging started.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 30,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000031",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:29.235223Z",
+      "stage": "challenging",
+      "event_type": "test_completed",
+      "severity": "info",
+      "message": "Independent verification returned verified.",
+      "source": "execution",
+      "metadata": {
+        "test_execution_id": "run_2cd6645e223d4febb9e3c3b8d75293d4_round_31",
+        "suite": "required_suites",
+        "challenge_family": "required_suites",
+        "outcome": "pass",
+        "executed": true,
+        "sequence": 31,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000032",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:29.236215Z",
+      "stage": "challenging",
+      "event_type": "stage_completed",
+      "severity": "info",
+      "message": "Stage challenging finished.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 32,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000033",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:29.236722Z",
+      "stage": "verified",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Stage verified started.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 33,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000034",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:35:29.237182Z",
+      "stage": "verified",
+      "event_type": "run_completed",
+      "severity": "info",
+      "message": "Run finished: verified.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 34,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000035",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:37:07.190054Z",
+      "stage": "verified",
+      "event_type": "stage_completed",
+      "severity": "info",
+      "message": "Stage verified finished.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 35,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000036",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:37:07.193750Z",
+      "stage": "challenging",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Stage challenging started.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 36,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000037",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:37:17.445311Z",
+      "stage": "challenging",
+      "event_type": "test_completed",
+      "severity": "info",
+      "message": "Independent verification returned verified.",
+      "source": "execution",
+      "metadata": {
+        "test_execution_id": "run_2cd6645e223d4febb9e3c3b8d75293d4_round_37",
+        "suite": "required_suites",
+        "challenge_family": "required_suites",
+        "outcome": "pass",
+        "executed": true,
+        "sequence": 37,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000038",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:37:17.446394Z",
+      "stage": "challenging",
+      "event_type": "stage_completed",
+      "severity": "info",
+      "message": "Stage challenging finished.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 38,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000039",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:37:17.447213Z",
+      "stage": "verified",
+      "event_type": "stage_started",
+      "severity": "info",
+      "message": "Stage verified started.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 39,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    },
+    {
+      "event_id": "event_00000040",
+      "run_id": "run_2cd6645e223d4febb9e3c3b8d75293d4",
+      "timestamp": "2026-10-09T19:37:17.447932Z",
+      "stage": "verified",
+      "event_type": "run_completed",
+      "severity": "info",
+      "message": "Run finished: verified.",
+      "source": "execution",
+      "metadata": {
+        "sequence": 40,
+        "target": "LedgerLite",
+        "attempt": 2,
+        "patch_hash": "38c6783249b5304f4f34f15652b3cd458060ce1ea6e25632e6979a8bc6e40fb7"
+      }
+    }
+  ],
+  "analytics": {
+    "source": "execution",
+    "run_count": 1,
+    "verified_count": 1,
+    "rejected_count": 0,
+    "failure_patterns": [
+      {
+        "challenge_family": "required_suites",
+        "failures": 1,
+        "executions": 4
+      }
+    ]
+  },
+  "executions": [
+    {
+      "execution_id": "c14c0b4855c84854b372b71ada46f278",
+      "phase": "baseline",
+      "status": "completed",
+      "source_sha256": "4798758fa0918eb02f1f7ad7adbba3f62b098f203327b7ccde89760be7d5a1d4",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 37,
+        "failed": 7
+      }
+    },
+    {
+      "execution_id": "22aa01bef03743ae8cbc5eda4378eb5d",
+      "phase": "patched",
+      "status": "completed",
+      "source_sha256": "1b3f1a60180ab2b147482df92e3f18875ba698df0456adee4c785cec8b68fff3",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 31,
+        "failed": 13
+      }
+    },
+    {
+      "execution_id": "bcedd1387d8f44f4a1237efc241cbdd0",
+      "phase": "patched",
+      "status": "completed",
+      "source_sha256": "77e89e0b57dc1ade38b0aab78ee6394e721cd311af6e2cd9ed26e3c09ff4f645",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 44
+      }
+    },
+    {
+      "execution_id": "fee482ae301e4361adccb19c8c7ea125",
+      "phase": "baseline",
+      "status": "completed",
+      "source_sha256": "4798758fa0918eb02f1f7ad7adbba3f62b098f203327b7ccde89760be7d5a1d4",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 37,
+        "failed": 7
+      }
+    },
+    {
+      "execution_id": "ce8603ae73f143cb9ac40cc770e7143a",
+      "phase": "patched",
+      "status": "completed",
+      "source_sha256": "77e89e0b57dc1ade38b0aab78ee6394e721cd311af6e2cd9ed26e3c09ff4f645",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 44
+      }
+    },
+    {
+      "execution_id": "c4088f191ed042f0ada93ff538b077d2",
+      "phase": "baseline",
+      "status": "completed",
+      "source_sha256": "4798758fa0918eb02f1f7ad7adbba3f62b098f203327b7ccde89760be7d5a1d4",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 37,
+        "failed": 7
+      }
+    },
+    {
+      "execution_id": "f582e572b4b84c878e0c1afab8871e53",
+      "phase": "patched",
+      "status": "completed",
+      "source_sha256": "77e89e0b57dc1ade38b0aab78ee6394e721cd311af6e2cd9ed26e3c09ff4f645",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 44
+      }
+    }
+  ],
+  "evidence_hashes_validated": 19,
+  "browser_rechallenge_observed": {
+    "pending_status": "challenging",
+    "previous_counts_cleared": true,
+    "final_status": "verified"
+  },
+  "sponsor_limits": "No ClickHouse, Guild, ElevenLabs, AkashML or Senso live request occurred.",
+  "release_code_commit": "3ecb7dde789a0641013f04db41edbfd04c0bb668",
+  "production_build_readback": {
+    "report_reference_occurrences": 19,
+    "run_count": 1,
+    "unsuccessful_rounds": 1,
+    "recorded_rounds": 4,
+    "new_console_errors": 0
+  }
+}

@@ -55,3 +55,16 @@ Docker isolation and credentialed model calls were not validated by workers.
 
 OpenAI configuration is local and ignored; model gpt-5.4-mini selected for the bounded demo.
 No credentialed calls or end-to-end model success have been recorded yet.
+
+- LedgerLite v2 aaab5d6 reviewed and merged: only the transport-stable selector changes
+  behavioral assertions. 256 default tests pass; Ruff and API drift pass. Local
+  baseline/reference reruns meet expectations.
+- Actual v2 frozen suite in isolated Docker: baseline 44 checks (37 pass, seven expected
+  BOLA failures); separate secure reference 44/44 passes; independent reducer verified.
+  This is reference validation, not a model-generated patch demonstration.
+  Raw evidence: ignored runs/integration/reference-verification-v2.json.
+  Evidence digest: 56369125f183ad9eaf37654d51f172a048f3b4ba8f56498ee9f895994f5bfbd3.
+- User changed defender model to gpt-6-luna. Backend config updated locally; no secrets
+  committed. Initial live run limited to three attempts, no HTTP retries.
+- Reviewed Developer B completed commits fcb6617/942607b and posted frozen-v1 agreement
+  in issue 2. Optional sponsor routes/report revisions deferred; B-owned files preserved.

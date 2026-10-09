@@ -58,11 +58,52 @@ def test_valid_proposal_uses_strict_responses_and_preserves_snapshot():
     assert (method, url) == ("POST", "https://api.openai.com/v1/responses")
     payload = json.loads(body)
     assert payload["store"] is False and "tools" not in payload
+    assert payload["reasoning"] == {"effort": "none"}
     assert payload["text"]["format"]["strict"] is True
     assert payload["text"]["format"]["schema"]["additionalProperties"] is False
     assert json.loads(payload["input"])["feedback"] == ["Previous security check failed"]
     assert headers["Authorization"] == "Bearer test-secret" and timeout == 30
     assert SOURCE.files["app.py"] == "query = 'unsafe'\n"
+
+
+@pytest.mark.parametrize(
+    "effort", ["none", "minimal", "low", "medium", "high", "xhigh", "max", None]
+)
+def test_reasoning_effort_configuration_controls_responses_payload(effort):
+    client, calls = defender(completed(), reasoning_effort=effort)
+    client.generate_patch(SOURCE, FINDING, [])
+    payload = json.loads(calls[0][3])
+    if effort is None:
+        assert "reasoning" not in payload
+    else:
+        assert payload["reasoning"] == {"effort": effort}
+
+
+@pytest.mark.parametrize("effort", ["unknown", "NONE", "", True, 1, {"effort": "none"}])
+def test_invalid_reasoning_effort_is_rejected_before_network(effort):
+    with pytest.raises(ValueError, match="Unsupported reasoning effort"):
+        defender(completed(), reasoning_effort=effort)
+
+
+def test_deadline_configuration_sends_none_and_does_not_retry():
+    calls = []
+
+    def transport(*args):
+        calls.append(args)
+        return HttpResponse(503, b'{"error":"upstream unavailable"}')
+
+    client = OpenAIDefender(
+        allowed_files={"app.py"},
+        api_key="test-secret",
+        model="gpt-6-luna",
+        timeout=30,
+        retries=0,
+        transport=transport,
+    )
+    with pytest.raises(ProviderError, match="http_503"):
+        client.generate_patch(SOURCE, FINDING, [])
+    assert len(calls) == 1 and calls[0][4] == 30
+    assert json.loads(calls[0][3])["reasoning"] == {"effort": "none"}
 
 
 @pytest.mark.parametrize(

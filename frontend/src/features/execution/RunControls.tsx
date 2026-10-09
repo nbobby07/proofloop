@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { RunResponse } from "../../types";
 import type { ConnectionStatus } from "../../hooks/useBackendHealth";
 import type { useRun } from "./useRun";
-import { terminal } from "./lifecycle";
+import { canChallenge, terminal } from "./lifecycle";
 
 export function RunControls({
   fixture,
@@ -48,7 +48,7 @@ export function RunControls({
             <span>↗</span>
           </button>
           <button
-            disabled={fixture || live.busy || !run || !terminal(run.status)}
+            disabled={fixture || live.busy || !canChallenge(run)}
             onClick={() => void live.challenge()}
           >
             Challenge again <span>↻</span>
@@ -56,7 +56,7 @@ export function RunControls({
           <small>
             {fixture
               ? "Switch to Live backend to execute."
-              : "Backend capabilities may still return PLANNED."}
+              : "Executes the authorized LedgerLite target."}
           </small>
         </div>
       </div>

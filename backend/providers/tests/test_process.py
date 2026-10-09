@@ -39,3 +39,19 @@ def test_output_limit(tmp_path):
             env={"PATH": os.defpath},
             timeout=5,
         )
+
+
+def test_exited_process_group_permission_race_preserves_result(tmp_path, monkeypatch):
+    import errno
+
+    def exited_group(*args):
+        raise PermissionError(errno.EPERM, "Unit-test exited process group")
+
+    monkeypatch.setattr(os, "killpg", exited_group)
+    result = run_bounded(
+        [sys.executable, "-c", "print('done')"],
+        cwd=tmp_path,
+        env={"PATH": os.defpath},
+        timeout=5,
+    )
+    assert result.returncode == 0 and result.stdout == b"done\n"

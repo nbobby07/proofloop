@@ -40,7 +40,7 @@ function PipelineTimeline({
               className={active ? "active" : completed ? "complete" : ""}
             >
               <span className="stage-number">
-                {completed ? "✓" : String(i + 1).padStart(2, "0")}
+                {completed && !active ? "✓" : String(i + 1).padStart(2, "0")}
               </span>
               <div>
                 <strong>{stage.label}</strong>

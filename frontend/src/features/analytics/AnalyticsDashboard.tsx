@@ -46,15 +46,15 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
     <>
       <div className="page-heading">
         <div>
-          <p className="eyebrow">ClickHouse · security observability</p>
+          <p className="eyebrow">Execution analytics</p>
           <h1>
             History informs
             <br />
             <span>the next challenge.</span>
           </h1>
           <p className="support">
-            SQL-derived outcomes. Traceable recommendations. No synthetic
-            totals.
+            Persisted execution outcomes, including unsuccessful and incomplete
+            verification rounds.
           </p>
         </div>
         <button
@@ -95,7 +95,7 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
               {fixture
                 ? "Live data only"
                 : data
-                  ? "API v1 · SQL-backed adapter required"
+                  ? "Persisted backend evidence"
                   : loading
                     ? "Loading…"
                     : "No data available"}
@@ -106,13 +106,13 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
       <section className="panel">
         <div className="section-heading">
           <div>
-            <p className="eyebrow">Adaptive testing</p>
+            <p className="eyebrow">Verification history</p>
             <h2>Where checks fail.</h2>
           </div>
           <span className="badge">
             {updated
               ? `Fetched ${updated.toLocaleTimeString()}`
-              : "Awaiting SQL results"}
+              : "Awaiting execution results"}
           </span>
         </div>
         {patterns.length && !fixture ? (
@@ -121,9 +121,9 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
               <thead>
                 <tr>
                   <th>Challenge family</th>
-                  <th>Failures</th>
-                  <th>Recorded outcomes</th>
-                  <th>Observed failure rate</th>
+                  <th>Unsuccessful / incomplete</th>
+                  <th>Verification rounds</th>
+                  <th>Unsuccessful rate</th>
                 </tr>
               </thead>
               <tbody>
@@ -160,8 +160,8 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
         <div className="evidence-note">
           <span>↗</span>
           <p>
-            ClickHouse recommendations can prioritize allowlisted challenges.
-            Recorded outcomes include timeouts, skipped checks and incomplete
+            Optional ClickHouse delivery is separate from these local results.
+            Recorded rounds include timeouts, skipped checks and incomplete
             results. The orchestrator controls selection and budgets;
             analytics never determine security verdicts.
           </p>

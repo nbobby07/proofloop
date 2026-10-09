@@ -27,10 +27,18 @@ def create_app(*, orchestrator=None) -> FastAPI:
             service = orchestrator
         application.state.orchestrator = service
         service.recover()
+        from backend.telemetry.delivery import configured_delivery
+
+        delivery = configured_delivery(service.store)
+        application.state.telemetry = delivery
+        if delivery:
+            delivery.start()
         try:
             yield
         finally:
             await service.close()
+            if delivery:
+                await delivery.close()
 
     application = FastAPI(title="ProofLoop", version="0.1.0", lifespan=lifespan)
     origins = os.getenv("PROOFLOOP_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")

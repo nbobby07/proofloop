@@ -46,6 +46,11 @@ def run_bounded(argv: list[str], *, cwd, env, timeout: float) -> subprocess.Comp
                     os.killpg(process.pid, signal.SIGKILL)
                 except ProcessLookupError:
                     pass
+                except PermissionError:
+                    # macOS can report EPERM for a group whose leader just exited.
+                    # Never suppress a failure to terminate a still-running child.
+                    if process.poll() is None:
+                        raise
             elif process.poll() is None:
                 process.kill()
             if process.poll() is None:

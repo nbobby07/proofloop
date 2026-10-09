@@ -66,7 +66,8 @@ def test_nonexistent_invoice(client, identity, invoice_id):
     assert response.json() == {"detail": "Invoice not found"}
 
 
-@pytest.mark.parametrize("identity", (None, "", "mallory", "Administrator", "alice "))
+# Embedded whitespace survives HTTP header normalization; trailing OWS does not.
+@pytest.mark.parametrize("identity", (None, "", "mallory", "Administrator", "alice bob"))
 @pytest.mark.parametrize("invoice_id", ("inv-1001", "inv-2047", "inv-missing"))
 def test_invalid_identity(client, identity, invoice_id):
     response = client.get(

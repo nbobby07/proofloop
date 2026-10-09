@@ -18,8 +18,8 @@ demo_target/
 Alice (`alice`) and Bob (`bob`) own three invoices each. Administrator
 (`administrator`) can read every invoice. `X-Synthetic-Identity` selects the
 synthetic identity; it is intentionally NOT authentication. Missing, empty, unknown,
-or differently cased selectors return 401. Identity is checked before invoice
-existence; authenticated requests for unknown IDs return 404. Correct behavior is
+or differently cased selectors reaching the application return 401. Identity is
+checked before invoice existence; authenticated requests for unknown IDs return 404. Correct behavior is
 200 for owners and Administrator, 403 for other users, with no invoice disclosed.
 
 Routes:
@@ -44,6 +44,12 @@ python -m uvicorn demo_target.ledgerlite.app:app --host 127.0.0.1 --port 8010
 # Separate secure reference (use instead of the command above):
 python -m uvicorn demo_target.ledgerlite.reference_secure:app --host 127.0.0.1 --port 8011
 ```
+
+HTTP servers may strip optional leading/trailing header whitespace before the
+application sees it. Thus `alice ` may arrive as valid `alice`; the fixture does
+not promise rejection of whitespace removed by transport. The frozen v2 suite
+uses the transport-stable invalid selector `alice bob`, whose embedded space
+survives normalization and is rejected with 401.
 
 Do not expose this fixture remotely. Prefer the in-process trusted test suite; it
 uses no network server. The original hashes are pinned in

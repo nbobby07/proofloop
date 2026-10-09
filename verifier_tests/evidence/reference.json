@@ -32,17 +32,17 @@
     "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-]",
     "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-mallory]",
     "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-Administrator]",
-    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-alice ]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-alice bob]",
     "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-None]",
     "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-]",
     "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-mallory]",
     "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-Administrator]",
-    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-alice ]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-alice bob]",
     "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-None]",
     "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-]",
     "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-mallory]",
     "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-Administrator]",
-    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-alice ]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-alice bob]",
     "verifier_tests/test_ledgerlite.py::test_health",
     "verifier_tests/test_ledgerlite.py::test_access_sequence_preserves_functionality"
   ],
@@ -73,24 +73,24 @@
   "probe_exit_code": 0,
   "pytest_exit_code": 0,
   "pytest_stderr": "",
-  "pytest_stdout": "............................................                             [100%]\n44 passed in 0.10s\n",
+  "pytest_stdout": "............................................                             [100%]\n44 passed in 0.17s\n",
   "results": [
     {
       "phases": [
         {
-          "duration_seconds": 0.03858495899476111,
+          "duration_seconds": 0.05421562498668209,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.00159629198606126,
+          "duration_seconds": 0.002083375002257526,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 9.08750225789845e-05,
+          "duration_seconds": 0.00012466698535718024,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -101,19 +101,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.0001465840032324195,
+          "duration_seconds": 0.0002025419962592423,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0008540840062778443,
+          "duration_seconds": 0.0011384999961592257,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 8.720799814909697e-05,
+          "duration_seconds": 9.524999768473208e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -124,19 +124,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00013862500782124698,
+          "duration_seconds": 0.00016570801381021738,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0007150420278776437,
+          "duration_seconds": 0.0009199999913107604,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 7.070801802910864e-05,
+          "duration_seconds": 0.00011158300912939012,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -147,19 +147,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.0001172090123873204,
+          "duration_seconds": 0.00017795799067243934,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006693750037811697,
+          "duration_seconds": 0.0009889590146485716,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.541699985973537e-05,
+          "duration_seconds": 0.00012024998432025313,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -170,19 +170,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00011441600508987904,
+          "duration_seconds": 0.0001898749906104058,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006408750195987523,
+          "duration_seconds": 0.0010238329996354878,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 7.087501580826938e-05,
+          "duration_seconds": 9.133300045505166e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -193,19 +193,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00012137502199038863,
+          "duration_seconds": 0.00015637499745935202,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006358749815262854,
+          "duration_seconds": 0.0009567920060362667,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.554200081154704e-05,
+          "duration_seconds": 8.7958003859967e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -216,19 +216,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.0001144580019172281,
+          "duration_seconds": 0.00014908300363458693,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006406249885912985,
+          "duration_seconds": 0.0011063339770771563,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.10839924775064e-05,
+          "duration_seconds": 9.695798507891595e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -239,19 +239,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00010783399920910597,
+          "duration_seconds": 0.0001757080026436597,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006262089882511646,
+          "duration_seconds": 0.0009571659902576357,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.429199129343033e-05,
+          "duration_seconds": 8.624998736195266e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -262,19 +262,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00011337501928210258,
+          "duration_seconds": 0.0001553750189486891,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006074580014683306,
+          "duration_seconds": 0.0008313340076711029,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.53750030323863e-05,
+          "duration_seconds": 8.387499838136137e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -285,19 +285,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.0001094160252250731,
+          "duration_seconds": 0.00015279100625775754,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006544579809997231,
+          "duration_seconds": 0.000787582976045087,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.079199374653399e-05,
+          "duration_seconds": 8.02910071797669e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -308,19 +308,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00010766700142994523,
+          "duration_seconds": 0.0001465829845983535,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0007511249859817326,
+          "duration_seconds": 0.0007982089882716537,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 8.704100036993623e-05,
+          "duration_seconds": 8.075000368990004e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -331,19 +331,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00014670798555016518,
+          "duration_seconds": 0.00014437499339692295,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.003814625000813976,
+          "duration_seconds": 0.004257042019162327,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 8.141700527630746e-05,
+          "duration_seconds": 8.433300536125898e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -354,19 +354,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.0001372499973513186,
+          "duration_seconds": 0.00015029197675175965,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006967080116737634,
+          "duration_seconds": 0.0008474999922327697,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.433401722460985e-05,
+          "duration_seconds": 8.30409990157932e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -377,19 +377,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00011620798613876104,
+          "duration_seconds": 0.00017583300359547138,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006175420130603015,
+          "duration_seconds": 0.0008763330115471035,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.091699469834566e-05,
+          "duration_seconds": 8.67500202730298e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -400,19 +400,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00010570799349807203,
+          "duration_seconds": 0.00015829200856387615,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006217079935595393,
+          "duration_seconds": 0.0008026249997783452,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.383299478329718e-05,
+          "duration_seconds": 8.212501415982842e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -423,19 +423,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00011366698890924454,
+          "duration_seconds": 0.00015154201537370682,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006093750125728548,
+          "duration_seconds": 0.0007652500062249601,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 5.9542013332247734e-05,
+          "duration_seconds": 7.924999226815999e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -446,19 +446,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00010529201244935393,
+          "duration_seconds": 0.00014074999489821494,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005715829902328551,
+          "duration_seconds": 0.0007822920160833746,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 5.9833022532984614e-05,
+          "duration_seconds": 8.166601764969528e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -469,19 +469,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00010429200483486056,
+          "duration_seconds": 0.00014466600259765983,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005912089836783707,
+          "duration_seconds": 0.0007741250155959278,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 5.787500413134694e-05,
+          "duration_seconds": 7.94160005170852e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -492,19 +492,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00013345901970751584,
+          "duration_seconds": 0.0001899579947348684,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005855000053998083,
+          "duration_seconds": 0.0007833749987185001,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.462499732151628e-05,
+          "duration_seconds": 8.491598418913782e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -515,19 +515,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.0001397909945808351,
+          "duration_seconds": 0.00018783300765790045,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005919579998590052,
+          "duration_seconds": 0.0007485410023946315,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.195800960995257e-05,
+          "duration_seconds": 8.450000314041972e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -538,19 +538,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00014000001829117537,
+          "duration_seconds": 0.00018499998259358108,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.000586042006034404,
+          "duration_seconds": 0.0007695420063100755,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.895800470374525e-05,
+          "duration_seconds": 8.233299013227224e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -561,19 +561,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00014050002209842205,
+          "duration_seconds": 0.00018554198322817683,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005642499891109765,
+          "duration_seconds": 0.000769499980378896,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.120899342931807e-05,
+          "duration_seconds": 8.641602471470833e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -584,19 +584,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00013333300012163818,
+          "duration_seconds": 0.00018754199845716357,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005895000067539513,
+          "duration_seconds": 0.0007657909882254899,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.224997923709452e-05,
+          "duration_seconds": 8.308302494697273e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -607,19 +607,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.0001401670160703361,
+          "duration_seconds": 0.00018175001605413854,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0007523749954998493,
+          "duration_seconds": 0.0007577500073239207,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 8.229201193898916e-05,
+          "duration_seconds": 8.679201710037887e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -630,19 +630,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00016999998479150236,
+          "duration_seconds": 0.00018716699560172856,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006489170191343874,
+          "duration_seconds": 0.0007842089980840683,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.345799192786217e-05,
+          "duration_seconds": 8.399999933317304e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -653,19 +653,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00013533298624679446,
+          "duration_seconds": 0.00018437500693835318,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005797500198241323,
+          "duration_seconds": 0.0008173329988494515,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.329198367893696e-05,
+          "duration_seconds": 0.00010341699817217886,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -676,19 +676,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00013866598601453006,
+          "duration_seconds": 0.00022408401127904654,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005902500124648213,
+          "duration_seconds": 0.0008599589928053319,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.270897574722767e-05,
+          "duration_seconds": 9.012498776428401e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -699,19 +699,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00013441700139082968,
+          "duration_seconds": 0.00019820898887701333,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005995000246912241,
+          "duration_seconds": 0.0008186250051949173,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.36249897070229e-05,
+          "duration_seconds": 8.524997974745929e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -722,19 +722,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.0001397079904563725,
+          "duration_seconds": 0.00018283299868926406,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0009177090250886977,
+          "duration_seconds": 0.001247665990376845,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.595900049433112e-05,
+          "duration_seconds": 8.499997784383595e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -745,19 +745,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.0001345830096397549,
+          "duration_seconds": 0.00018395899678580463,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006152499991003424,
+          "duration_seconds": 0.0008438330260105431,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.020799628458917e-05,
+          "duration_seconds": 0.00011666701175272465,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -768,19 +768,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00012970800162293017,
+          "duration_seconds": 0.00023116599186323583,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005763329972978681,
+          "duration_seconds": 0.0009395829983986914,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.233301246538758e-05,
+          "duration_seconds": 9.795799269340932e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -791,42 +791,42 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00013004199718125165,
+          "duration_seconds": 0.00019995798356831074,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.000565333990380168,
+          "duration_seconds": 0.0009313339833170176,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.304201087914407e-05,
+          "duration_seconds": 8.82500025909394e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
         }
       ],
-      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-alice ]"
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-alice bob]"
     },
     {
       "phases": [
         {
-          "duration_seconds": 0.00013091700384393334,
+          "duration_seconds": 0.00018887498299591243,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.000563584006158635,
+          "duration_seconds": 0.0009538340091239661,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.158300675451756e-05,
+          "duration_seconds": 8.699999307282269e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -837,19 +837,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00012983399210497737,
+          "duration_seconds": 0.0001832089910749346,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006139579927548766,
+          "duration_seconds": 0.0008707500237505883,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.154199945740402e-05,
+          "duration_seconds": 0.0001027089892886579,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -860,19 +860,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.0001328329963143915,
+          "duration_seconds": 0.00021216599270701408,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005743329820688814,
+          "duration_seconds": 0.0010680419800337404,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.225000834092498e-05,
+          "duration_seconds": 0.0004461249918676913,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -883,19 +883,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.0001315839763265103,
+          "duration_seconds": 0.0005253329873085022,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.000546958006452769,
+          "duration_seconds": 0.00127162502030842,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.141600897535682e-05,
+          "duration_seconds": 9.883299935609102e-05,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -906,42 +906,42 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00012937499559484422,
+          "duration_seconds": 0.00020616597612388432,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005636250134557486,
+          "duration_seconds": 0.001335667009698227,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.29170099273324e-05,
+          "duration_seconds": 0.0001084580144379288,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
         }
       ],
-      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-alice ]"
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-alice bob]"
     },
     {
       "phases": [
         {
-          "duration_seconds": 0.0001340830058325082,
+          "duration_seconds": 0.00022879199241288006,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005584580067079514,
+          "duration_seconds": 0.0011523750144988298,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.254197796806693e-05,
+          "duration_seconds": 0.00010112498421221972,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -952,19 +952,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00013258299441076815,
+          "duration_seconds": 0.00024570798268541694,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005611669912468642,
+          "duration_seconds": 0.0009660829964559525,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.133300485089421e-05,
+          "duration_seconds": 0.00010041601490229368,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -975,19 +975,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00013229099567979574,
+          "duration_seconds": 0.0004639580147340894,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0005584580067079514,
+          "duration_seconds": 0.0011226670176256448,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.129199755378067e-05,
+          "duration_seconds": 0.00010716699762269855,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -998,19 +998,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00013129200669936836,
+          "duration_seconds": 0.0005361669755075127,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.000999707990558818,
+          "duration_seconds": 0.00510158299584873,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 8.22500151116401e-05,
+          "duration_seconds": 0.00021349999587982893,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -1021,42 +1021,42 @@
     {
       "phases": [
         {
-          "duration_seconds": 0.00015937502030283213,
+          "duration_seconds": 0.00027749998844228685,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006224999960977584,
+          "duration_seconds": 0.0034250839962624013,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 6.283298716880381e-05,
+          "duration_seconds": 0.00032745799398981035,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
         }
       ],
-      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-alice ]"
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-alice bob]"
     },
     {
       "phases": [
         {
-          "duration_seconds": 6.59999786876142e-05,
+          "duration_seconds": 0.0004554170009214431,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.0006900420121382922,
+          "duration_seconds": 0.0036520840076263994,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 5.441697430796921e-05,
+          "duration_seconds": 0.00014641598681919277,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -1067,19 +1067,19 @@
     {
       "phases": [
         {
-          "duration_seconds": 6.820799899287522e-05,
+          "duration_seconds": 0.00014024999109096825,
           "failure": null,
           "outcome": "passed",
           "phase": "setup"
         },
         {
-          "duration_seconds": 0.002904416003730148,
+          "duration_seconds": 0.017082542006392032,
           "failure": null,
           "outcome": "passed",
           "phase": "call"
         },
         {
-          "duration_seconds": 0.0006699580117128789,
+          "duration_seconds": 0.0016188340086955577,
           "failure": null,
           "outcome": "passed",
           "phase": "teardown"
@@ -1101,7 +1101,7 @@
   "schema_version": 1,
   "scope": "frozen LedgerLite suite only; no platform security verdict",
   "source": "execution",
-  "suite_manifest_sha256": "a962a7322491c872a921e9f43c82b2a5ef67c02fa65afc47ab805ff91c487c2f",
+  "suite_manifest_sha256": "2e426b9ffb46e0f9168c0327332ef4394728ceb0215ea11af59008f4a1018765",
   "suite_passed": true,
   "target": "LedgerLite",
   "target_file_sha256": {

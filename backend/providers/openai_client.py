@@ -24,6 +24,7 @@ class OpenAIDefender:
         timeout: float = 30,
         retries: int = 1,
         max_output_tokens: int = 8192,
+        reasoning_effort: str | None = "none",
         transport: Transport = https_request,
     ):
         if not allowed_files or not all(mutable_path(p) for p in allowed_files):
@@ -32,11 +33,17 @@ class OpenAIDefender:
             raise ValueError("attempt must be 1..10")
         if type(max_output_tokens) is not int or not 256 <= max_output_tokens <= 16384:
             raise ValueError("max_output_tokens must be 256..16384")
+        if reasoning_effort is not None and (
+            type(reasoning_effort) is not str
+            or reasoning_effort not in {"none", "minimal", "low", "medium", "high", "xhigh", "max"}
+        ):
+            raise ValueError("Unsupported reasoning effort")
         self.allowed_files = frozenset(allowed_files)
         self._api_key = api_key if api_key is not None else os.getenv("OPENAI_API_KEY")
         self.model = model if model is not None else os.getenv("OPENAI_MODEL")
         self.attempt = attempt
         self.max_output_tokens = max_output_tokens
+        self.reasoning_effort = reasoning_effort
         self.http = JsonHttpClient("openai", timeout=timeout, retries=retries, transport=transport)
 
     def generate_patch(
@@ -92,6 +99,8 @@ class OpenAIDefender:
                 }
             },
         }
+        if self.reasoning_effort is not None:
+            payload["reasoning"] = {"effort": self.reasoning_effort}
         response = self.http.request(
             "POST",
             "https://api.openai.com/v1/responses",

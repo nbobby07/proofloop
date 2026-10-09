@@ -22,6 +22,13 @@ from backend.providers.senso_client import SensoPolicyStore, ApprovedPolicyDocum
   UTF-8 text while retaining the immutable original for trusted application/verification.
   Paths in both snapshots and the patch allowlist must match. Recreate the defender per attempt.
   The model cannot set a different attempt. No SDK, filesystem writes, or tools are used.
+  `reasoning_effort` defaults to `"none"` and sends Responses `reasoning: {effort: "none"}`.
+  Other validated values are `minimal`, `low`, `medium`, `high`, `xhigh`, and `max`; the
+  configured model must support the selected value. Set `reasoning_effort=None` to omit
+  the field for models without reasoning controls. For the deadline-limited GPT-6 Luna
+  composition use `model="gpt-6-luna", reasoning_effort="none", timeout=30, retries=0`.
+  GPT-6 Luna supports `none`; its API default is `medium`, so explicit configuration matters.
+  No paid call was made while validating this request setting.
   Proposals remain untrusted until A2's `apply_unified_diff` and independent verifier accept them.
 - `SemgrepScanner(approved_roots=[frozen_source_root], executable="semgrep")` uses the
   bundled, limited Python rules. Paths must be real directories without symlinks; on macOS
@@ -123,6 +130,7 @@ clean `eval` scan. This demonstrates scanner execution only, not remediation ver
 ## Official implementation sources
 
 - [OpenAI Responses structured output](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses)
+- [GPT-6 Luna reasoning controls](https://developers.openai.com/api/docs/models/gpt-6-luna)
 - [AkashML introduction and endpoint/auth](https://akashml.com/docs/getting-started/introduction)
 - [AkashML chat-completion schema](https://akashml.com/docs/api-reference/openai/post-v1-chat-completions)
 - [Semgrep CLI reference](https://docs.semgrep.dev/cli-reference)

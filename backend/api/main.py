@@ -1,6 +1,8 @@
 """Start from repo root: python -m uvicorn backend.api.main:app --reload."""
 
 import os
+from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
@@ -10,8 +12,23 @@ from fastapi.responses import JSONResponse
 from backend.api.routes import router
 
 
-def create_app() -> FastAPI:
-    application = FastAPI(title="ProofLoop", version="0.1.0")
+def create_app(*, orchestrator=None) -> FastAPI:
+    from backend.engine.orchestrator import Orchestrator
+    from backend.storage.runs import RunStore
+
+    @asynccontextmanager
+    async def lifespan(application):
+        service = orchestrator or Orchestrator(
+            RunStore(Path(os.getenv("PROOFLOOP_RUNS_DIR", "runs")))
+        )
+        application.state.orchestrator = service
+        service.recover()
+        try:
+            yield
+        finally:
+            await service.close()
+
+    application = FastAPI(title="ProofLoop", version="0.1.0", lifespan=lifespan)
     origins = os.getenv("PROOFLOOP_CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")
     application.add_middleware(
         CORSMiddleware,
@@ -39,6 +56,18 @@ def create_app() -> FastAPI:
         return JSONResponse(
             status_code=422,
             content={"error": {"code": "invalid_request", "message": "Request validation failed."}},
+        )
+
+    @application.exception_handler(Exception)
+    async def internal_error(request: Request, error: Exception) -> JSONResponse:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": {
+                    "code": "internal_error",
+                    "message": "The request could not be completed.",
+                }
+            },
         )
 
     application.include_router(router)

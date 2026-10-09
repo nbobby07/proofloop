@@ -16,7 +16,14 @@ from backend.providers.senso_client import SensoPolicyStore, ApprovedPolicyDocum
 - `OpenAIDefender(allowed_files={"ledgerlite/app.py"}, attempt=attempt)` reads
   `OPENAI_API_KEY` and `OPENAI_MODEL`. Model choice must support Responses structured outputs.
   `generate_patch(source, finding, feedback)` returns canonical `PatchProposal` only after
-  strict DTO and exact-context unified-diff admission. Supply a canonical provider
+  strict DTO and exact-context unified-diff admission. The internal structured response is
+  `{attempt, replacements: [{path, content}]}`; the model supplies full contents for changed
+  existing allowlisted files, never hunk counts or diff headers. Both internal models forbid
+  extra fields. Replacements are capped at 20 files and 200,000 aggregate UTF-8 bytes;
+  duplicate paths, unknown/missing fields, unapproved paths, attempt drift and all-no-op
+  responses are rejected. Trusted `difflib` generates a deterministic unified diff in sorted
+  path order, preserving final-newline markers; the existing exact validator still admits it.
+  There is no weaker diff-validation fallback. Supply a canonical provider
   `SourceSnapshot(snapshot_id=<opaque id or digest>, files=<approved path-to-text mapping>)`.
   A2's immutable byte snapshot is a different internal type: convert its approved files to
   UTF-8 text while retaining the immutable original for trusted application/verification.
@@ -110,6 +117,15 @@ python -m scripts.export_contracts --check
 The coordinator must add `backend/providers/tests` to CI's explicit pytest command or shared
 configuration so adapter tests are collected. Default tests need no credentials, CLI, or network.
 Mock responses are labeled test data and never installed as production providers.
+
+The deterministic replacement-application tests use A2's real `apply_unified_diff` when it
+is present in the integrated checkout; they do not import or execute target source or the
+secure reference. For the separate provider checkout, opt into the finalized trusted A2
+developer module with `PROOFLOOP_A2_PATCHER_PATH=/absolute/path/to/backend/engine/patcher.py`.
+With that setting, the combined suite passed 187 tests with five live-provider/CLI checks
+skipped. The eight A2 application cases prove exact output bytes for owner-check source
+changes, multiple hunks/files, empty contents, and final-newline changes. This is patch-format
+interoperability evidence, not a successful security-verification claim. No paid calls were made.
 
 Opt-in local real CLI check (no provider keys, no runtime rule downloads):
 

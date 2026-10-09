@@ -24,13 +24,19 @@ no Developer B production files were changed. See docs/INTEGRATION.md for commit
 - Backend tests, Ruff, API drift, frontend contracts/lint/build pass at integration gates.
 - Key-free CI now collects all integrated provider and sandbox unit suites.
 
-## Active acceptance
+## Live acceptance
 
-Real API flow reaches discovery and reproduced Docker baseline. Local Python CA configuration
-was corrected with trusted SSL_CERT_FILE, never by disabling TLS. GPT-6 Luna account access is
-confirmed. Model diff formatting failed strict admission; A3 is supplying a reviewed internal
-replacement-output adapter to derive exact diffs without weakening verification. No model patch
-has been accepted yet. Failures and raw execution evidence remain in ignored runs/ storage.
+Real API run `run_c42befd59bb640d9bff0f71a7d306546` used GPT-6 Luna with a three-attempt
+budget and no HTTP retries. Actual Semgrep discovery and Docker baseline succeeded. The first
+model patch was rejected for administrator regressions. The second passed all 44 frozen checks
+(6 security, 22 functional, 16 adversarial), followed by fresh baseline/patched challenge execution.
+Raw run manifests preserve both attempts and failure evidence under ignored runs/ storage.
+API rechallenge invalidated the old verdict, reran baseline/patched containers, and passed with five additional evidence references.
+
+The local Python certificate bundle was configured using trusted SSL_CERT_FILE. Model proposals
+use internal bounded replacement source and deterministic exact diffs; the public PatchProposal
+and strict verifier admission remain unchanged. No reference patch or fake result is installed
+in production composition.
 
 ## Developer B coordination
 
@@ -40,7 +46,7 @@ B-owned changes remain separate for their own review and integration.
 
 ## Limits and next steps
 
-- Finish live model patch, independent verification, fresh challenge and rechallenge acceptance.
+- Push branch and open the protected-main PR; await required CI and review.
 - Optional AkashML/Senso credentialed calls, telemetry, Guild and narration are unverified/deferred.
 - Push security-engine and open main PR after acceptance and final checks.
 - Main requires backend/frontend CI and one approving review. Do not merge before both.

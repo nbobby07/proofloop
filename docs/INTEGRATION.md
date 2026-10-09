@@ -53,8 +53,8 @@ Docker isolation and credentialed model calls were not validated by workers.
 - Developer B coordination record: https://github.com/nbobby07/proofloop/issues/2.
 - Main protection verified: backend and frontend CI plus one approving review required.
 
-OpenAI configuration is local and ignored; model gpt-5.4-mini selected for the bounded demo.
-No credentialed calls or end-to-end model success have been recorded yet.
+OpenAI configuration is local and ignored. The requested final defender model is gpt-6-luna.
+Actual acceptance is recorded below; optional provider calls remain unverified.
 
 - LedgerLite v2 aaab5d6 reviewed and merged: only the transport-stable selector changes
   behavioral assertions. 256 default tests pass; Ruff and API drift pass. Local
@@ -68,3 +68,34 @@ No credentialed calls or end-to-end model success have been recorded yet.
   committed. Initial live run limited to three attempts, no HTTP retries.
 - Reviewed Developer B completed commits fcb6617/942607b and posted frozen-v1 agreement
   in issue 2. Optional sponsor routes/report revisions deferred; B-owned files preserved.
+
+## Model-backed acceptance
+
+- Composition 485bd41 and diagnostic fix f14c1da reviewed and merged; all owned paths respected.
+- Provider reasoning d2debf5 and replacement adapter b43e5c2 reviewed and merged.
+  The model supplies bounded source replacements; trusted code derives exact diffs and the
+  existing patcher/verifier admission is unchanged. Public API contracts did not change.
+- Final default suite: 319 passed / 8 opt-in skipped; Ruff lint/format and API drift passed.
+- Python CA bundle failure was diagnosed before provider execution; SSL_CERT_FILE uses the
+  system trust bundle and authenticated model access preflight succeeded. TLS stays verified.
+- Invalid model diffs failed admission with defender_invalid_patch and no applied patch.
+  Their completed error manifests/evidence remain in local ignored storage.
+- Actual GPT-6 Luna API run: run_c42befd59bb640d9bff0f71a7d306546. Run creation returned 202
+  in 0.0024s. Discovery was an actual complete four-file Semgrep scan; baseline executed in Docker.
+- Attempt one was rejected: security 6/6, functional 16/22, adversarial 15/16. It blocked
+  administrator access; neither model output nor security-only success was accepted as verified.
+- Attempt two: all 44 checks passed (security 6/6, functional 22/22, adversarial 16/16).
+  A fresh baseline/patched deterministic challenge also passed, yielding a verified scoped verdict.
+- Run/report/events/analytics were read through real API handlers, without mock transports.
+  Initial verified report has 14 evidence references and preserves the rejected attempt.
+- Model inference occurred only on authorized synthetic source. No AkashML/Senso calls, remote
+  attacks, sponsor telemetry, narration or Guild review occurred. Actual provider billing was
+  not queried; no measured dollar claim is made.
+
+- API rechallenge returned 202/challenging, executed a fresh baseline and patched suite, then
+  verified again. Five new references; final report 19 hash-validated references. Seven distinct
+  actual container execution IDs across baseline, both patch attempts, challenge and rechallenge.
+- Sanitized actual API acceptance receipt is committed in docs/evidence/live-api-acceptance.json;
+  it includes both actual verdicts, events, summary counts, artifact hashes and execution identities.
+- Production source inventory checked for the local credential: no tracked file contains it.
+  Developer B frontend/telemetry/reports/Guild paths have no integration-branch modifications.

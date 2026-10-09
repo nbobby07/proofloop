@@ -28,5 +28,20 @@ export function mergeEvents(
 }
 
 export const canChallenge = (run: RunResponse | null) =>
-  !!run && ["verified", "rejected", "inconclusive"].includes(run.status) &&
-  !!run.patch && run.baseline?.reproduced === true;
+  !!run &&
+  ["verified", "rejected", "inconclusive"].includes(run.status) &&
+  !!run.patch &&
+  run.baseline?.reproduced === true;
+
+// Presentation labels for recorded rounds; these cannot assign a run verdict.
+export function recordedOutcome(event: SecurityEvent) {
+  if (event.source === "fixture")
+    return { label: "Preview", tone: "incomplete" };
+  if (event.metadata?.executed === false)
+    return { label: "Not executed", tone: "incomplete" };
+  if (event.metadata?.executed === true && event.metadata?.outcome === "pass")
+    return { label: "Passed", tone: "pass" };
+  if (event.metadata?.executed === true && event.metadata?.outcome === "fail")
+    return { label: "Failed", tone: "fail" };
+  return { label: "Incomplete / unavailable", tone: "incomplete" };
+}

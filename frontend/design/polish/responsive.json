@@ -1,0 +1,149 @@
+[
+  {
+    "navigation": [
+      {
+        "text": "Verification",
+        "width": 187
+      },
+      {
+        "text": "Analytics",
+        "width": 187
+      },
+      {
+        "text": "Run history",
+        "width": 187
+      },
+      {
+        "text": "Integrations",
+        "width": 187
+      }
+    ],
+    "overflow": [
+      {
+        "scrollWidth": 1000,
+        "selector": "page-heading",
+        "width": 1000
+      },
+      {
+        "scrollWidth": 404,
+        "selector": "run-actions",
+        "width": 404
+      },
+      {
+        "scrollWidth": 998,
+        "selector": "pipeline-list",
+        "width": 998
+      },
+      {
+        "scrollWidth": 1000,
+        "selector": "arena-grid",
+        "width": 1000
+      },
+      {
+        "scrollWidth": 1000,
+        "selector": "evidence-layout",
+        "width": 1000
+      }
+    ],
+    "pageWidth": 1280,
+    "width": 1280
+  },
+  {
+    "navigation": [
+      {
+        "text": "Verification",
+        "width": 149
+      },
+      {
+        "text": "Analytics",
+        "width": 149
+      },
+      {
+        "text": "Run history",
+        "width": 149
+      },
+      {
+        "text": "Integrations",
+        "width": 149
+      }
+    ],
+    "overflow": [
+      {
+        "scrollWidth": 560,
+        "selector": "page-heading",
+        "width": 560
+      },
+      {
+        "scrollWidth": 404,
+        "selector": "run-actions",
+        "width": 404
+      },
+      {
+        "scrollWidth": 558,
+        "selector": "pipeline-list",
+        "width": 558
+      },
+      {
+        "scrollWidth": 560,
+        "selector": "arena-grid",
+        "width": 560
+      },
+      {
+        "scrollWidth": 560,
+        "selector": "evidence-layout",
+        "width": 560
+      }
+    ],
+    "pageWidth": 768,
+    "width": 768
+  },
+  {
+    "navigation": [
+      {
+        "text": "Verification",
+        "width": 88
+      },
+      {
+        "text": "Analytics",
+        "width": 88
+      },
+      {
+        "text": "Run history",
+        "width": 88
+      },
+      {
+        "text": "Integrations",
+        "width": 88
+      }
+    ],
+    "overflow": [
+      {
+        "scrollWidth": 366,
+        "selector": "page-heading",
+        "width": 366
+      },
+      {
+        "scrollWidth": 352,
+        "selector": "run-actions",
+        "width": 352
+      },
+      {
+        "scrollWidth": 364,
+        "selector": "pipeline-list",
+        "width": 364
+      },
+      {
+        "scrollWidth": 366,
+        "selector": "arena-grid",
+        "width": 366
+      },
+      {
+        "scrollWidth": 366,
+        "selector": "evidence-layout",
+        "width": 366
+      }
+    ],
+    "pageWidth": 390,
+    "width": 390
+  }
+]

@@ -25,7 +25,9 @@ const AnalyticsDashboard = lazy(() =>
 );
 
 export function Dashboard() {
-  const [fixture, updateFixture] = useState(() => readSelection("source") !== "execution");
+  const [fixture, updateFixture] = useState(
+    () => readSelection("source") !== "execution",
+  );
   const setFixture = (value: boolean) => {
     saveSelection("source", value ? "fixture" : "execution");
     updateFixture(value);
@@ -33,7 +35,15 @@ export function Dashboard() {
   const [page, setPage] = useState<Page>("arena");
   const health = useBackendHealth();
   const live = useRun(!fixture);
-  const run = fixture ? fixtureRun : live.run;
+  // Suppress old evidence while the challenge request is in flight, even before
+  // its acceptance arrives. A rejected request restores the last known snapshot.
+  const challengeRequested = live.busyAction === "challenge";
+  const run = fixture
+    ? fixtureRun
+    : challengeRequested && live.run
+      ? { ...live.run, status: "challenging" as const, verification: null }
+      : live.run;
+  const report = fixture || challengeRequested ? null : live.report;
   const events = fixture ? (fixtureRun.events ?? []) : live.events;
   const openHistoryRun = (id: string) => {
     setFixture(false);
@@ -68,15 +78,21 @@ export function Dashboard() {
             run={run}
             connection={health.status}
           />
-          <SecurityArena run={run} events={events} />
+          <SecurityArena run={run} events={events} report={report} />
           <div className="evidence-layout">
             <EvidenceReport
               run={run}
-              report={fixture ? null : live.report}
+              events={events}
+              report={report}
               reportError={live.reportError}
               fixture={fixture}
             />
-            <EventStream events={events} fixture={fixture} />
+            <div className="review-rail">
+              <EventStream events={events} fixture={fixture} />
+              {report && (
+                <BriefingPanel key={JSON.stringify(report)} report={report} />
+              )}
+            </div>
           </div>
         </>
       )}
@@ -92,9 +108,11 @@ export function Dashboard() {
       {page === "integrations" && (
         <div className="sponsor-grid">
           <GuildAuditPanel />
-          {!fixture && live.report ? (
-            <BriefingPanel key={JSON.stringify(live.report)} report={live.report} />
-          ) : <IncidentBriefingPlayer />}
+          {report ? (
+            <BriefingPanel key={JSON.stringify(report)} report={report} />
+          ) : (
+            <IncidentBriefingPlayer />
+          )}
         </div>
       )}
     </AppShell>

@@ -12,9 +12,9 @@ reproduction, Patch & remediation, Security evidence, Event stream.
 
 | Role | Color | Application |
 |---|---|---|
-| Canvas | #101216 | Quiet graphite background |
+| Canvas | #0E1115 | Quiet graphite background |
 | Navigation | #0C0E12 | Persistent application shell |
-| Panel | #15181D | Evidence surfaces |
+| Panel | #15191E | Evidence surfaces |
 | Structure | #2A3039 | Fine separators and boundaries |
 | Primary text | #E7E9EF | Warm neutral foreground |
 | Secondary text | #9AA3B2 | Context, timestamps and labels |
@@ -29,14 +29,14 @@ These shapes repeat by function. The custom boundary graphic explains object
 ownership. Large color fills are reserved for small semantic surfaces.
 
 Typography uses locally available system sans with Inter when installed.
-Use 25px page headings, compact section headings, readable 12–13px working
+Use 32px desktop page headings (23px on phones), compact section headings, readable 12–13px working
 text and monospace run IDs, diffs, HTTP status and timestamps. Metadata has
 less emphasis than actions and results. Code is selectable. No font-network
 dependency is required for the demo.
 
 ## Layout
 
-Desktop: 216px navigation, 55px top bar, 30px content gutters. The workspace
+Desktop: 216px navigation, 55px top bar, 32px content gutters. The workspace
 context and explicit fixture/live switch remain above the run controls.
 
 1. Page title and execution actions.
@@ -47,8 +47,8 @@ context and explicit fixture/live switch remain above the run controls.
 5. Evidence inspector and chronological event stream. Accessible tabs switch
    between verification summaries, exact diff and saved report.
 
-Analytics and history have separate pages. Optional audit/narration tools live
-in Integrations. At tablet widths the evidence panels stack; at phone widths
+Analytics and history have separate pages. Optional audit tools live in Integrations; report-bound narration also appears
+beside current evidence. At tablet widths the evidence panels stack; at phone widths
 navigation becomes four equal items, the pipeline becomes two rows and the
 arena panels stack. No controls disappear into clipped horizontal navigation.
 
@@ -89,8 +89,8 @@ contract. React/TypeScript/Vite/Tailwind remain the required foundation.
 ## Evidence constraints
 
 The merged backend API is live. Its analytics currently come from local run
-storage; the UI does not label them ClickHouse SQL. ClickHouse/Guild/narration
-remain unverified until connected. No fabricated chart series or integration
+storage; the UI does not label them ClickHouse SQL. ClickHouse/Guild remain unverified until connected. Report-bound ElevenLabs
+playback was verified in the UI polish browser run. No fabricated chart series or integration
 success states are introduced. A terminal run with no recorded stage completion
 shows Not recorded, rather than implying a stage is still pending or succeeded.
 
@@ -100,3 +100,15 @@ Readable desktop and 390px phone layouts; all navigation visible; source labelin
 persists; keyboard tabs/dialog work; real API failures remain errors; accepted
 rechallenge clears stale evidence; build/lint/contracts and relevant tests pass.
 See VALIDATION.md for measured results and local runtime limits.
+
+
+## UI and motion refinement — October 9, 2026
+
+The frontend now uses a complete Discover → Report rail, an independent-verdict
+strip, amber fixture results, retained recorded rounds and report-bound narration
+beside the evidence. Navigation/evidence indicators share Motion layout identity;
+150/220/320ms tokens and reduced-motion guards keep movement restrained. Current
+results are withheld while Challenge Again is pending and invalidated after acceptance.
+Recharts remains the analytics engine after evaluating Bklit registry installation.
+See [UI-MOTION-POLISH.md](UI-MOTION-POLISH.md) for research, measured bundle impact,
+actual execution receipts, matched screenshots and explicit validation limitations.

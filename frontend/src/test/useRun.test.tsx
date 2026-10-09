@@ -62,13 +62,11 @@ describe("run lifecycle", () => {
       });
     vi.mocked(api.getReport).mockReset().mockResolvedValue(reportDouble);
     vi.mocked(api.createRun).mockReset();
-    vi.mocked(api.challengeRun)
-      .mockReset()
-      .mockResolvedValue({
-        run_id: "run_unit",
-        source: "execution",
-        status: "challenging",
-      });
+    vi.mocked(api.challengeRun).mockReset().mockResolvedValue({
+      run_id: "run_unit",
+      source: "execution",
+      status: "challenging",
+    });
   });
   it("invalidates prior verification after an accepted challenge even if a stale terminal snapshot arrives", async () => {
     const { result } = renderHook(() => useRun(true));
@@ -80,6 +78,31 @@ describe("run lifecycle", () => {
     expect(result.current.run?.verification).toBeNull();
     expect(result.current.report).toBeNull();
     expect(api.getReport).toHaveBeenCalledTimes(1);
+  });
+  it("exposes a pending challenge request and restores known evidence on rejection", async () => {
+    let rejectRequest!: (reason: Error) => void;
+    vi.mocked(api.challengeRun).mockImplementation(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectRequest = reject;
+        }),
+    );
+    const { result } = renderHook(() => useRun(true));
+    act(() => result.current.open("run_unit"));
+    await waitFor(() => expect(result.current.report).toEqual(reportDouble));
+    let request!: Promise<void>;
+    act(() => {
+      request = result.current.challenge();
+    });
+    expect(result.current.busyAction).toBe("challenge");
+    await act(async () => {
+      rejectRequest(new Error("Challenge request failed"));
+      await request;
+    });
+    expect(result.current.busyAction).toBeNull();
+    expect(result.current.error).toBe("Challenge request failed");
+    expect(result.current.report).toEqual(reportDouble);
+    expect(result.current.run?.status).toBe("verified");
   });
   it("does not submit a challenge for an execution error without reproduced baseline and patch", async () => {
     vi.mocked(api.getRun).mockResolvedValue({
@@ -174,16 +197,26 @@ describe("run lifecycle", () => {
   it("restores only the selected run ID and refetches its current result", async () => {
     const first = renderHook(() => useRun(true));
     act(() => first.result.current.open("run_unit"));
-    await waitFor(() => expect(first.result.current.run?.status).toBe("verified"));
+    await waitFor(() =>
+      expect(first.result.current.run?.status).toBe("verified"),
+    );
     first.unmount();
-    vi.mocked(api.getRun).mockClear().mockResolvedValue({
-      ...runDouble, status: "error", verification: null,
+    vi.mocked(api.getRun)
+      .mockClear()
+      .mockResolvedValue({
+        ...runDouble,
+        status: "error",
+        verification: null,
+      });
+    vi.mocked(api.getReport).mockResolvedValue({
+      ...reportDouble,
+      status: "error",
     });
-    vi.mocked(api.getReport).mockResolvedValue({ ...reportDouble, status: "error" });
     const restored = renderHook(() => useRun(true));
-    await waitFor(() => expect(restored.result.current.run?.status).toBe("error"));
+    await waitFor(() =>
+      expect(restored.result.current.run?.status).toBe("error"),
+    );
     expect(api.getRun).toHaveBeenCalled();
     expect(restored.result.current.run?.verification).toBeNull();
   });
-
 });

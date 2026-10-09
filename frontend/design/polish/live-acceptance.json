@@ -1,0 +1,133 @@
+{
+  "date": "2026-10-09",
+  "frontend": "http://127.0.0.1:5176",
+  "backend": "http://127.0.0.1:8001",
+  "before_challenge": {
+    "run_id": "run_b79f04fcd8114bf7b215a49e4286175e",
+    "source": "execution",
+    "status": "verified",
+    "baseline": {
+      "reproduced": true,
+      "observed_status": 200
+    },
+    "patch_attempt": 2,
+    "verification": {
+      "security_passed": 6,
+      "security_total": 6,
+      "functional_passed": 22,
+      "functional_total": 22,
+      "adversarial_passed": 16,
+      "adversarial_total": 16
+    },
+    "recorded_rounds": [
+      {
+        "event_id": "event_00000016",
+        "message": "Independent verification returned rejected.",
+        "metadata": {
+          "test_execution_id": "run_b79f04fcd8114bf7b215a49e4286175e_round_16",
+          "suite": "required_suites",
+          "challenge_family": "required_suites",
+          "outcome": "fail",
+          "executed": true,
+          "sequence": 16,
+          "target": "LedgerLite",
+          "attempt": 1,
+          "patch_hash": "bacedd8ed764ab93581df06b5fbe8637ca1de9416f652abdcb72becd61bfeae9"
+        }
+      },
+      {
+        "event_id": "event_00000028",
+        "message": "Independent verification returned verified.",
+        "metadata": {
+          "test_execution_id": "run_b79f04fcd8114bf7b215a49e4286175e_round_28",
+          "suite": "required_suites",
+          "challenge_family": "required_suites",
+          "outcome": "pass",
+          "executed": true,
+          "sequence": 28,
+          "target": "LedgerLite",
+          "attempt": 2,
+          "patch_hash": "8046e2fc95b96106a820e2f5691845c2b34ae8a491664d379fbf1ab781e1265c"
+        }
+      },
+      {
+        "event_id": "event_00000031",
+        "message": "Independent verification returned verified.",
+        "metadata": {
+          "test_execution_id": "run_b79f04fcd8114bf7b215a49e4286175e_round_31",
+          "suite": "required_suites",
+          "challenge_family": "required_suites",
+          "outcome": "pass",
+          "executed": true,
+          "sequence": 31,
+          "target": "LedgerLite",
+          "attempt": 2,
+          "patch_hash": "8046e2fc95b96106a820e2f5691845c2b34ae8a491664d379fbf1ab781e1265c"
+        }
+      }
+    ],
+    "report_references": 14,
+    "briefing": {
+      "status": "ready",
+      "report_sha256": "398a94577f6423d22320edd2fef900d9360a330f80c7034a0c8f840fe30170e3",
+      "audio_path": "/api/audio/briefing_45d4494a88b23b82673c6e8514643db73c711955180bc4849852d44dcf5e5d5c"
+    }
+  },
+  "old_audio_after_challenge_http_status": 409,
+  "after_challenge": {
+    "run_id": "run_b79f04fcd8114bf7b215a49e4286175e",
+    "source": "execution",
+    "status": "verified",
+    "verification": {
+      "security_passed": 6,
+      "security_total": 6,
+      "functional_passed": 22,
+      "functional_total": 22,
+      "adversarial_passed": 16,
+      "adversarial_total": 16
+    },
+    "event_count": 40,
+    "report_references": 19,
+    "new_rounds": [
+      {
+        "event_id": "event_00000037",
+        "message": "Independent verification returned verified.",
+        "metadata": {
+          "test_execution_id": "run_b79f04fcd8114bf7b215a49e4286175e_round_37",
+          "suite": "required_suites",
+          "challenge_family": "required_suites",
+          "outcome": "pass",
+          "executed": true,
+          "sequence": 37,
+          "target": "LedgerLite",
+          "attempt": 2,
+          "patch_hash": "8046e2fc95b96106a820e2f5691845c2b34ae8a491664d379fbf1ab781e1265c"
+        }
+      }
+    ]
+  },
+  "browser_observations": {
+    "challenge_in_progress": {
+      "current_verdict": "Challenging",
+      "suite_counts": [
+        "\u2014 / \u2014",
+        "\u2014 / \u2014",
+        "\u2014 / \u2014"
+      ],
+      "audio_players": 0
+    },
+    "briefing_controls": [
+      "play",
+      "pause",
+      "replay",
+      "transcript"
+    ],
+    "keyboard_evidence_tabs": "Right arrow moved Code changes to Evidence report",
+    "responsive_page_widths": [
+      1440,
+      1280,
+      768,
+      390
+    ]
+  }
+}

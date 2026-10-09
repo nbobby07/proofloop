@@ -24,7 +24,15 @@ export function RunControls({
     <>
       <div className="page-heading">
         <div>
-          <h1>Security verification</h1>
+          <p className="eyebrow page-kicker">
+            SECURITY OPERATIONS <span>/</span> VERIFICATION
+          </p>
+          <h1>
+            Security verification
+            <span className="heading-period" aria-hidden="true">
+              .
+            </span>
+          </h1>
           <p className="support">
             Reproduce the vulnerability. Review the patch. Inspect the evidence.
           </p>
@@ -75,11 +83,15 @@ export function RunControls({
             </Dialog.Root>
           )}
           <button
+            className="challenge-action"
+            title="Invalidate the previous verdict and execute fresh independent challenges"
             disabled={fixture || live.busy || !canChallenge(run)}
             onClick={() => void live.challenge()}
           >
             <Icon name="refresh" />
-            Challenge again
+            {live.busyAction === "challenge"
+              ? "Requesting challenge…"
+              : "Challenge again"}
           </button>
           <button
             className="primary"
@@ -92,10 +104,28 @@ export function RunControls({
             onClick={() => void live.start()}
           >
             <Icon name="play" />
-            {live.busy ? "Submitting…" : "Start verification"}
+            {live.busyAction === "start" ? "Submitting…" : "Start verification"}
           </button>
         </div>
       </div>
+      {!fixture && run?.status === "challenging" && (
+        <div className="challenge-notice" role="status">
+          <Icon name="refresh" />
+          <div>
+            <strong>
+              {live.busyAction === "challenge"
+                ? "Requesting fresh challenges"
+                : "Fresh challenges in progress"}
+            </strong>
+            <p>
+              {live.busyAction === "challenge"
+                ? "Previous result withheld while the backend accepts the request."
+                : "Previous verdict invalidated. New events and independent verification must complete before a new result is recorded."}
+            </p>
+          </div>
+          <span className="badge">Awaiting verdict</span>
+        </div>
+      )}
       <div className="run-strip">
         <div>
           <span className="eyebrow">CURRENT RUN</span>

@@ -166,6 +166,12 @@ class LedgerLiteEngine:
         self.scanner = SemgrepScanner(
             approved_roots=[self.workspaces], timeout=30, executable=semgrep_executable
         )
+        self.legacy_scanner = SemgrepScanner(
+            approved_roots=[self.workspaces],
+            timeout=30,
+            executable=semgrep_executable,
+            rules=[repository / "backend/providers/rules/python-security-classic-v1.yml"],
+        )
         self.runner = DockerRunner(
             image_id, workspace_parent=self.workspaces, docker_host=docker_host
         )
@@ -230,9 +236,15 @@ class LedgerLiteEngine:
             reference = next(
                 (ref for ref in record.evidence if ref.description == CONTEXT_DESCRIPTION), None
             )
-            if reference is None or self.artifacts.read(reference) != self.pins:
+            stored = self.artifacts.read(reference) if reference else None
+            if stored is None or (
+                {k: v for k, v in stored.items() if k != "ruleset_hash"}
+                != {k: v for k, v in self.pins.items() if k != "ruleset_hash"}
+                or stored.get("ruleset_hash")
+                not in {self.scanner.ruleset_hash, self.legacy_scanner.ruleset_hash}
+            ):
                 raise ExecutionFailure("execution_context_changed")
-            ctx = Context(dict(self.pins))
+            ctx = Context(dict(stored))
             if record.run.patch:
                 ctx.patch = apply_unified_diff(
                     self.original, record.run.patch.diff, allowed_files=PATCH_ALLOWLIST
@@ -240,9 +252,13 @@ class LedgerLiteEngine:
             self.contexts[run_id] = ctx
         return self.contexts[run_id]
 
-    def _scan(self, snapshot):
+    def _scan(self, snapshot, ctx=None):
+        expected = ctx.pins["ruleset_hash"] if ctx else self.pins["ruleset_hash"]
+        scanner = (
+            self.legacy_scanner if expected == self.legacy_scanner.ruleset_hash else self.scanner
+        )
         with disposable_workspace(snapshot, self.workspaces) as workspace:
-            report = self.scanner.scan_with_details(workspace)
+            report = scanner.scan_with_details(workspace)
         payload = asdict(report)
         payload["result"] = report.result.model_dump(mode="json")
         payload["source_sha256"] = snapshot.sha256
@@ -252,7 +268,7 @@ class LedgerLiteEngine:
             or report.diagnostics
             or report.skipped_paths
             or set(report.scanned_paths) != set(SOURCE_FILES)
-            or report.result.ruleset_hash != self.pins["ruleset_hash"]
+            or report.result.ruleset_hash != expected
         ):
             raise ExecutionFailure("scan_incomplete", RunStatus.INCONCLUSIVE, [reference])
         return report, reference
@@ -368,7 +384,7 @@ class LedgerLiteEngine:
                 refs.append(baseline_ref)
             if ctx.baseline is None:
                 raise ExecutionFailure("baseline_missing", RunStatus.INCONCLUSIVE)
-            _, scan_ref = self._scan(ctx.patch.patched)
+            _, scan_ref = self._scan(ctx.patch.patched, ctx)
             refs.append(scan_ref)
             patched, execution_ref = self._run(ctx, ctx.patch.patched, "patched")
             refs.append(execution_ref)
@@ -442,7 +458,7 @@ class UnavailableEngine:
         raise ExecutionFailure(self.code)
 
 
-def configured_engine(store: RunStore):
+def _configured_classic_engine(store: RunStore):
     """Opt-in only. Configuration errors become safe run failures, not startup tracebacks."""
     if os.getenv("PROOFLOOP_EXECUTION_ENABLED") != "1":
         return None
@@ -469,3 +485,16 @@ def configured_engine(store: RunStore):
         return UnavailableEngine("approved_inputs_invalid")
     except Exception:
         return UnavailableEngine("execution_configuration_failed")
+
+
+def configured_engine(store: RunStore):
+    classic = _configured_classic_engine(store)
+    if os.getenv("PROOFLOOP_WORKSPACE_ENABLED") != "1":
+        return classic
+    from backend.api.workspace_engine import TargetDispatcher, WorkspaceEngine
+
+    try:
+        workspace = WorkspaceEngine(Path(__file__).resolve().parents[2], store)
+    except Exception:
+        workspace = UnavailableEngine("workspace_configuration_failed")
+    return TargetDispatcher(classic, workspace, store)

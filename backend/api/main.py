@@ -22,11 +22,23 @@ def create_app(*, orchestrator=None) -> FastAPI:
             from backend.api.composition import configured_engine
 
             store = RunStore(Path(os.getenv("PROOFLOOP_RUNS_DIR", "runs")))
-            service = Orchestrator(store, configured_engine(store), stage_timeout=180)
+            service = Orchestrator(store, configured_engine(store), stage_timeout=1200)
         else:
             service = orchestrator
         application.state.orchestrator = service
         service.recover()
+        if os.getenv("PROOFLOOP_AKASH_ENABLED") == "1":
+            import asyncio
+
+            from backend.providers.akash_compute import Budget, Compute
+
+            try:
+                await asyncio.to_thread(
+                    Compute(Budget(service.store.root / "akash-budget.sqlite3")).reconcile
+                )
+            except Exception:
+                # Outstanding reservations continue blocking new cloud deployments.
+                pass
         from backend.reports.briefings import BriefingService
         from backend.reports.narrator import ElevenLabsClient, NarrationConfig, NarrationUnavailable
 

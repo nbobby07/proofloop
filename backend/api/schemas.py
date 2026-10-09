@@ -48,6 +48,7 @@ class EventSeverity(StrEnum):
 
 
 class EventType(StrEnum):
+    PROVIDER_ACTIVITY = "provider_activity"
     STAGE_STARTED = "stage_started"
     STAGE_COMPLETED = "stage_completed"
     FINDING_DISCOVERED = "finding_discovered"
@@ -130,8 +131,24 @@ class RunResponse(ContractModel):
 
 class CreateRunRequest(ContractModel):
     # An allowlisted server-side target id; never an arbitrary host URL or shell command.
-    target: Literal["LedgerLite"]
+    target: Literal["LedgerLite", "LedgerLite Workspace"]
     max_attempts: int = Field(default=3, ge=1, le=10)
+    execution_mode: Literal["local", "local_akash"] = "local"
+
+    @model_validator(mode="after")
+    def supported_execution(self):
+        if self.target == "LedgerLite" and self.execution_mode != "local":
+            raise ValueError("Akash execution requires the versioned Workspace target")
+        return self
+
+
+class ExecutionDetails(ContractModel):
+    run_id: Identifier
+    target: str
+    execution_mode: Literal["local", "local_akash"]
+    source: Literal["execution"] = "execution"
+    entries: list[dict[str, JsonValue]] = Field(default_factory=list)
+    budget: dict[str, JsonValue] = Field(default_factory=dict)
 
 
 class ChallengeRequest(ContractModel):

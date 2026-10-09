@@ -24,6 +24,7 @@ export const statuses: RunStatus[] = [
   "error",
 ];
 const eventTypes = [
+  "provider_activity",
   "stage_started",
   "stage_completed",
   "finding_discovered",

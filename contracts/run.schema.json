@@ -40,6 +40,7 @@
     },
     "EventType": {
       "enum": [
+        "provider_activity",
         "stage_started",
         "stage_completed",
         "finding_discovered",

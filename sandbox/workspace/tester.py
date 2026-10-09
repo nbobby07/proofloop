@@ -1,6 +1,8 @@
 """Trusted black-box HTTP oracle. Never imports application code or accepts model verdicts."""
 
+import base64
 import csv
+import hashlib
 import http.client
 import io
 import json
@@ -298,7 +300,19 @@ if __name__ == "__main__":
         "suite_sha256": sha(job["cases"]),
         "results": results,
     }
-    print("PROOFLOOP_RECEIPT=" + json.dumps(receipt, separators=(",", ":")), flush=True)
+    # Provider log scanners bound each line. Frame the receipt without weakening
+    # integrity checks; the collector requires every chunk and its payload hash.
+    payload = json.dumps(receipt, separators=(",", ":")).encode()
+    encoded = base64.b64encode(payload).decode()
+    pieces = [encoded[i : i + 6000] for i in range(0, len(encoded), 6000)]
+    print(
+        "PROOFLOOP_RECEIPT_BEGIN="
+        + json.dumps({"chunks": len(pieces), "sha256": hashlib.sha256(payload).hexdigest()}),
+        flush=True,
+    )
+    for index, piece in enumerate(pieces):
+        print(f"PROOFLOOP_RECEIPT_CHUNK={index}:{piece}", flush=True)
+    print("PROOFLOOP_RECEIPT_END=complete", flush=True)
     if os.environ.get("PROOFLOOP_CLOUD") == "1":
         from http.server import BaseHTTPRequestHandler, HTTPServer
 

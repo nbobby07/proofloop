@@ -144,7 +144,7 @@ export function Dashboard() {
           </Suspense>
         ) : (
           <Welcome
-            start={() => void live.start()}
+            start={(target, mode) => void live.start(target, mode)}
             history={() => setPage("history")}
             connection={health.status}
             busy={live.busy}

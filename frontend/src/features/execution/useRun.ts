@@ -153,7 +153,10 @@ export function useRun(enabled: boolean) {
       revision: previous.revision + 1,
     }));
   }, []);
-  const start = async () => {
+  const start = async (
+    target: "LedgerLite" | "LedgerLite Workspace" = "LedgerLite",
+    executionMode: "local" | "local_akash" = "local",
+  ) => {
     if (!enabled || busy) return;
     const controller = new AbortController();
     mutation.current?.abort();
@@ -163,7 +166,11 @@ export function useRun(enabled: boolean) {
     setError(null);
     try {
       const result = await createRun(
-        { target: "LedgerLite", max_attempts: 3 },
+        {
+          target,
+          max_attempts: 3,
+          execution_mode: executionMode,
+        },
         controller.signal,
       );
       if (controller.signal.aborted) return;

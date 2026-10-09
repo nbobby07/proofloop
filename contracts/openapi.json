@@ -217,6 +217,15 @@
       "CreateRunRequest": {
         "additionalProperties": false,
         "properties": {
+          "execution_mode": {
+            "default": "local",
+            "enum": [
+              "local",
+              "local_akash"
+            ],
+            "title": "Execution Mode",
+            "type": "string"
+          },
           "max_attempts": {
             "default": 3,
             "maximum": 10.0,
@@ -225,7 +234,10 @@
             "type": "integer"
           },
           "target": {
-            "const": "LedgerLite",
+            "enum": [
+              "LedgerLite",
+              "LedgerLite Workspace"
+            ],
             "title": "Target",
             "type": "string"
           }
@@ -287,6 +299,7 @@
       },
       "EventType": {
         "enum": [
+          "provider_activity",
           "stage_started",
           "stage_completed",
           "finding_discovered",
@@ -372,6 +385,60 @@
         "title": "EvidenceReference",
         "type": "object"
       },
+      "ExecutionDetails": {
+        "additionalProperties": false,
+        "properties": {
+          "budget": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "title": "Budget",
+            "type": "object"
+          },
+          "entries": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "title": "Entries",
+            "type": "array"
+          },
+          "execution_mode": {
+            "enum": [
+              "local",
+              "local_akash"
+            ],
+            "title": "Execution Mode",
+            "type": "string"
+          },
+          "run_id": {
+            "maxLength": 128,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9_-]+$",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "source": {
+            "const": "execution",
+            "default": "execution",
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "run_id",
+          "target",
+          "execution_mode"
+        ],
+        "title": "ExecutionDetails",
+        "type": "object"
+      },
       "FailurePattern": {
         "additionalProperties": false,
         "properties": {
@@ -436,6 +503,19 @@
         ],
         "title": "FindingSeverity",
         "type": "string"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
       },
       "HealthResponse": {
         "additionalProperties": false,
@@ -787,6 +867,46 @@
           "query_ms"
         ],
         "title": "TelemetryAnalyticsResponse",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
         "type": "object"
       },
       "VerificationSummary": {
@@ -1479,6 +1599,48 @@
           }
         },
         "summary": "Get Events"
+      }
+    },
+    "/api/runs/{run_id}/execution": {
+      "get": {
+        "operationId": "execution_details_api_runs__run_id__execution_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "maxLength": 128,
+              "minLength": 1,
+              "pattern": "^[A-Za-z0-9_-]+$",
+              "title": "Run Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionDetails"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Execution Details"
       }
     },
     "/api/runs/{run_id}/report": {

@@ -1,5 +1,6 @@
 """Workspace admission and evidence integrity; no candidate code executes in CI."""
 
+import base64
 import copy
 import hashlib
 import json
@@ -132,6 +133,34 @@ def test_single_complete_receipt_only():
     for raw in ("", line + "\n" + line):
         with pytest.raises(ValueError):
             parse_receipt(raw, job)
+
+
+def test_large_chunked_receipt_requires_complete_ordered_hash_bound_transport():
+    job, result = receipt()
+    result["results"][0]["tests"][0]["steps"][0]["evidence"] = "x" * 80_000
+    payload = json.dumps(result).encode()
+    encoded = base64.b64encode(payload).decode()
+    pieces = [encoded[i : i + 6000] for i in range(0, len(encoded), 6000)]
+    lines = [
+        "PROOFLOOP_RECEIPT_BEGIN="
+        + json.dumps({"chunks": len(pieces), "sha256": hashlib.sha256(payload).hexdigest()}),
+        *[f"PROOFLOOP_RECEIPT_CHUNK={i}:{piece}" for i, piece in enumerate(pieces)],
+        "PROOFLOOP_RECEIPT_END=complete",
+    ]
+    assert max(map(len, lines)) < 6100
+    assert parse_receipt("\n".join(lines), job) == result
+    corrupted = lines.copy()
+    corrupted[1] = corrupted[1][:-4] + "AAAA"
+    for invalid in (
+        lines[:-1],
+        lines[:2] + lines[3:],
+        lines[:2] + lines[1:],
+        [lines[0], lines[2], lines[1], *lines[3:]],
+        lines + lines,
+        corrupted,
+    ):
+        with pytest.raises(ValueError):
+            parse_receipt("\n".join(invalid), job)
 
 
 def test_original_generation_is_immutable_and_correctness_focused():

@@ -21,6 +21,13 @@ CREATE TABLE IF NOT EXISTS {table}
     policy_hash String,
     finding_key String,
     baseline_reproduced Nullable(UInt8),
+    provider LowCardinality(String),
+    activity LowCardinality(String),
+    target_revision String,
+    environment LowCardinality(String),
+    model LowCardinality(String),
+    cost_reservation_usd Nullable(Float64),
+    measured_cost_usd Nullable(Float64),
     inserted_at DateTime64(6, 'UTC')
 )
 ENGINE = ReplacingMergeTree(inserted_at)

@@ -91,8 +91,16 @@ export function IntegrationStatus({
             "Evidence-bound briefing routes · availability checked for each completed report",
           ],
           [
-            "Semgrep / Akash / OpenAI / Senso",
-            "Availability is not exposed by the current API",
+            "AkashML + Akash compute",
+            "Model requests, cloud deployments, executed checks and lease closure are recorded in Workspace investigations.",
+          ],
+          [
+            "Semgrep / OpenAI",
+            "Scanner diagnostics and patch proposals are bound to each investigation's evidence.",
+          ],
+          [
+            "Senso",
+            "Live policy retrieval is not configured; reviewed local policies remain authoritative.",
           ],
         ].map(([name, detail]) => (
           <div className="integration-row" key={name}>
@@ -101,7 +109,7 @@ export function IntegrationStatus({
               <small>{detail}</small>
             </div>
             <span className="badge">
-              {name === "ElevenLabs" ? "See current briefing" : "Not verified"}
+              {name === "ElevenLabs" ? "See current briefing" : name === "Senso" || name === "Guild" ? "Not verified" : "See run evidence"}
             </span>
           </div>
         ))}

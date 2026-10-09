@@ -1,5 +1,6 @@
 """Versioned local/cloud builds and receipt validation; no candidate host execution."""
 
+import base64
 import hashlib
 import json
 import os
@@ -94,6 +95,28 @@ def validate_receipt(receipt, job):
 
 
 def parse_receipt(logs, job):
+    framed = [line for line in logs.splitlines() if line.startswith("PROOFLOOP_RECEIPT_")]
+    if framed:
+        if "PROOFLOOP_RECEIPT=" in logs or len(logs) > 512_000:
+            raise ValueError("Ambiguous or oversized receipt")
+        if not framed[0].startswith("PROOFLOOP_RECEIPT_BEGIN=") or framed[-1] != (
+            "PROOFLOOP_RECEIPT_END=complete"
+        ):
+            raise ValueError("Incomplete receipt framing")
+        header = json.loads(framed[0].split("=", 1)[1])
+        count = header.get("chunks")
+        if type(count) is not int or not 1 <= count <= 100 or len(framed) != count + 2:
+            raise ValueError("Invalid receipt chunk inventory")
+        pieces = []
+        for index, line in enumerate(framed[1:-1]):
+            prefix = f"PROOFLOOP_RECEIPT_CHUNK={index}:"
+            if not line.startswith(prefix) or len(line) > 6100:
+                raise ValueError("Missing, repeated or reordered receipt chunk")
+            pieces.append(line[len(prefix) :])
+        payload = base64.b64decode("".join(pieces), validate=True)
+        if hashlib.sha256(payload).hexdigest() != header.get("sha256"):
+            raise ValueError("Receipt transport hash mismatch")
+        return validate_receipt(json.loads(payload), job)
     lines = [
         line.removeprefix("PROOFLOOP_RECEIPT=")
         for line in logs.splitlines()

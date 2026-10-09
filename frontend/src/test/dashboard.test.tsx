@@ -34,7 +34,7 @@ describe("guided investigation workspace", () => {
         name: "Find out whether your security fix actually works.",
       }),
     ).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "LedgerLite" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "LedgerLite Classic" })).toBeTruthy();
     await waitFor(() =>
       expect(
         (

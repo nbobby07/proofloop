@@ -18,6 +18,7 @@ SETTINGS = {
     "SEMGREP_EXECUTABLE",
     "OPENAI_API_KEY",
     "OPENAI_MODEL",
+    "SSL_CERT_FILE",
 }
 
 

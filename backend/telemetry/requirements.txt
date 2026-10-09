@@ -1,2 +1,2 @@
-# Optional adapter dependency; coordinate additions to the shared lock with Developer A.
-clickhouse-connect>=0.8,<2
+# Optional production telemetry driver; verified against ClickHouse Cloud.
+clickhouse-connect==1.10.0

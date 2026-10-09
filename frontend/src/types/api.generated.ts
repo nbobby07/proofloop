@@ -158,6 +158,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/telemetry/analytics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Cloud Analytics */
+        get: operations["cloud_analytics_api_telemetry_analytics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -402,6 +419,39 @@ export interface components {
          * @enum {string}
          */
         Source: "fixture" | "execution";
+        /**
+         * TelemetryAnalyticsResponse
+         * @description SQL results only; local fallback never masquerades as cloud telemetry.
+         */
+        TelemetryAnalyticsResponse: {
+            analytics: components["schemas"]["AnalyticsResponse"];
+            /** Event Count */
+            event_count: number;
+            /** Incomplete Rounds */
+            incomplete_rounds: number;
+            /** Latest Event At */
+            latest_event_at?: string | null;
+            /** Mean Patch Attempts */
+            mean_patch_attempts?: number | null;
+            /** Mean Verification Duration Ms */
+            mean_verification_duration_ms?: number | null;
+            /** Pending Events */
+            pending_events: number;
+            /** Query Ms */
+            query_ms: number;
+            /**
+             * Source
+             * @default execution
+             * @constant
+             */
+            source: "execution";
+            /**
+             * Storage
+             * @default clickhouse
+             * @constant
+             */
+            storage: "clickhouse";
+        };
         /** VerificationSummary */
         VerificationSummary: {
             /** Adversarial Passed */
@@ -975,6 +1025,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    cloud_analytics_api_telemetry_analytics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TelemetryAnalyticsResponse"];
                 };
             };
         };

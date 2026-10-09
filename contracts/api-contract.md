@@ -81,3 +81,14 @@ BriefingRequest/BriefingResponse and never accept arbitrary narration text:
 The frontend independently hashes the displayed report, validates the returned
 identity, and clears its player when the report is invalidated. Current audio cannot
 be mistaken for a new verdict. Fixture and unfinished reports are never exported.
+
+## Optional live ClickHouse analytics extension
+
+`GET /api/telemetry/analytics` returns canonical `TelemetryAnalyticsResponse` from
+actual SQL, or HTTP 503 when disabled/unavailable. It includes execution provenance,
+`storage=clickhouse`, the existing analytics DTO, event count, pending delivery count,
+incomplete round count, optional mean proposals and verification-stage duration,
+latest event timestamp and measured snapshot query milliseconds. No arbitrary query
+is accepted. The seven original v1 models and local `/api/analytics` are unchanged.
+UI fallback uses the local endpoint and explicitly changes its source label; local
+values never receive a ClickHouse claim.

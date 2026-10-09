@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
-import type { AnalyticsResponse } from "../../types";
-import { errorMessage, getAnalytics } from "../../services/api";
+import type {
+  AnalyticsResponse,
+  TelemetryAnalyticsResponse,
+} from "../../types";
+import {
+  errorMessage,
+  getAnalytics,
+  getCloudAnalytics,
+} from "../../services/api";
 import {
   BarChart,
   Bar,
@@ -14,6 +21,8 @@ import { Icon } from "../../components/Icon";
 
 export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
   const [data, setData] = useState<AnalyticsResponse | null>(null);
+  const [cloud, setCloud] = useState<TelemetryAnalyticsResponse | null>(null);
+  const [localFallback, setLocalFallback] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [attempt, setAttempt] = useState(0);
@@ -26,7 +35,21 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
     const load = async () => {
       setLoading(true);
       try {
-        const response = await getAnalytics(controller.signal);
+        let response: AnalyticsResponse;
+        try {
+          const result = await getCloudAnalytics(controller.signal);
+          if (!active) return;
+          setCloud(result);
+          setLocalFallback(false);
+          response = result.analytics;
+        } catch {
+          if (!active) return;
+          setCloud(null);
+          setData(null);
+          setUpdated(null);
+          setLocalFallback(true);
+          response = await getAnalytics(controller.signal);
+        }
         if (!active) return;
         if (response.source !== "execution")
           throw new Error("Live analytics rejected fixture data.");
@@ -77,6 +100,38 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
           Refresh analytics
         </button>
       </div>
+      {!fixture && cloud && (
+        <section
+          className="panel analytics-panel"
+          aria-label="ClickHouse query evidence"
+        >
+          <div className="section-heading">
+            <h2>Live from ClickHouse</h2>
+            <span className="badge">SQL-backed execution history</span>
+          </div>
+          <p>
+            {cloud.event_count} deduplicated events · {cloud.pending_events}{" "}
+            local events awaiting delivery · {cloud.query_ms.toFixed(0)} ms to
+            fetch this SQL snapshot
+          </p>
+          <p className="fine-print">
+            Latest recorded event:{" "}
+            {cloud.latest_event_at
+              ? new Date(cloud.latest_event_at).toLocaleString()
+              : "No events yet"}
+            . Query time includes network latency; this is a small real dataset,
+            not a scale benchmark.
+          </p>
+        </section>
+      )}
+      {!fixture && localFallback && (
+        <div className="notice" role="status">
+          ClickHouse is unavailable or disabled.{" "}
+          {data
+            ? "Showing locally persisted analytics; these values are not a live SQL result."
+            : "Local analytics are loading or unavailable; no cloud result is shown."}
+        </div>
+      )}
       {fixture && (
         <div className="notice">
           Fixture preview does not feed production analytics. Switch to Live
@@ -119,7 +174,11 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
       <section className="panel analytics-panel">
         <div className="section-heading">
           <div>
-            <h2>Unsuccessful rounds by challenge family</h2>
+            <h2>
+              {cloud
+                ? "Failed rounds by challenge family"
+                : "Unsuccessful rounds by challenge family"}
+            </h2>
           </div>
           <span className="badge">
             {updated
@@ -129,7 +188,11 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
         </div>
         {patterns.length > 0 && !fixture && (
           <div className="chart-legend">
-            <span>Unsuccessful / incomplete rounds</span>
+            <span>
+              {cloud
+                ? "Explicit failures / recorded rounds"
+                : "Unsuccessful / incomplete rounds"}
+            </span>
             <span>Rate per challenge family · 0–100%</span>
           </div>
         )}
@@ -137,7 +200,7 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
           <div
             className="analytics-chart"
             role="img"
-            aria-label="Unsuccessful or incomplete rounds by challenge family; exact values are in the table below."
+            aria-label="Recorded round outcomes by challenge family; exact values are in the table below."
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
@@ -173,12 +236,13 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
                       <div className="chart-tooltip">
                         <b>{pattern.challenge_family}</b>
                         <p>
-                          <strong>{pattern.failures}</strong> unsuccessful /
-                          incomplete of {pattern.executions} rounds
+                          <strong>{pattern.failures}</strong>{" "}
+                          {cloud ? "failed" : "unsuccessful / incomplete"} of{" "}
+                          {pattern.executions} rounds
                         </p>
                         <p>
                           {pattern.executions
-                            ? `${pattern.rate.toFixed(1)}% unsuccessful`
+                            ? `${pattern.rate.toFixed(1)}% ${cloud ? "failed" : "unsuccessful"}`
                             : "Rate unavailable · no rounds"}
                         </p>
                       </div>
@@ -207,9 +271,11 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
               <thead>
                 <tr>
                   <th>Challenge family</th>
-                  <th>Unsuccessful / incomplete</th>
+                  <th>
+                    {cloud ? "Explicit failures" : "Unsuccessful / incomplete"}
+                  </th>
                   <th>Verification rounds</th>
-                  <th>Unsuccessful rate</th>
+                  <th>{cloud ? "Failure rate" : "Unsuccessful rate"}</th>
                 </tr>
               </thead>
               <tbody>
@@ -246,35 +312,66 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
         <div className="evidence-note">
           <Icon name="info" />
           <p>
-            Optional ClickHouse delivery is separate from these local results.
-            Recorded rounds include timeouts, skipped checks and incomplete
-            results. The orchestrator controls selection and budgets; analytics
-            never determine security verdicts.
+            {cloud
+              ? `ClickHouse counts explicit failures in the numerator and nonconflicting recorded outcomes in the denominator. ${cloud.incomplete_rounds} rounds have incomplete or unknown outcomes. `
+              : "Local analytics include unsuccessful and incomplete outcomes. "}
+            These are verification rounds, not individual checks. The
+            orchestrator controls selection and budgets; analytics never
+            determine security verdicts.
           </p>
         </div>
       </section>
-      <section className="panel planned-metrics">
-        <h2>Additional telemetry</h2>
-        <div>
-          {[
-            "Executed test totals",
-            "Attack reproduction rate",
-            "Average patch attempts",
-            "Verification duration",
-            "Outcomes over time",
-            "Regression trends",
-          ].map((label) => (
-            <span className="badge" key={label}>
-              {label} · PLANNED
-            </span>
-          ))}
-        </div>
-        <p className="fine-print">
-          These measurements are not available in the current analytics feed.
-          ClickHouse ingestion and adaptive recommendations remain unverified
-          until the telemetry service is connected.
-        </p>
-      </section>
+      {cloud ? (
+        <section className="panel analytics-panel">
+          <h2>What the execution history tells us</h2>
+          <p>
+            {patterns[0]
+              ? `${patterns[0].failures} of ${patterns[0].executions} recorded ${patterns[0].challenge_family.replaceAll("_", " ")} rounds failed. Review unsuccessful attempts before accepting another proposed fix.`
+              : "No completed verification rounds are recorded yet."}
+          </p>
+          <p>
+            Average proposals per observed run:{" "}
+            <strong>
+              {cloud.mean_patch_attempts?.toFixed(2) ?? "Unavailable"}
+            </strong>
+            . Average verification stage:{" "}
+            <strong>
+              {cloud.mean_verification_duration_ms == null
+                ? "Unavailable"
+                : `${(cloud.mean_verification_duration_ms / 1000).toFixed(2)} seconds`}
+            </strong>
+            .
+          </p>
+          <p className="fine-print">
+            Descriptive history helps decide what to inspect. It does not
+            generate attacks, alter the frozen test suite, or establish a
+            security verdict.
+          </p>
+        </section>
+      ) : (
+        <section className="panel planned-metrics">
+          <h2>Additional telemetry</h2>
+          <div>
+            {[
+              "Executed test totals",
+              "Attack reproduction rate",
+              "Average patch attempts",
+              "Verification duration",
+              "Outcomes over time",
+              "Regression trends",
+            ].map((label) => (
+              <span className="badge" key={label}>
+                {label} · PLANNED
+              </span>
+            ))}
+          </div>
+          <p className="fine-print">
+            These measurements are not available in the current analytics feed.
+            Connect ClickHouse to view delivery coverage and available SQL
+            metrics.
+          </p>
+        </section>
+      )}
     </>
   );
 }

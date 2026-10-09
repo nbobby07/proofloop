@@ -182,6 +182,21 @@ class AnalyticsResponse(ContractModel):
     failure_patterns: list[FailurePattern]
 
 
+class TelemetryAnalyticsResponse(ContractModel):
+    """SQL results only; local fallback never masquerades as cloud telemetry."""
+
+    source: Literal["execution"] = "execution"
+    storage: Literal["clickhouse"] = "clickhouse"
+    analytics: AnalyticsResponse
+    event_count: int = Field(ge=0)
+    pending_events: int = Field(ge=0)
+    incomplete_rounds: int = Field(ge=0)
+    mean_patch_attempts: float | None = Field(default=None, ge=0, allow_inf_nan=False)
+    mean_verification_duration_ms: float | None = Field(default=None, ge=0, allow_inf_nan=False)
+    latest_event_at: AwareDatetime | None = None
+    query_ms: float = Field(ge=0, allow_inf_nan=False)
+
+
 class ErrorDetail(ContractModel):
     code: Literal["not_implemented", "not_found", "invalid_request", "conflict", "internal_error"]
     message: str

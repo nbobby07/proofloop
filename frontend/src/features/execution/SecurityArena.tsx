@@ -1,371 +1,323 @@
+import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { motionTokens } from "../../components/motion";
-import type {
-  ReportResponse,
-  RunResponse,
-  RunStatus,
-  SecurityEvent,
-} from "../../types";
+import type { ReportResponse, RunResponse, SecurityEvent } from "../../types";
 import { Icon } from "../../components/Icon";
-import { labels } from "./lifecycle";
+import { motionTokens } from "../../components/motion";
+import { BriefingPanel } from "../briefing/BriefingPanel";
+import { RunControls } from "./RunControls";
 import { terminal } from "./lifecycle";
+import {
+  activityCopy,
+  attemptHistory,
+  checkCounts,
+  currentPhase,
+  issueDescription,
+  phases,
+  resultCopy,
+} from "../investigation/model";
+import type { EvidenceView } from "../investigation/model";
 
-const stages: { label: string; states: RunStatus[] }[] = [
-  { label: "Discover", states: ["discovering"] },
-  { label: "Reproduce", states: ["reproducing"] },
-  { label: "Patch", states: ["generating_patch", "applying_patch"] },
-  { label: "Verify", states: ["verifying"] },
-  { label: "Challenge", states: ["challenging"] },
-  {
-    label: "Report",
-    states: ["verified", "rejected", "inconclusive", "error"],
-  },
-];
-function PipelineTimeline({
-  run,
-  events,
-  report,
-}: {
-  report: ReportResponse | null;
-  run: RunResponse;
-  events: SecurityEvent[];
-}) {
-  const reduced = useReducedMotion();
-  // A terminal stage is completed when a fresh challenge invalidates that verdict.
-  let cycleStart = 0;
-  events.forEach((event, index) => {
-    if (event.event_type === "stage_completed" && terminal(event.stage))
-      cycleStart = index + 1;
-  });
-  const currentEvents = events.slice(cycleStart);
-  return (
-    <section className="pipeline-card">
-      <div className="section-heading">
-        <div className="heading-with-icon">
-          <span className="section-index">01</span>
-          <h2>Execution pipeline</h2>
-        </div>
-        <span className="pipeline-source">
-          {run.source === "fixture"
-            ? "ILLUSTRATIVE PIPELINE"
-            : "BACKEND EXECUTION"}
-        </span>
-      </div>
-      <ol className="pipeline-list">
-        {stages.map((stage, i) => {
-          const isReport = stage.label === "Report";
-          const active =
-            !isReport &&
-            (stage.states.includes(run.status) ||
-              (stage.label === "Patch" && run.status === "retrying"));
-          const completed = isReport
-            ? !!report
-            : currentEvents.some(
-                (e) =>
-                  stage.states.includes(e.stage) &&
-                  e.event_type === "stage_completed",
-              );
-          const seen = currentEvents.some((e) =>
-            stage.states.includes(e.stage),
-          );
-          const historical =
-            cycleStart > 0 &&
-            events
-              .slice(0, cycleStart)
-              .some((e) => stage.states.includes(e.stage));
-          return (
-            <li
-              key={stage.label}
-              className={active ? "active" : completed ? "complete" : ""}
-            >
-              <motion.span
-                className="stage-number"
-                animate={{
-                  backgroundColor: active ? "#27374a" : "#191e24",
-                  borderColor: active ? "#8eafd3" : "#39434f",
-                }}
-                transition={{ duration: reduced ? 0 : motionTokens.state }}
-              >
-                {completed && !active ? (
-                  <Icon name="check" />
-                ) : (
-                  String(i + 1).padStart(2, "0")
-                )}
-              </motion.span>
-              <div>
-                <strong>{stage.label}</strong>
-                <small>
-                  {active
-                    ? "In progress"
-                    : completed
-                      ? "Recorded"
-                      : isReport
-                        ? run.source === "fixture"
-                          ? "Preview only"
-                          : terminal(run.status)
-                            ? "Awaiting report"
-                            : "Pending"
-                        : historical && !seen
-                          ? "Earlier cycle"
-                          : seen
-                            ? "Events recorded"
-                            : terminal(run.status)
-                              ? "Not recorded"
-                              : "Pending"}
-                </small>
-              </div>
-            </li>
-          );
-        })}
-      </ol>
-      <div
-        className={`verdict verdict-${run.source === "fixture" ? "fixture" : run.status}`}
-      >
-        <span className="verdict-emblem">
-          <Icon
-            name={
-              run.status === "verified" && run.source === "execution"
-                ? "check"
-                : "shield"
-            }
-            size={21}
-          />
-        </span>
-        <div className="verdict-state">
-          <span className="verdict-label">
-            {run.source === "fixture"
-              ? "ILLUSTRATIVE VERDICT"
-              : "INDEPENDENT VERDICT"}
-          </span>
-          <motion.strong
-            key={run.status}
-            initial={reduced ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: reduced ? 0 : motionTokens.micro }}
-            role="status"
-          >
-            {run.source === "fixture"
-              ? `Preview · ${labels[run.status]}`
-              : labels[run.status]}
-          </motion.strong>
-        </div>
-        <span>
-          {run.source === "fixture"
-            ? "Illustrative state. No independent verification has executed."
-            : run.status === "verified"
-              ? "Passed the executed suite. See report for scope and limitations."
-              : run.status === "rejected"
-                ? "Required checks failed. Review the recorded evidence."
-                : run.status === "inconclusive"
-                  ? "Required evidence is incomplete."
-                  : run.status === "error"
-                    ? "Execution did not complete."
-                    : "Awaiting independent verification."}
-        </span>
-      </div>
-    </section>
-  );
-}
 export function SecurityArena({
   run,
   events,
   report = null,
+  busy = false,
+  requestingChallenge = false,
+  inspect = () => {},
+  challenge = () => {},
+  useLive = () => {},
+  refresh = () => {},
 }: {
-  report?: ReportResponse | null;
   run: RunResponse | null;
   events: SecurityEvent[];
+  report?: ReportResponse | null;
+  busy?: boolean;
+  requestingChallenge?: boolean;
+  inspect?: (view: EvidenceView) => void;
+  challenge?: () => void;
+  useLive?: () => void;
+  refresh?: () => void;
 }) {
   const reduced = useReducedMotion();
-  if (!run)
-    return (
-      <section className="panel run-empty">
-        <span className="empty-icon">
-          <Icon name="shield" size={26} />
-        </span>
-        <h2>No run selected</h2>
-        <p>
-          Start a verification run or open a saved run to inspect its attack,
-          patch, and test evidence.
-        </p>
-      </section>
+  const [briefingOpen, setBriefingOpen] = useState(false);
+  if (!run) return null;
+  const fixture = run.source === "fixture";
+  const finished = terminal(run.status);
+  const phase = currentPhase(run, events);
+  const attempts = attemptHistory(run, events);
+  const counts = checkCounts(run);
+  const copy = resultCopy(run, events);
+  const currentPatchPassed =
+    !!run.patch &&
+    events.some(
+      (event) =>
+        event.source === "execution" &&
+        event.stage === "verifying" &&
+        event.event_type === "test_completed" &&
+        event.metadata?.attempt === run.patch?.attempt &&
+        event.metadata?.executed === true &&
+        event.metadata?.outcome === "pass",
     );
-  const attacks = events.filter((e) =>
-    ["baseline_reproduced", "challenge_proposed"].includes(e.event_type),
+  const completed = [
+    !fixture && run.baseline?.reproduced === true,
+    !fixture && currentPatchPassed,
+    !fixture && run.status === "verified",
+  ];
+  const cycleStart = events.reduce(
+    (start, event, index) =>
+      ["run_completed", "run_failed"].includes(event.event_type)
+        ? index + 1
+        : start,
+    0,
   );
-  const defense = events.filter((e) =>
-    ["patch_proposed", "patch_applied", "retry_scheduled"].includes(
-      e.event_type,
-    ),
-  );
+  const latest = requestingChallenge
+    ? undefined
+    : [...events.slice(cycleStart)]
+        .reverse()
+        .find((event) =>
+          [
+            "baseline_reproduced",
+            "patch_proposed",
+            "test_completed",
+            "retry_scheduled",
+            "challenge_proposed",
+            "finding_discovered",
+          ].includes(event.event_type),
+        );
+  const activity = !finished
+    ? activityCopy[run.status as keyof typeof activityCopy]
+    : null;
   return (
     <>
-      <PipelineTimeline run={run} events={events} report={report} />
-      <div className="arena-grid">
-        <section className="team-panel red-team">
-          <div className="team-heading">
-            <span className="team-symbol">
-              <Icon name="attack" />
-            </span>
-            <h2>Attack reproduction</h2>
-            <span className="team-label">RED TEAM</span>
-          </div>
-          <div className="team-body">
-            <div className="finding-heading">
-              <span className="eyebrow">
-                {run.finding?.id ?? "Vulnerability"}
-              </span>
-              {run.finding && (
-                <span className={`badge severity-${run.finding.severity}`}>
-                  {run.finding.severity}
-                </span>
-              )}
-            </div>
-            <h3 className="finding-title">
-              {run.finding?.title ?? "Awaiting discovery"}
-            </h3>
-            <motion.div
-              className={`request-trace ${run.baseline?.reproduced ? "boundary-reproduced" : ""}`}
-              animate={{
-                borderColor: run.baseline?.reproduced ? "#7c4846" : "#343d48",
-              }}
-              transition={{ duration: reduced ? 0 : motionTokens.state }}
-            >
-              <div>
-                <span className="avatar">
-                  <Icon name="fingerprint" />
-                </span>
-                <div>
-                  <strong>Principal</strong>
-                  <small>Authenticated principal</small>
-                </div>
-              </div>
-              <div className="authorization-boundary">
-                <span /> <Icon name="arrow" />
-                <small>Ownership boundary</small>
-              </div>
-              <div>
-                <Icon name="file" />
-                <div>
-                  <strong>Protected object</strong>
-                  <small>Other owner</small>
-                </div>
-              </div>
-            </motion.div>
-            <span className="trace-caption">
-              {run.target} ownership model · schematic
-            </span>
-            <div className="observation">
-              <span>Recorded baseline</span>
-              <div>
-                <code className={run.baseline?.reproduced ? "danger-text" : ""}>
-                  {run.baseline?.observed_status
-                    ? `HTTP ${run.baseline.observed_status}`
-                    : "Not recorded"}
-                </code>
-                <span className="observation-note">
-                  {run.baseline
-                    ? run.baseline.reproduced
-                      ? "Vulnerability reproduced"
-                      : "Not reproduced"
-                    : "Awaiting evidence"}
-                </span>
-              </div>
-            </div>
-            <div className="team-events">
-              {attacks.length ? (
-                attacks.slice(-2).map((e) => (
-                  <p key={e.event_id}>
-                    <span className="dot" />
-                    {e.message}
-                  </p>
-                ))
+      <ol
+        className={`investigation-phases ${finished ? "phases-finished" : ""}`}
+        aria-label="Investigation progress"
+      >
+        {phases.map((label, index) => (
+          <li
+            key={label}
+            className={
+              !finished && index === phase
+                ? "phase-current"
+                : completed[index]
+                  ? "phase-recorded"
+                  : ""
+            }
+            aria-current={!finished && index === phase ? "step" : undefined}
+          >
+            <span className="phase-number">
+              {completed[index] && index !== (!finished ? phase : -1) ? (
+                <Icon name="check" />
               ) : (
-                <p className="empty-copy">
-                  No attack or challenge events recorded.
-                </p>
+                index + 1
               )}
+            </span>
+            <div>
+              <strong>{["Find", "Fix", "Prove"][index]}</strong>
+              <span>{label}</span>
             </div>
+          </li>
+        ))}
+      </ol>
+      {finished ? (
+        <article className={`outcome-story outcome-${copy.tone}`}>
+          <div className="outcome-label">
+            <span className="outcome-seal">
+              <Icon
+                name={
+                  copy.tone === "pass"
+                    ? "check"
+                    : copy.tone === "fail"
+                      ? "info"
+                      : "shield"
+                }
+                size={21}
+              />
+            </span>
+            <span>{copy.label}</span>
+            {!fixture && (
+              <span className="result-source">Independent verification</span>
+            )}
+          </div>
+          <motion.div
+            key={run.status}
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            initial={reduced ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: reduced ? 0 : motionTokens.state }}
+          >
+            <h1 className="outcome-title">{copy.title}</h1>
+            <p className="outcome-description">{copy.description}</p>
+          </motion.div>
+          <RunControls
+            run={run}
+            busy={busy}
+            challenge={challenge}
+            inspect={inspect}
+            useLive={useLive}
+            refresh={refresh}
+          />
+        </article>
+      ) : (
+        <article className="activity-story">
+          <div className="outcome-label">
+            <span className="activity-mark">
+              <Icon name="arena" size={22} />
+            </span>
+            <span>
+              {requestingChallenge
+                ? "Request pending"
+                : `In progress · ${["Find", "Fix", "Prove"][phase]}`}
+            </span>
+          </div>
+          <motion.div
+            key={run.status}
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            initial={reduced ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: reduced ? 0 : motionTokens.panel }}
+          >
+            <h1 className="outcome-title">
+              {requestingChallenge
+                ? "Requesting a fresh challenge."
+                : activity?.title}
+            </h1>
+            <p className="outcome-description">
+              {requestingChallenge
+                ? "The previous result is withheld while the backend accepts the request. No new verdict is available yet."
+                : activity?.description}
+            </p>
+          </motion.div>
+          {latest && (
+            <div className="latest-evidence">
+              <span>Latest recorded update</span>
+              <p>{latest.message}</p>
+            </div>
+          )}
+          <button className="text-button" onClick={() => inspect("audit")}>
+            Follow the audit trail <Icon name="arrow" />
+          </button>
+        </article>
+      )}
+      {(run.baseline || finished) && (
+        <section
+          className="evidence-comparison"
+          aria-label="Before and after evidence"
+        >
+          <div className="comparison-before">
+            <span className="section-label">Before</span>
+            <h2>
+              {run.baseline?.reproduced
+                ? "The original failure"
+                : "Original application"}
+            </h2>
+            <p>{issueDescription(run)}</p>
+            <span className="comparison-footnote">
+              {run.baseline?.observed_status ? (
+                <>
+                  Recorded response{" "}
+                  <code>HTTP {run.baseline.observed_status}</code>
+                </>
+              ) : (
+                "Original HTTP response unavailable"
+              )}
+            </span>
+          </div>
+          <div
+            className={`comparison-after ${finished && run.status === "verified" && !fixture ? "comparison-passed" : ""}`}
+          >
+            <span className="section-label">{finished ? "After" : "Next"}</span>
+            <h2>
+              {fixture
+                ? "Illustrative patch outcome"
+                : run.status === "verified"
+                  ? "The fix earned a passing verdict"
+                  : run.status === "rejected"
+                    ? "The patch was not accepted"
+                    : "Independent evidence required"}
+            </h2>
+            <p>
+              {fixture
+                ? "The sample shows a proposed ownership check and illustrative test counts."
+                : run.status === "verified"
+                  ? "The current patch passed the required verification. Passing is limited to the executed suite."
+                  : run.status === "rejected"
+                    ? "Required checks failed. Review the outcomes before trusting this proposal."
+                    : "A proposed patch is not proof. Completed independent checks determine the result."}
+            </p>
+            <button className="text-button" onClick={() => inspect("results")}>
+              {counts
+                ? `${counts.passed} / ${counts.total} ${fixture ? "illustrative" : "recorded passing"} checks`
+                : "View test evidence"}
+              <Icon name="arrow" />
+            </button>
           </div>
         </section>
-        <section className="team-panel blue-team">
-          <div className="team-heading">
-            <span className="team-symbol">
-              <Icon name="shield" />
-            </span>
-            <h2>Patch & remediation</h2>
-            <span className="team-label">BLUE TEAM</span>
+      )}
+      {attempts.length > 0 && (
+        <section className="attempt-story">
+          <div className="section-intro">
+            <h2>How the fix evolved</h2>
+            <button className="text-button" onClick={() => inspect("results")}>
+              Inspect test results <Icon name="arrow" />
+            </button>
           </div>
-          <div className="team-body">
-            <div className="finding-heading">
-              <span className="eyebrow">DEFENDER PROPOSAL</span>
-              <span className="badge">
-                {run.patch
-                  ? `Attempt ${String(run.patch.attempt).padStart(2, "0")}`
-                  : "Pending"}
-              </span>
-            </div>
-            <h3 className="finding-title">
-              {run.patch
-                ? "Authorization patch proposed"
-                : "Awaiting remediation"}
-            </h3>
-            <motion.div
-              key={run.patch?.attempt ?? "waiting"}
-              className={`patch-summary ${run.patch ? "has-code" : ""}`}
-              initial={reduced ? false : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: reduced ? 0 : motionTokens.panel }}
-            >
-              <Icon name="code" size={22} />
-              <div>
-                <strong>
-                  {run.patch ? "Code changes available" : "No patch generated"}
-                </strong>
-                <p>
-                  {run.patch
-                    ? "Review added and removed lines in the code changes tab."
-                    : "The defender’s proposal will appear after generation."}
-                </p>
-              </div>
-              {run.patch && (
-                <pre className="patch-preview">
-                  <code>
-                    {run.patch.diff
-                      .split("\n")
-                      .filter(
-                        (line) =>
-                          line.startsWith("+") && !line.startsWith("+++"),
-                      )
-                      .slice(0, 2)
-                      .join("\n") || "Unified diff available below"}
-                  </code>
-                </pre>
-              )}
-            </motion.div>
-            <div className="observation">
-              <span>Proposal status</span>
-              <div>
-                <code>{run.patch ? "Diff recorded" : "Not recorded"}</code>
-                <span className="observation-note">
-                  Independent verification required
+          <ol className="attempt-sequence" aria-label="Patch attempt history">
+            {attempts.map((item) => (
+              <li key={item.attempt} className={`attempt-${item.tone}`}>
+                <span className="attempt-marker">
+                  <Icon
+                    name={
+                      item.tone === "pass"
+                        ? "check"
+                        : item.tone === "fail"
+                          ? "info"
+                          : "code"
+                    }
+                  />
                 </span>
-              </div>
-            </div>
-            <div className="team-events">
-              {defense.length ? (
-                defense.slice(-2).map((e) => (
-                  <p key={e.event_id}>
-                    <span className="dot" />
-                    {e.message}
-                  </p>
-                ))
-              ) : (
-                <p className="empty-copy">No patch or retry events recorded.</p>
-              )}
-            </div>
-          </div>
+                <div>
+                  <span>Attempt {item.attempt}</span>
+                  <strong>{item.label}</strong>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <p className="fine-print">
+            Only recorded attempts are shown. Earlier failures remain in the
+            audit trail.
+          </p>
         </section>
-      </div>
+      )}
+      {finished && (
+        <p className="scope-note">
+          <Icon name="shield" />
+          {fixture
+            ? "Preview evidence is illustrative and cannot establish a security verdict."
+            : "This verdict applies to the current patch and frozen executed suite. It does not prove universal security."}
+        </p>
+      )}
+      {report && (
+        <div className="briefing-disclosure">
+          <button
+            className="text-button"
+            aria-expanded={briefingOpen}
+            onClick={() => setBriefingOpen((value) => !value)}
+          >
+            <Icon name="volume" />
+            {briefingOpen
+              ? "Close incident briefing"
+              : "Listen to the incident briefing"}
+          </button>
+          {briefingOpen && (
+            <BriefingPanel key={JSON.stringify(report)} report={report} />
+          )}
+        </div>
+      )}
     </>
   );
 }

@@ -83,59 +83,96 @@ describe("evidence presentation boundaries", () => {
     expect(screen.getByText(/Previous counts cleared/)).toBeTruthy();
     expect(screen.queryByText("Recorded passing")).toBeNull();
   });
-  it("marks previous cycle stages historical while a new challenge is active", () => {
+  it("emphasizes the fresh challenge and does not reuse an old completion as current activity", () => {
     render(
       <SecurityArena
         run={run}
         events={[
-          event("old-verify", { event_type: "stage_completed" }),
-          event("invalidate", {
-            stage: "verified",
-            event_type: "stage_completed",
+          event("old-pass", {
+            message: "Old passing round",
+            metadata: { attempt: 2, executed: true, outcome: "pass" },
           }),
-          event("new-challenge", {
-            stage: "challenging",
-            event_type: "stage_started",
+          event("old-completion", {
+            stage: "verified",
+            event_type: "run_completed",
           }),
         ]}
       />,
     );
-    const pipeline = screen
-      .getByRole("heading", { name: "Execution pipeline" })
-      .closest("section")!;
     expect(
-      within(pipeline).getAllByText("Earlier cycle").length,
-    ).toBeGreaterThan(0);
-    expect(within(pipeline).getByRole("status").textContent).toBe(
-      "Challenging",
-    );
-    expect(within(pipeline).queryByText("Verified")).toBeNull();
+      screen.getByRole("heading", {
+        name: "Putting the fix through fresh challenges.",
+      }),
+    ).toBeTruthy();
+    expect(screen.queryByText("Old passing round")).toBeNull();
+    const progress = screen.getByRole("list", {
+      name: "Investigation progress",
+    });
+    expect(
+      within(progress)
+        .getByText("Prove")
+        .closest("li")
+        ?.getAttribute("aria-current"),
+    ).toBe("step");
+    expect(
+      screen.queryByRole("button", { name: "Challenge this fix" }),
+    ).toBeNull();
   });
-  it("retains the diff filter when evidence tabs switch and keeps exact code selectable", async () => {
-    const user = userEvent.setup();
+  it("does not turn all-passing counts into a verified verdict when the backend says incomplete", () => {
     render(
-      <Tooltip.Provider>
-        <EvidenceReport
-          run={run}
-          report={null}
-          reportError={null}
-          fixture={false}
-        />
-      </Tooltip.Provider>,
+      <SecurityArena
+        run={{
+          ...run,
+          status: "inconclusive",
+          verification: {
+            security_passed: 6,
+            security_total: 6,
+            functional_passed: 22,
+            functional_total: 22,
+            adversarial_passed: 16,
+            adversarial_total: 16,
+          },
+        }}
+        events={[]}
+      />,
     );
-    await user.click(screen.getByRole("tab", { name: "Code changes" }));
-    await user.click(screen.getByRole("checkbox", { name: "Changes only" }));
-    await user.click(screen.getByRole("tab", { name: "Verification" }));
-    await user.click(screen.getByRole("tab", { name: "Code changes" }));
     expect(
-      (
-        screen.getByRole("checkbox", {
-          name: "Changes only",
-        }) as HTMLInputElement
-      ).checked,
-    ).toBe(true);
-    expect(screen.getByLabelText("Patch code changes").textContent).toContain(
-      "+new",
+      screen.getByRole("heading", {
+        name: "There isn’t enough evidence for a verdict.",
+      }),
+    ).toBeTruthy();
+    expect(screen.queryByText("Verified")).toBeNull();
+    expect(
+      screen.getByRole("button", { name: "Inspect recorded evidence" }),
+    ).toBeTruthy();
+  });
+  it("uses the live verdict and actual counts for the result headline and next action", () => {
+    render(
+      <SecurityArena
+        run={{
+          ...run,
+          status: "verified",
+          verification: {
+            security_passed: 6,
+            security_total: 6,
+            functional_passed: 22,
+            functional_total: 22,
+            adversarial_passed: 16,
+            adversarial_total: 16,
+          },
+        }}
+        events={[]}
+      />,
     );
+    expect(
+      screen.getByRole("heading", {
+        name: "Patch verified against 44 executed checks.",
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "Challenge this fix" }),
+    ).toBeTruthy();
+    expect(screen.queryByText("HTTP 403")).toBeNull();
+    expect(screen.getByText("HTTP 200")).toBeTruthy();
   });
 });

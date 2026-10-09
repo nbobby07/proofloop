@@ -1,3 +1,22 @@
+# Current product UX redesign validation — 2026-10-09
+
+On `feat/product-ux-redesign`, all 26 tests across 6 frontend files, lint, TypeScript,
+production build and contract drift checks pass. No backend or dependency changes.
+Browser testing created a real rejected investigation (three failed proposals,
+31/44 current checks passing), then opened a previously verified investigation and
+completed a fresh challenge with 44/44 checks passing. Old narration returned 409
+and disappeared immediately during the challenge. JSON export matched the backend.
+
+Desktop, tablet and phone measurements at 1440/1280/768/390px show no page overflow.
+Presentation Mode was inspected at 2560×1440. Keyboard tabs, focus restoration,
+Escape, diff filtering, narration and fixture/live separation were exercised.
+Reduced motion is covered by an actual Motion component test with a mocked media
+query; OS/browser reduced-motion emulation was unavailable. This is not a full
+assistive-technology audit or independent human usability study.
+
+See [UX-REDESIGN.md](UX-REDESIGN.md) for complete results, caveats and before/after
+screenshots. The records below are historical results for earlier branches.
+
 # Current UI polish validation — 2026-10-09
 
 On `feat/ui-motion-polish`, frontend lint/typecheck/build and all 21 frontend tests

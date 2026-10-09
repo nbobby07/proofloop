@@ -215,6 +215,7 @@ export function useRun(enabled: boolean) {
     }
   };
   return {
+    selectedRunId: runId,
     run,
     events,
     report,

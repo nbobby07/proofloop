@@ -145,26 +145,26 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
                 layout="vertical"
                 margin={{ top: 10, right: 25, bottom: 5, left: 0 }}
               >
-                <CartesianGrid horizontal={false} stroke="#303846" />
+                <CartesianGrid horizontal={false} stroke="#d6ddd4" />
                 <XAxis
                   type="number"
                   domain={[0, 100]}
                   ticks={[0, 25, 50, 75, 100]}
                   tickFormatter={(value: number) => `${value}%`}
-                  tick={{ fill: "#b7c2d5", fontSize: 10 }}
+                  tick={{ fill: "#57666e", fontSize: 13 }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
                   type="category"
                   dataKey="challenge_family"
-                  width={125}
-                  tick={{ fill: "#c5cfe0", fontSize: 10 }}
+                  width={130}
+                  tick={{ fill: "#57666e", fontSize: 13 }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <Tooltip
-                  cursor={{ fill: "#ffffff04" }}
+                  cursor={{ fill: "#25303805" }}
                   content={({ active, payload }) => {
                     if (!active || !payload?.length) return null;
                     const pattern = payload[0]
@@ -188,7 +188,7 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
                 <Bar
                   dataKey="rate"
                   name="Unsuccessful rate"
-                  fill="#ce8f8b"
+                  fill="#aa695c"
                   radius={[0, 3, 3, 0]}
                   maxBarSize={22}
                   isAnimationActive={false}
@@ -198,7 +198,11 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
           </div>
         )}
         {patterns.length > 0 && !fixture ? (
-          <div className="pattern-table">
+          <div
+            className="pattern-table"
+            tabIndex={0}
+            aria-label="Exact analytics values"
+          >
             <table>
               <thead>
                 <tr>

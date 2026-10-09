@@ -1,6 +1,7 @@
+import { useState } from "react";
 import type { RunResponse } from "../../types";
 import { StatusBadge } from "../../components/StatusBadge";
-
+import { Icon } from "../../components/Icon";
 export function SecurityHistory({
   history,
   open,
@@ -8,17 +9,42 @@ export function SecurityHistory({
   history: RunResponse[];
   open: (id: string) => void;
 }) {
+  const [input, setInput] = useState("");
   return (
     <>
-      <div className="page-heading">
+      <header className="page-heading">
+        <h1>Investigation history</h1>
+        <p>
+          Live runs opened in this browser session. Statuses are last observed;
+          open an investigation to fetch its current evidence.
+        </p>
+      </header>
+      <form
+        className="history-open"
+        onSubmit={(event) => {
+          event.preventDefault();
+          open(input.trim());
+        }}
+      >
+        <label htmlFor="saved-run">Open a saved investigation</label>
         <div>
-          <h1>Run history</h1>
-          <p className="support">
-            Verification runs opened in this browser session.
-          </p>
+          <input
+            id="saved-run"
+            value={input}
+            onChange={(event) => setInput(event.target.value)}
+            placeholder="Run ID, such as run_…"
+            pattern="[A-Za-z0-9_-]{1,128}"
+            required
+          />
+          <button className="primary">
+            Open saved run <Icon name="arrow" />
+          </button>
         </div>
-      </div>
-      <section className="panel">
+      </form>
+      <section
+        className="history-list"
+        aria-label="Investigations opened this session"
+      >
         {history.length ? (
           history.map((item) => (
             <button
@@ -27,17 +53,24 @@ export function SecurityHistory({
               onClick={() => open(item.run_id)}
             >
               <span>
-                <strong>{item.run_id}</strong>
-                <small>{item.target} · execution</small>
+                <strong>{item.target}</strong>
+                <small>
+                  <code>{item.run_id}</code>
+                </small>
               </span>
               <StatusBadge status={item.status} />
-              <span>Open ↗</span>
+              <Icon name="arrow" />
             </button>
           ))
         ) : (
-          <p className="empty-copy">
-            No live runs observed. Fixture previews are excluded from history.
-          </p>
+          <div className="empty-state">
+            <Icon name="history" size={28} />
+            <h2>No investigations opened yet</h2>
+            <p>
+              Your observed live runs will appear here. Fixture previews are
+              excluded.
+            </p>
+          </div>
         )}
       </section>
     </>

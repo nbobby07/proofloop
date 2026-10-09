@@ -60,8 +60,8 @@ export function EventStream({
     <section className="panel event-panel">
       <div className="section-heading">
         <div className="heading-with-icon">
-          <span className="section-index">03</span>
-          <h2>Event stream</h2>
+          <Icon name="history" />
+          <h2>Execution events</h2>
           <span className="count-badge">{events.length}</span>
         </div>
         <label className="filter">

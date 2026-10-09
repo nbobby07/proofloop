@@ -12,12 +12,12 @@ export function IncidentBriefingPlayer({ audio }: { audio?: BriefingAudio }) {
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  useEffect(
-    () => () => {
-      player.current?.pause();
-    },
-    [audio?.url],
-  );
+  useEffect(() => {
+    const element = player.current;
+    return () => {
+      element?.pause();
+    };
+  }, [audio?.url]);
   const play = async (replay = false) => {
     if (!player.current) return;
     try {

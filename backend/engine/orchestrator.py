@@ -51,6 +51,11 @@ for _state in set(S) - TERMINAL:
     TRANSITIONS[_state] |= {S.ERROR, S.INCONCLUSIVE}
 
 
+class DiscoveryReceipt(ContractModel):
+    finding: Finding | None = None
+    evidence: list[EvidenceReference] = Field(default_factory=list)
+
+
 class BaselineReceipt(ContractModel):
     result: BaselineResult
     evidence: list[EvidenceReference] = Field(default_factory=list)
@@ -69,7 +74,7 @@ class StageResult(ContractModel):
 
 
 class ExecutionEngine(Protocol):
-    async def discover(self, run_id: str, target: str) -> Finding | None: ...
+    async def discover(self, run_id: str, target: str) -> DiscoveryReceipt: ...
     async def reproduce(self, run_id: str, finding: Finding) -> BaselineReceipt: ...
     async def generate_patch(
         self, run_id: str, finding: Finding, attempt: int, feedback: list[str]
@@ -81,6 +86,21 @@ class ExecutionEngine(Protocol):
 
 class EngineUnavailable(RuntimeError):
     """Real dependencies have not been configured; never substitute demo results."""
+
+
+class ExecutionFailure(RuntimeError):
+    """Trusted adapter failures use fixed codes, never raw upstream exception text."""
+
+    def __init__(
+        self,
+        code: str,
+        status: RunStatus = S.ERROR,
+        evidence: list[EvidenceReference] | None = None,
+    ):
+        super().__init__(code)
+        self.code = code
+        self.status = status
+        self.evidence = evidence or []
 
 
 class InvalidTransition(ValueError):
@@ -272,7 +292,9 @@ class Orchestrator:
                 self._finish(record, verdict)
                 return
             self.transition(record, S.DISCOVERING)
-            finding = await self._call(engine.discover, run_id, record.run.target)
+            discovery = await self._call(engine.discover, run_id, record.run.target)
+            record.evidence.extend(discovery.evidence)
+            finding = discovery.finding
             if finding is None:
                 self._finish(record, S.INCONCLUSIVE, "no_reproducible_finding")
                 return
@@ -322,11 +344,18 @@ class Orchestrator:
             raise
         except TimeoutError:
             self._finish(record, S.INCONCLUSIVE, "stage_timeout")
+        except ExecutionFailure as exc:
+            record.evidence.extend(exc.evidence)
+            self._finish(record, exc.status, exc.code)
         except EngineUnavailable:
             self._finish(record, S.ERROR, "engine_not_configured")
         except Exception:
             # Never persist arbitrary exception text: providers may include credentials/PII.
             self._finish(record, S.ERROR, "execution_failed")
+        finally:
+            release = getattr(self.engine, "release", None)
+            if release is not None:
+                release(record.run.run_id)
 
     def recover(self) -> None:
         """Interrupted work cannot resume against unpinned in-memory engine contexts."""

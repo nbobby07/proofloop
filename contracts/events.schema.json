@@ -1,0 +1,118 @@
+{
+  "$defs": {
+    "EventSeverity": {
+      "enum": [
+        "info",
+        "warning",
+        "error",
+        "critical"
+      ],
+      "title": "EventSeverity",
+      "type": "string"
+    },
+    "EventType": {
+      "enum": [
+        "stage_started",
+        "stage_completed",
+        "finding_discovered",
+        "baseline_reproduced",
+        "patch_proposed",
+        "patch_applied",
+        "test_completed",
+        "challenge_proposed",
+        "retry_scheduled",
+        "run_completed",
+        "run_failed"
+      ],
+      "title": "EventType",
+      "type": "string"
+    },
+    "JsonValue": {},
+    "RunStatus": {
+      "enum": [
+        "pending",
+        "discovering",
+        "reproducing",
+        "generating_patch",
+        "applying_patch",
+        "verifying",
+        "challenging",
+        "retrying",
+        "verified",
+        "rejected",
+        "inconclusive",
+        "error"
+      ],
+      "title": "RunStatus",
+      "type": "string"
+    },
+    "Source": {
+      "enum": [
+        "fixture",
+        "execution"
+      ],
+      "title": "Source",
+      "type": "string"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "event_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "title": "Event Id",
+      "type": "string"
+    },
+    "event_type": {
+      "$ref": "#/$defs/EventType"
+    },
+    "message": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+    },
+    "metadata": {
+      "additionalProperties": {
+        "$ref": "#/$defs/JsonValue"
+      },
+      "title": "Metadata",
+      "type": "object"
+    },
+    "run_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "severity": {
+      "$ref": "#/$defs/EventSeverity"
+    },
+    "source": {
+      "$ref": "#/$defs/Source"
+    },
+    "stage": {
+      "$ref": "#/$defs/RunStatus"
+    },
+    "timestamp": {
+      "format": "date-time",
+      "title": "Timestamp",
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "run_id",
+    "timestamp",
+    "stage",
+    "event_type",
+    "severity",
+    "message",
+    "source"
+  ],
+  "title": "SecurityEvent",
+  "type": "object"
+}

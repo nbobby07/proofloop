@@ -1,0 +1,1 @@
+"""Developer B owns telemetry."""

@@ -1,0 +1,96 @@
+proofloop/
+├── .editorconfig
+├── .env.example
+├── .github/
+│   ├── pull_request_template.md
+│   └── workflows/
+│       └── ci.yml
+├── .gitignore
+├── AGENTS.md
+├── CURRENT.md
+├── README.md
+├── backend/
+│   ├── __init__.py
+│   ├── api/
+│   │   ├── __init__.py
+│   │   ├── main.py
+│   │   ├── routes.py
+│   │   └── schemas.py
+│   ├── engine/
+│   │   ├── __init__.py
+│   │   ├── attacker.py
+│   │   ├── defender.py
+│   │   ├── orchestrator.py
+│   │   ├── patcher.py
+│   │   ├── scanner.py
+│   │   └── verifier.py
+│   ├── providers/
+│   │   ├── __init__.py
+│   │   ├── akash_client.py
+│   │   ├── contracts.py
+│   │   ├── openai_client.py
+│   │   ├── semgrep_client.py
+│   │   └── senso_client.py
+│   ├── reports/
+│   │   ├── __init__.py
+│   │   └── elevenlabs.py
+│   ├── storage/
+│   │   └── __init__.py
+│   ├── telemetry/
+│   │   ├── __init__.py
+│   │   └── clickhouse.py
+│   └── tests/
+│       ├── test_api.py
+│       └── test_contracts.py
+├── contracts/
+│   ├── api-contract.md
+│   ├── events.schema.json
+│   ├── example-run.json
+│   ├── openapi.json
+│   └── run.schema.json
+├── demo_target/
+│   └── README.md
+├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── DEVELOPMENT.md
+│   ├── REPOSITORY-TREE.txt
+│   ├── SECURITY.md
+│   ├── SETUP-RESULTS.md
+│   ├── SPONSORS.md
+│   ├── SPRINT.md
+│   └── SUBMISSION.md
+├── frontend/
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── src/
+│   │   ├── App.tsx
+│   │   ├── components/
+│   │   │   ├── ConnectionBadge.tsx
+│   │   │   └── FixturePreview.tsx
+│   │   ├── hooks/
+│   │   │   └── useBackendHealth.ts
+│   │   ├── index.css
+│   │   ├── main.tsx
+│   │   ├── pages/
+│   │   │   └── Dashboard.tsx
+│   │   ├── services/
+│   │   │   └── api.ts
+│   │   └── types/
+│   │       ├── api.generated.ts
+│   │       └── index.ts
+│   ├── tsconfig.json
+│   └── vite.config.ts
+├── guild/
+│   └── README.md
+├── pyproject.toml
+├── requirements.lock
+├── sandbox/
+│   └── README.md
+├── scripts/
+│   ├── __init__.py
+│   ├── dev_backend.py
+│   └── export_contracts.py
+└── verifier_tests/
+    └── README.md

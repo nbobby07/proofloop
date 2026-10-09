@@ -1,0 +1,59 @@
+{
+  "run_id": "example-001",
+  "status": "verified",
+  "target": "LedgerLite",
+  "source": "fixture",
+  "finding": {
+    "id": "BOLA-001",
+    "title": "Broken Object Level Authorization",
+    "severity": "high"
+  },
+  "baseline": { "reproduced": true, "observed_status": 200 },
+  "patch": {
+    "attempt": 1,
+    "diff": "--- a/ledger.py\n+++ b/ledger.py\n@@ -1,2 +1,4 @@\n def get_invoice(invoice, user):\n+    if invoice.owner_id != user.id:\n+        raise PermissionError(\"Forbidden\")\n     return invoice\n"
+  },
+  "verification": {
+    "security_passed": 4,
+    "security_total": 4,
+    "functional_passed": 5,
+    "functional_total": 5,
+    "adversarial_passed": 2,
+    "adversarial_total": 2
+  },
+  "events": [
+    {
+      "event_id": "fixture-event-001",
+      "run_id": "example-001",
+      "timestamp": "2026-10-09T18:00:00Z",
+      "stage": "reproducing",
+      "event_type": "baseline_reproduced",
+      "severity": "warning",
+      "message": "Fixture scenario: another user's invoice returned HTTP 200.",
+      "source": "fixture",
+      "metadata": { "fixture": true, "observed_status": 200 }
+    },
+    {
+      "event_id": "fixture-event-002",
+      "run_id": "example-001",
+      "timestamp": "2026-10-09T18:00:10Z",
+      "stage": "generating_patch",
+      "event_type": "patch_proposed",
+      "severity": "info",
+      "message": "Fixture scenario: an ownership check is proposed.",
+      "source": "fixture",
+      "metadata": { "fixture": true, "attempt": 1 }
+    },
+    {
+      "event_id": "fixture-event-003",
+      "run_id": "example-001",
+      "timestamp": "2026-10-09T18:00:20Z",
+      "stage": "verified",
+      "event_type": "run_completed",
+      "severity": "info",
+      "message": "Fixture scenario: 11 illustrative checks passed. No tests were executed.",
+      "source": "fixture",
+      "metadata": { "fixture": true, "executed": false }
+    }
+  ]
+}

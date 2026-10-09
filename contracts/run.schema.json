@@ -1,0 +1,336 @@
+{
+  "$defs": {
+    "BaselineResult": {
+      "additionalProperties": false,
+      "properties": {
+        "observed_status": {
+          "anyOf": [
+            {
+              "maximum": 599,
+              "minimum": 100,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Status"
+        },
+        "reproduced": {
+          "title": "Reproduced",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "reproduced"
+      ],
+      "title": "BaselineResult",
+      "type": "object"
+    },
+    "EventSeverity": {
+      "enum": [
+        "info",
+        "warning",
+        "error",
+        "critical"
+      ],
+      "title": "EventSeverity",
+      "type": "string"
+    },
+    "EventType": {
+      "enum": [
+        "stage_started",
+        "stage_completed",
+        "finding_discovered",
+        "baseline_reproduced",
+        "patch_proposed",
+        "patch_applied",
+        "test_completed",
+        "challenge_proposed",
+        "retry_scheduled",
+        "run_completed",
+        "run_failed"
+      ],
+      "title": "EventType",
+      "type": "string"
+    },
+    "Finding": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "title": "Id",
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/$defs/FindingSeverity"
+        },
+        "title": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "severity"
+      ],
+      "title": "Finding",
+      "type": "object"
+    },
+    "FindingSeverity": {
+      "enum": [
+        "info",
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "title": "FindingSeverity",
+      "type": "string"
+    },
+    "JsonValue": {},
+    "PatchProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "attempt": {
+          "maximum": 10,
+          "minimum": 1,
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "diff": {
+          "maxLength": 200000,
+          "minLength": 1,
+          "title": "Diff",
+          "type": "string"
+        }
+      },
+      "required": [
+        "attempt",
+        "diff"
+      ],
+      "title": "PatchProposal",
+      "type": "object"
+    },
+    "RunStatus": {
+      "enum": [
+        "pending",
+        "discovering",
+        "reproducing",
+        "generating_patch",
+        "applying_patch",
+        "verifying",
+        "challenging",
+        "retrying",
+        "verified",
+        "rejected",
+        "inconclusive",
+        "error"
+      ],
+      "title": "RunStatus",
+      "type": "string"
+    },
+    "SecurityEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "event_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_type": {
+          "$ref": "#/$defs/EventType"
+        },
+        "message": {
+          "maxLength": 2000,
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "metadata": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "title": "Metadata",
+          "type": "object"
+        },
+        "run_id": {
+          "maxLength": 128,
+          "minLength": 1,
+          "pattern": "^[A-Za-z0-9_-]+$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "severity": {
+          "$ref": "#/$defs/EventSeverity"
+        },
+        "source": {
+          "$ref": "#/$defs/Source"
+        },
+        "stage": {
+          "$ref": "#/$defs/RunStatus"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "run_id",
+        "timestamp",
+        "stage",
+        "event_type",
+        "severity",
+        "message",
+        "source"
+      ],
+      "title": "SecurityEvent",
+      "type": "object"
+    },
+    "Source": {
+      "enum": [
+        "fixture",
+        "execution"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "VerificationSummary": {
+      "additionalProperties": false,
+      "properties": {
+        "adversarial_passed": {
+          "minimum": 0,
+          "title": "Adversarial Passed",
+          "type": "integer"
+        },
+        "adversarial_total": {
+          "minimum": 0,
+          "title": "Adversarial Total",
+          "type": "integer"
+        },
+        "functional_passed": {
+          "minimum": 0,
+          "title": "Functional Passed",
+          "type": "integer"
+        },
+        "functional_total": {
+          "minimum": 0,
+          "title": "Functional Total",
+          "type": "integer"
+        },
+        "security_passed": {
+          "minimum": 0,
+          "title": "Security Passed",
+          "type": "integer"
+        },
+        "security_total": {
+          "minimum": 0,
+          "title": "Security Total",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "security_passed",
+        "security_total",
+        "functional_passed",
+        "functional_total",
+        "adversarial_passed",
+        "adversarial_total"
+      ],
+      "title": "VerificationSummary",
+      "type": "object"
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "baseline": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/BaselineResult"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "events": {
+      "items": {
+        "$ref": "#/$defs/SecurityEvent"
+      },
+      "title": "Events",
+      "type": "array"
+    },
+    "finding": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Finding"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "patch": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PatchProposal"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "run_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/Source"
+    },
+    "status": {
+      "$ref": "#/$defs/RunStatus"
+    },
+    "target": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Target",
+      "type": "string"
+    },
+    "verification": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/VerificationSummary"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "run_id",
+    "status",
+    "target",
+    "source"
+  ],
+  "title": "RunResponse",
+  "type": "object"
+}

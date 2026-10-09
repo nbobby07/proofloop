@@ -133,6 +133,7 @@ class Orchestrator:
         kind: EventType,
         message: str,
         severity: EventSeverity = EventSeverity.INFO,
+        metadata: dict | None = None,
     ) -> None:
         record.run.events.append(
             SecurityEvent(
@@ -144,6 +145,17 @@ class Orchestrator:
                 severity=severity,
                 message=message,
                 source=Source.EXECUTION,
+                metadata={
+                    **(metadata or {}),
+                    "sequence": len(record.run.events) + 1,
+                    "target": record.run.target,
+                    "attempt": len(record.attempts),
+                    **(
+                        {"patch_hash": hashlib.sha256(record.run.patch.diff.encode()).hexdigest()}
+                        if record.run.patch
+                        else {}
+                    ),
+                },
             )
         )
         self.store.save(record)
@@ -265,7 +277,27 @@ class Orchestrator:
         receipt.verdict = verdict
         receipt.summary = result.summary
         receipt.evidence = result.evidence
-        self.emit(record, EventType.TEST_COMPLETED, f"Independent verification returned {verdict}.")
+        self.emit(
+            record,
+            EventType.TEST_COMPLETED,
+            f"Independent verification returned {verdict}.",
+            metadata={
+                # One outcome per independent verification round, not per test.
+                "test_execution_id": f"{record.run.run_id}_round_{len(record.run.events) + 1}",
+                "suite": "required_suites",
+                "challenge_family": "required_suites",
+                "outcome": (
+                    "pass"
+                    if verdict == S.VERIFIED
+                    else "fail"
+                    if verdict == S.REJECTED
+                    else "error"
+                    if verdict == S.ERROR
+                    else "missing"
+                ),
+                "executed": result.complete,
+            },
+        )
         return verdict
 
     def _begin_verification(self, record: RunRecord, final: bool) -> None:

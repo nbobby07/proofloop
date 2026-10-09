@@ -39,7 +39,7 @@ export function IntegrationStatus({
         {[
           [
             "ClickHouse",
-            "Telemetry adapter · route wiring and real execution pending",
+            "Persisted-event delivery available · live connection unverified",
           ],
           [
             "Guild",

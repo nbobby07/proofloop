@@ -222,8 +222,8 @@ export function EvidenceReport({
               <p className="report-summary">{report.summary}</p>
               <h3>Evidence references</h3>
               {report.evidence?.length ? (
-                report.evidence.map((e) => (
-                  <div className="artifact" key={e.artifact_id}>
+                report.evidence.map((e, index) => (
+                  <div className="artifact" key={`${e.artifact_id}-${index}`}>
                     <strong>{e.description}</strong>
                     <code>{e.artifact_id}</code>
                     <small>SHA-256 {e.sha256}</small>

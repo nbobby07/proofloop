@@ -58,7 +58,7 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
         <div>
           <h1>Security analytics</h1>
           <p className="support">
-            Recorded run outcomes and failure patterns across verification runs.
+            Persisted execution outcomes, including unsuccessful and incomplete verification rounds.
           </p>
         </div>
         <button
@@ -111,7 +111,7 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
       <section className="panel analytics-panel">
         <div className="section-heading">
           <div>
-            <h2>Failures by challenge family</h2>
+            <h2>Unsuccessful rounds by challenge family</h2>
           </div>
           <span className="badge">
             {updated
@@ -123,7 +123,7 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
           <div
             className="analytics-chart"
             role="img"
-            aria-label="Recorded failures by challenge family; exact values are in the table below."
+            aria-label="Unsuccessful or incomplete rounds by challenge family; exact values are in the table below."
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
@@ -159,7 +159,7 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
                 />
                 <Bar
                   dataKey="failures"
-                  name="Recorded failures"
+                  name="Unsuccessful / incomplete"
                   fill="#ce8f8b"
                   radius={[0, 3, 3, 0]}
                   maxBarSize={22}
@@ -175,9 +175,9 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
               <thead>
                 <tr>
                   <th>Challenge family</th>
-                  <th>Failures</th>
-                  <th>Recorded outcomes</th>
-                  <th>Observed failure rate</th>
+                  <th>Unsuccessful / incomplete</th>
+                  <th>Verification rounds</th>
+                  <th>Unsuccessful rate</th>
                 </tr>
               </thead>
               <tbody>
@@ -214,8 +214,8 @@ export function AnalyticsDashboard({ fixture }: { fixture: boolean }) {
         <div className="evidence-note">
           <span>↗</span>
           <p>
-            ClickHouse recommendations can prioritize allowlisted challenges.
-            Recorded outcomes include timeouts, skipped checks and incomplete
+            Optional ClickHouse delivery is separate from these local results.
+            Recorded rounds include timeouts, skipped checks and incomplete
             results. The orchestrator controls selection and budgets; analytics
             never determine security verdicts.
           </p>

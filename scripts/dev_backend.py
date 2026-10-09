@@ -19,16 +19,27 @@ SETTINGS = {
     "OPENAI_API_KEY",
     "OPENAI_MODEL",
     "SSL_CERT_FILE",
+    "PROOFLOOP_TELEMETRY_ENABLED",
+    "CLICKHOUSE_HOST",
+    "CLICKHOUSE_PORT",
+    "CLICKHOUSE_USER",
+    "CLICKHOUSE_PASSWORD",
+    "CLICKHOUSE_SECURE",
+    "CLICKHOUSE_DATABASE",
 }
 
 
-def main() -> None:
+def load_environment() -> None:
     path = ROOT / ".env"
     if path.exists():
         for line in path.read_text(encoding="utf-8").splitlines():
             key, separator, value = line.partition("=")
             if separator and key.strip() in SETTINGS:
                 os.environ.setdefault(key.strip(), value.strip().strip("\"'"))
+
+
+def main() -> None:
+    load_environment()
     uvicorn.run(
         "backend.api.main:app",
         host=os.getenv("PROOFLOOP_BACKEND_HOST", "127.0.0.1"),

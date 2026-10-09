@@ -9,7 +9,7 @@ import {
   getRun,
   getRunEvents,
 } from "../../services/api";
-import { mergeEvents, terminal } from "./lifecycle";
+import { canChallenge, mergeEvents, terminal } from "./lifecycle";
 
 export function useRun(enabled: boolean) {
   const [run, setRun] = useState<RunResponse | null>(null);
@@ -167,7 +167,7 @@ export function useRun(enabled: boolean) {
     }
   };
   const challenge = async () => {
-    if (!enabled || busy || !run || !terminal(run.status)) return;
+    if (!enabled || busy || !run || !canChallenge(run)) return;
     const controller = new AbortController();
     mutation.current?.abort();
     mutation.current = controller;

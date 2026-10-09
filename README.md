@@ -2,21 +2,22 @@
 
 **Autonomous adversarial security verification.**
 
-ProofLoop is a Cyberdefense Hackathon project for October 9, 2026 in San Francisco. The planned system discovers vulnerabilities in authorized targets, reproduces them, proposes defensive patches, applies those patches to isolated copies, and challenges the results with independent tests. It exists to make remediation measurable and reproducible.
+ProofLoop is a Cyberdefense Hackathon project for October 9, 2026 in San Francisco. The system discovers vulnerabilities in authorized targets, reproduces them, proposes defensive patches, applies those patches to isolated copies, and challenges the results with independent tests. It exists to make remediation measurable and reproducible.
 
 Agents may propose attacks and fixes. They never determine their own verdicts. A passing result means the patch passed the executed suite; it does not prove universal security.
 
 ## Current implementation
 
-Working on `feat/security-engine`: all frozen FastAPI execution endpoints, bounded orchestration,
-atomic local run/evidence persistence, real Semgrep discovery, isolated Docker verification,
-strict patch admission, and a frozen 44-check LedgerLite suite. Execution is opt-in and fails
-explicitly when dependencies or evidence are unavailable. The dashboard fixture remains labeled.
+Integrated on `feat/release-integration`: the React security arena, all frozen FastAPI
+routes, real Semgrep discovery, OpenAI patch generation, isolated Docker verification,
+bounded retries, patch diffs, evidence reports, rechallenge and local analytics.
+A real browser run rejected the first model patch, accepted the second on all 44
+frozen checks, and passed a fresh user-triggered rechallenge. Execution is opt-in;
+missing dependencies produce an explicit error. Fixture preview stays visibly labeled.
 
-OpenAI patch generation is implemented; current live acceptance progress and exact limitations
-are in [integration results](docs/INTEGRATION.md). Optional AkashML/Senso adapters are implemented
-but credentialed validation is pending. ClickHouse, Guild, narration and the updated dashboard
-are coordinated separately with Developer B. None supplies security verdicts.
+ClickHouse has optional persisted-event delivery; live database access is unverified.
+Guild, ElevenLabs, AkashML and Senso adapters are preserved but unverified live.
+See [release results and exact pinned commits](docs/RELEASE-INTEGRATION.md).
 
 ## Architecture and stack
 
@@ -31,6 +32,8 @@ Use a separate clone on each computer. Run from the repository root:
 ```sh
 git clone https://github.com/nbobby07/proofloop.git
 cd proofloop
+# Until the release PR merges:
+git switch feat/release-integration
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e ".[dev]" -c requirements.lock
@@ -104,11 +107,11 @@ Use separate clones and pull requests into `main`. Coordinate shared contracts/d
 | `OPENAI_MODEL` | Explicit defender model; local demo uses `gpt-6-luna` |
 | `AKASH_API_KEY` | PLANNED AkashML credential, passed explicitly to its client |
 | `AKASH_MODEL` | PLANNED account-supported attacker model id |
-| `CLICKHOUSE_HOST` | PLANNED ClickHouse host name |
-| `CLICKHOUSE_PORT` | PLANNED HTTP(S) client port; default secure cloud port 8443 |
-| `CLICKHOUSE_USER` | PLANNED database user |
-| `CLICKHOUSE_PASSWORD` | PLANNED database password |
-| `CLICKHOUSE_SECURE` | PLANNED TLS switch, default `true`; adapt to chosen client |
+| `CLICKHOUSE_HOST` | Optional ClickHouse host name |
+| `CLICKHOUSE_PORT` | Optional HTTP(S) client port; default secure cloud port 8443 |
+| `CLICKHOUSE_USER` | Optional database user |
+| `CLICKHOUSE_PASSWORD` | Optional database password |
+| `CLICKHOUSE_SECURE` | TLS switch, default `true`; remote TLS is required |
 | `SENSO_API_KEY` | PLANNED policy retrieval key; also supported by Senso CLI |
 | `SENSO_ORG_ID` | PLANNED app-level organization selector; validate against authenticated org |
 | `GUILD_API_KEY` | Reserved app-level placeholder; verify official Guild auth mechanism before implementation |
@@ -126,6 +129,33 @@ When changing ports, update the browser API URL and CORS origins together. Shell
 
 ## Sponsor roadmap
 
-Semgrep has real local execution evidence. OpenAI defender live acceptance is tracked in the integration record. AkashML and Senso adapters are implemented but unverified with credentials. ClickHouse, Guild and narration are optional and not wired into the core security loop. Pi sponsors the overall award and needs no API. OpenAI defender and optional ElevenLabs narration are additional tools. [Sponsor contracts and official reference links](docs/SPONSORS.md) describe integration readiness requirements.
+Semgrep has real local execution evidence. OpenAI defender live acceptance is tracked in the integration record. AkashML and Senso adapters are implemented but unverified with credentials. ClickHouse delivery is wired behind an explicit opt-in and never required by execution. Guild and narration remain optional adapters without routes. Pi sponsors the overall award and needs no API. OpenAI defender and optional ElevenLabs narration are additional tools. [Sponsor contracts and official reference links](docs/SPONSORS.md) describe integration readiness requirements.
 
 Submission deadline: **October 9, 2026, 4:30 PM Pacific**. [Sprint](docs/SPRINT.md) and [submission checklist](docs/SUBMISSION.md) track the remaining work.
+
+## Enable a real LedgerLite run
+
+Install Semgrep in a separate Python environment, start Docker, and build the reviewed
+runner before setting execution pins. Do not execute generated target code on the host.
+The release used Semgrep 1.180.0 and this reviewed base image:
+
+```sh
+python3 -m venv .venv-semgrep
+.venv-semgrep/bin/python -m pip install semgrep==1.180.0
+docker build --build-arg PYTHON_BASE=python:3.11-slim@sha256:e88e9763f943ec1834f992a4b51e0f24500486803e8bc534e5767af9ea65f6ce -f sandbox/Dockerfile -t proofloop-runner:local .
+docker image inspect --format '{{.Id}}' proofloop-runner:local
+```
+
+In ignored root `.env`, set `OPENAI_API_KEY`, `OPENAI_MODEL` (the recorded run used
+`gpt-6-luna`), `PROOFLOOP_EXECUTION_ENABLED=1`, and `PROOFLOOP_VERIFIER_IMAGE` to the
+reviewed local image ID from the command above. Set `SEMGREP_EXECUTABLE` to the
+absolute path of `.venv-semgrep/bin/semgrep` and `PROOFLOOP_MANIFEST_SHA256` to the
+reviewed v2 pin `2e426b9ffb46e0f9168c0327332ef4394728ceb0215ea11af59008f4a1018765`.
+Use the backend launcher so its environment is loaded. Keep keys backend-only.
+If Python needs a CA bundle, configure a trusted `SSL_CERT_FILE`; never disable TLS.
+
+Open the frontend, choose Live backend, and click Start verification. A successful
+health response proves API availability, not execution readiness. Model proposals
+can fail or be rejected; the independent verifier and saved evidence determine the
+outcome. See [runtime boundaries](backend/api/INTEGRATION.md) and
+[optional ClickHouse setup](backend/telemetry/README.md).

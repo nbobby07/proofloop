@@ -4,7 +4,7 @@ import { X } from "lucide-react";
 import type { RunResponse } from "../../types";
 import type { ConnectionStatus } from "../../hooks/useBackendHealth";
 import type { useRun } from "./useRun";
-import { terminal } from "./lifecycle";
+import { canChallenge, terminal } from "./lifecycle";
 import { Icon } from "../../components/Icon";
 
 export function RunControls({
@@ -75,7 +75,7 @@ export function RunControls({
             </Dialog.Root>
           )}
           <button
-            disabled={fixture || live.busy || !run || !terminal(run.status)}
+            disabled={fixture || live.busy || !canChallenge(run)}
             onClick={() => void live.challenge()}
           >
             <Icon name="refresh" />

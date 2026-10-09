@@ -28,3 +28,6 @@ and researched UI libraries. Reviewed desktop and phone previews are in `design/
 
 See [Developer A handoff](DEVELOPER-B-HANDOFF.md) for exact API/metadata proposals,
 adapter setup, pending sponsor access, checks and limitations.
+
+The lead separately exercised the release through real model patching, Docker
+verification and browser rechallenge. See [release receipt](../docs/RELEASE-INTEGRATION.md).

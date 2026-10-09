@@ -67,6 +67,46 @@ families ranked by observed failure rate. Missing context returns an empty list.
 A controls admission, challenge budget, policy and verdict. Record query results
 and selection rationale in A's evidence store.
 
+## Release wiring and validation
+
+The release integrates `TelemetryDelivery` with the FastAPI lifespan. Enable with
+`PROOFLOOP_TELEMETRY_ENABLED=1`; it is disabled by default. Every batch is read from
+an atomically persisted local manifest, delivered in a single background worker,
+and limited to 1000 events. Failed/ambiguous inserts retain the cursor for replay.
+Restart replays retained manifests; `FINAL` deduplicates by run and event ID.
+Local manifests must be retained as the durable outbox. There is no separate queue.
+SQL and connection operations run outside the async request loop. Database outages
+never block security execution or the local `/api/analytics` endpoint.
+
+The producer now records canonical `sequence`, approved `target`, patch `attempt`
+and exact proposal `patch_hash`. Each completed independent verification round
+adds a unique `test_execution_id`, `suite=required_suites`, matching challenge
+family, and an honest outcome/completeness flag. These are aggregate round metrics,
+NOT individual-check counts. Missing individual-check, timing, suite/policy context
+and baseline dimensions stay unavailable. Context-based adaptive recommendations
+remain unused. Infrastructure failures without a receipt do not invent test records.
+Local analytics include all recorded attempt/round failures and incomplete outcomes;
+ClickHouse patterns count only explicit fail outcomes in the failure numerator.
+
+Setup from the repository root with the backend environment active:
+
+```sh
+python -m pip install -r backend/telemetry/requirements.txt
+# Set CLICKHOUSE_HOST/USER/PASSWORD and TLS settings in the ignored .env.
+python -m scripts.telemetry initialize
+# Then enable PROOFLOOP_TELEMETRY_ENABLED=1 and restart the backend.
+python -m scripts.telemetry replay
+python -m scripts.telemetry query
+python -m scripts.telemetry query --run-id YOUR_RUN_ID
+```
+
+Initialization is an explicit administrative step and is never called by requests.
+The query CLI reads actual SQL results or exits with a safe unavailable error.
+Release tests use explicitly synthetic driver doubles for persistence-before-delivery,
+ambiguous insert replay, stable IDs, batching, fixture exclusion, secret projection,
+worker-thread execution and graceful outages. No live database credentials were
+available during release validation; no live connection or ingestion is claimed.
+
 Adapter unit tests pass, covering evidence admission, safe SQL boundaries and
 provider-error handling. No live SQL requests or ingestion checks have been
 executed. See frontend/VALIDATION.md for results and remaining access requirements.

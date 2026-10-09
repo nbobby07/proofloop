@@ -1,4 +1,4 @@
-import type { RunStatus, SecurityEvent } from "../../types";
+import type { RunResponse, RunStatus, SecurityEvent } from "../../types";
 
 export const labels: Record<RunStatus, string> = {
   pending: "Queued",
@@ -26,3 +26,7 @@ export function mergeEvents(
     ...incoming.filter((e) => !seen.has(e.event_id) && !!seen.add(e.event_id)),
   ];
 }
+
+export const canChallenge = (run: RunResponse | null) =>
+  !!run && ["verified", "rejected", "inconclusive"].includes(run.status) &&
+  !!run.patch && run.baseline?.reproduced === true;

@@ -29,6 +29,11 @@ python -m verifier_tests.run --variant candidate --target-root /absolute/disposa
 ```
 
 The committed evidence files record actual local execution, not illustrative counts.
+`http_transport.json` additionally records all 44 unchanged test functions executed
+against loopback uvicorn HTTP for both original and reference: 37/7 and 44/0. It
+uses a temporary HTTP-client fixture in place of TestClient (trusted test source
+unchanged), and separately records trailing-space normalization versus embedded
+space rejection. This is local HTTP validation, not a hardened container claim.
 They include every setup/call/teardown outcome, test IDs, pytest exit code, durations,
 failure descriptions, probe request/response, manifest SHA-256, input SHA-256s,
 runtime versions, stdout/stderr, and explicit completeness. Results remain synthetic
@@ -57,10 +62,18 @@ review and a suite version change.
 - Six Administrator cases assert complete content across both owners.
 - Nine missing-invoice cases cover all accounts and three absent IDs (including
   neighboring IDs), asserting 404.
-- Fifteen invalid-identity cases cover absent/empty/unknown/wrong-case/whitespace
+- Fifteen invalid-identity cases cover absent/empty/unknown/wrong-case/embedded-space
   selectors against Alice, Bob, and missing invoices, asserting 401.
 - Health and interleaved denied/owner/Administrator access preserve functionality
   and exact content after denials. The vulnerable original fails the sequence case.
+
+`ledgerlite-v2` is a reviewed transport-compatibility revision: the three
+invalid-identity cases formerly using `alice ` now use `alice bob`. HTTP servers
+may normalize leading/trailing optional header whitespace, while TestClient
+preserves it. Rejecting whitespace already stripped by transport is not an
+application guarantee. Embedded whitespace survives transport and remains invalid.
+All 44 checks and every owner/role/status assertion are preserved; the expected
+baseline still has exactly seven BOLA failures.
 
 The mutation validation actually executes four flawed patches: a two-invoice
 allowlist, blanket blocking, missing Administrator bypass, and reversed ownership.
@@ -113,7 +126,7 @@ verifier_tests/
   run.py                       # completeness checks and JSON evidence CLI
   validate_mutants.py          # four known bad patch experiments
   manifest.json                # frozen IDs/hashes and patch allowlist
-  evidence/{baseline,reference,mutations}.json
+  evidence/{baseline,reference,mutations,http_transport}.json
 ```
 
 Synthetic identity selection is forgeable by design; this suite tests object

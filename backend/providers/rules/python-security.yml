@@ -1,0 +1,25 @@
+rules:
+  - id: proofloop.python.sql-formatted-query
+    languages: [python]
+    severity: ERROR
+    message: SQL query constructed with string interpolation; use bound parameters.
+    metadata:
+      category: security
+      cwe: ["CWE-89: SQL Injection"]
+      impact: HIGH
+    pattern-either:
+      - pattern: $DB.execute(f"...", ...)
+      - pattern: $DB.execute("..." % ..., ...)
+      - pattern: $DB.execute("...".format(...), ...)
+      - pattern: $DB.execute("..." + ..., ...)
+  - id: proofloop.python.dynamic-eval
+    languages: [python]
+    severity: ERROR
+    message: Dynamic evaluation requires independent review of the input trust boundary.
+    metadata:
+      category: security
+      cwe: ["CWE-95: Eval Injection"]
+      impact: HIGH
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: exec(...)

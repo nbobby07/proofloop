@@ -63,6 +63,12 @@ class ElevenLabsClient:
             if os.path.exists(name):
                 os.unlink(name)
 
+    def identity(self, report: ReportResponse) -> str:
+        identity = json.dumps(
+            [report_digest(report), self.config.voice_id, self.config.model_id, "script-v1"]
+        )
+        return "briefing_" + hashlib.sha256(identity.encode()).hexdigest()
+
     def generate_incident_briefing(self, report: ReportResponse) -> AudioArtifact:
         report = require_execution_report(report)
         if not self.approved_for_export:
@@ -71,8 +77,7 @@ class ElevenLabsClient:
         if len(script) > 10000:
             raise NarrationUnavailable("Briefing exceeds the bounded narration input size.")
         digest = report_digest(report)
-        identity = json.dumps([digest, self.config.voice_id, self.config.model_id, "script-v1"])
-        artifact_id = "briefing_" + hashlib.sha256(identity.encode()).hexdigest()
+        artifact_id = self.identity(report)
         audio_path = self.directory / f"{artifact_id}.mp3"
         metadata_path = self.directory / f"{artifact_id}.json"
         if any(path.is_symlink() for path in (audio_path, metadata_path)):
@@ -138,6 +143,9 @@ class ElevenLabsClient:
         if not re.fullmatch(r"briefing_[a-f0-9]{64}", artifact_id):
             raise ValueError("Invalid briefing artifact id.")
         paths = tuple(self.directory / f"{artifact_id}.{ext}" for ext in ("mp3", "json"))
-        if any(path.resolve().parent != self.directory or not path.is_file() for path in paths):
+        if any(
+            path.is_symlink() or path.resolve().parent != self.directory or not path.is_file()
+            for path in paths
+        ):
             raise NarrationUnavailable("Saved briefing artifact is unavailable.")
         return paths

@@ -25,8 +25,9 @@ Default tests: 324 passed / 8 opt-in skipped. Additional real Docker/Semgrep tes
 ClickHouse delivery now reads persisted canonical events on a background worker;
 explicit initialization/replay/query commands are supplied. Delivery boundaries are
 tested with doubles, but credentials are absent and live ingestion is unverified.
-The core and local analytics work without it. Guild, ElevenLabs, AkashML and Senso
-adapters are preserved and remain unverified live. None can override the verifier.
+The core and local analytics work without it. ElevenLabs is now verified live through
+optional evidence-bound briefing routes. Guild, AkashML and Senso remain unverified
+live. None can override the verifier.
 
 ## Delivery
 
@@ -35,3 +36,20 @@ The final PR must pass backend/frontend CI and obtain one approving review befor
 merge. Main has not yet been updated. PRs #1/#3 stay open until that merge.
 Do not delete branches or worktrees. Submission/video/contact work is deferred at
 the user's request; no submission is attempted in this integration task.
+
+## Sponsor follow-up
+
+See [SPONSOR-ACTIVATION.md](docs/SPONSOR-ACTIVATION.md): ElevenLabs now generated real
+MP3s from completed reports and passed browser play/pause/replay/transcript checks.
+Old audio returns 409 after rechallenge. Live mode and selected run survive refresh.
+A fresh model-backed run again rejected its first patch and verified its second on
+44/44 checks; fresh rechallenge also passed. Tests now total 328 passed / 8 skipped.
+ClickHouse service ownership is unverified: the prior claim was imported from B's
+handoff, not independently observed. No ClickHouse service was created in this chat.
+Human review was requested from boaaaat on PR #4. Submission remains out of scope.
+
+
+Latest pinned dashboard follow-up: `f9643d3c0b2bffb23784683a2272d13da61cd262`.
+It includes the redesigned workspace plus adapter/frontend tests, merged without
+modifying Developer B's branch. Final combined validation: 346 Python tests passed,
+8 skipped; 16 frontend tests passed. CI now includes all those suites.

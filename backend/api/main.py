@@ -27,6 +27,20 @@ def create_app(*, orchestrator=None) -> FastAPI:
             service = orchestrator
         application.state.orchestrator = service
         service.recover()
+        from backend.reports.briefings import BriefingService
+        from backend.reports.narrator import ElevenLabsClient, NarrationConfig, NarrationUnavailable
+
+        narrator = None
+        if os.getenv("PROOFLOOP_NARRATION_ENABLED") == "1":
+            try:
+                narrator = ElevenLabsClient(
+                    NarrationConfig.from_env(),
+                    service.store.root / "briefings",
+                    approved_for_export=True,
+                )
+            except (ValueError, NarrationUnavailable):
+                pass
+        application.state.briefings = BriefingService(service.store, narrator)
         from backend.telemetry.delivery import configured_delivery
 
         delivery = configured_delivery(service.store)
@@ -37,6 +51,7 @@ def create_app(*, orchestrator=None) -> FastAPI:
             yield
         finally:
             await service.close()
+            await application.state.briefings.close()
             if delivery:
                 await delivery.close()
 

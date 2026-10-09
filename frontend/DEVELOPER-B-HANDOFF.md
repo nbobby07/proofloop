@@ -1,7 +1,17 @@
 # Developer B implementation handoff
 
-Branch: `feat/product-dashboard`. Only B-owned paths changed. Shared Pydantic,
-OpenAPI, generated TypeScript and Developer A's implementation are untouched.
+Historical author handoff. Current verified sponsor/account status is in
+[the release follow-up](../docs/SPONSOR-ACTIVATION.md); the ClickHouse service
+creation/ownership claim below has not been independently verified. ElevenLabs
+was subsequently activated in the integrating account and has real playback evidence.
+
+Branch: `feat/product-dashboard`. Developer A's `origin/feat/security-engine`
+through `bb5eddf`, then release-integration through `f5d067a`, were merged at the
+user's request. Merge reconciliation preserved the lead's challenge eligibility,
+repeated artifact keys, aggregate analytics semantics and telemetry delivery.
+New implementation
+edits are confined to B-owned paths. Shared Pydantic, OpenAPI and generated
+TypeScript contracts are unchanged.
 Coordinate the following changes with A; this file is a proposal, not a frozen API.
 
 ## Implemented frontend
@@ -12,7 +22,7 @@ Coordinate the following changes with A; this file is a proposal, not a frozen A
 - Run creation, opening a run ID, cursor polling, event deduplication and severity filter.
 - Accepted rechallenge clears current verification/report while waiting for new evidence.
 - Verification counts, interactive unified diff and saved report JSON download.
-- SQL-response analytics page and session-local execution-only history.
+- Canonical API-response analytics page and session-local execution-only history.
 - Integration readiness page; reusable hosted-review display and audio player.
 - Reduced-motion support, focus states, responsive grids and bounded scroll containers.
 
@@ -22,8 +32,9 @@ Pipeline completion markers require stage_completed events; final status is back
 
 ## Frozen route integration
 
-Existing /api/runs, /events, /report, /challenge and /analytics return 501 in the
-scaffold. A implements these. Frontend already consumes their canonical DTOs.
+The merged API implements /api/runs, /events, /report, /challenge and /analytics.
+Frontend consumes their canonical DTOs. Analytics currently reads A's local run
+storage; ClickHouse backing is still pending and is not claimed by the UI.
 Create request: LedgerLite, max_attempts=3. Challenge: max_challenges=2, policy_ids=[].
 404/409/422/501/network errors remain visible. No mutating request is auto-retried.
 
@@ -54,10 +65,13 @@ Explicit connect/configuration and initialize_schema at startup/migration time;
 never connect on import. Install the optional telemetry/requirements.txt dependency
 and coordinate root lock/config updates. Use a dedicated runtime account and TLS.
 
-A persists events first, calls insert_security_events in a worker/threadpool, and
-replays persisted batches after TelemetryUnavailable. The existing analytics route
-returns query_security_analytics(AnalyticsFilters(run_id=...)); failure-pattern
-queries are context-restricted, historical and consumed by A's orchestrator.
+The merged release provides TelemetryDelivery: persisted local manifests supply
+batches to one background worker; ambiguous insert failures retain replay offsets.
+Enable explicitly with PROOFLOOP_TELEMETRY_ENABLED=1 after schema initialization.
+See backend/telemetry/README.md and scripts/telemetry.py. Coordinate routing the
+existing analytics endpoint to
+query_security_analytics(AnalyticsFilters(run_id=...)); failure-pattern queries
+are context-restricted, historical and intended for A's orchestrator.
 
 Required proposed metadata is documented in backend/telemetry/README.md. The most
 important fields are unique monotonic sequence, target, test_execution_id, suite,
@@ -134,11 +148,17 @@ No secret values were read, printed or committed. Never put secrets into VITE_*.
 
 ## Delivery status
 
-Frontend production build (including TypeScript), ESLint, Python source compilation,
-Ruff lint/format for owned Python paths, and Git whitespace checks passed.
-No tests or smoke tests were created or run, per user instruction. No security
-execution, live ingestion, narration, hosted audit or visual browser QA is claimed.
+The user's later instruction explicitly authorized tests and branch integration.
+Frontend production build (including TypeScript), ESLint, Ruff and exported schema
+checks passed. Automated checks: 324 backend tests passed in Linux (8 opt-in
+skipped), 18 B adapter tests passed, and 15 frontend tests passed. See VALIDATION.md
+for commands and the Windows environment limitation.
+
+Desktop and 390px phone layouts were reviewed in Chrome. A real local API run
+was scheduled, polled to its engine_not_configured error, and its report/analytics
+loaded. This confirms error-path integration, not successful vulnerability execution.
+Live ClickHouse ingestion, narration and hosted Guild execution remain unverified.
 
 Shared CURRENT.md/docs updates are pending coordination. Recommended milestones:
-frontend implemented; telemetry/reporting adapters implemented but UNVERIFIED;
+frontend implemented; telemetry/reporting adapters unit-checked, live UNVERIFIED;
 route integration, hosted deployment, real sponsor receipts and recurrence PLANNED.

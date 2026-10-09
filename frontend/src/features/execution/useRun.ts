@@ -11,6 +11,8 @@ import {
 } from "../../services/api";
 import { canChallenge, mergeEvents, terminal } from "./lifecycle";
 
+import { saveSelection, savedRunId } from "./session";
+
 export function useRun(enabled: boolean) {
   const [run, setRun] = useState<RunResponse | null>(null);
   const [events, setEvents] = useState<SecurityEvent[]>([]);
@@ -20,7 +22,7 @@ export function useRun(enabled: boolean) {
   const [busy, setBusy] = useState(false);
   const [polling, setPolling] = useState(false);
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
-  const [selection, setSelection] = useState({ id: "", revision: 0 });
+  const [selection, setSelection] = useState(() => ({ id: savedRunId(), revision: 0 }));
   const [history, setHistory] = useState<RunResponse[]>([]);
   const mutation = useRef<AbortController | null>(null);
   const pendingChallenge = useRef<Set<string> | null>(null);
@@ -129,6 +131,7 @@ export function useRun(enabled: boolean) {
   }, [enabled, runId, selection.revision]);
 
   const open = useCallback((id: string) => {
+    saveSelection("run", id.trim());
     mutation.current?.abort();
     pendingChallenge.current = null;
     setRun(null);

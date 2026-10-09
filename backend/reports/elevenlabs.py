@@ -1,4 +1,4 @@
-"""PLANNED narration; only completed execution evidence may drive incident briefings."""
+"""Stable narration protocol. Concrete REST implementation is in narrator.py."""
 
 from typing import Protocol
 

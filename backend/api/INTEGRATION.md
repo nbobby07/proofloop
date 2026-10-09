@@ -1,94 +1,119 @@
-# Orchestrator integration handoff
+# Execution composition and handoff
 
-The canonical Pydantic wire models and generated contracts are unchanged. All six execution
-routes are implemented, alongside the existing health route. HTTP 202 schedules bounded work;
-poll the run or append-only events endpoint. Reports return 409 until a terminal state.
+All six execution endpoints and health are implemented without changes to canonical Pydantic
+wire models or generated contracts. HTTP 202 schedules work; poll run/events. Reports return
+409 until terminal. Rechallenge synchronously invalidates current verification before scheduling.
 
-## Composition and engine interface
+## Real runtime configuration
 
-`create_app(orchestrator=Orchestrator(RunStore(Path("runs")), engine))` installs a trusted
-`ExecutionEngine` implementation from `backend.engine.orchestrator`. The default app deliberately
-has no configured engine: requests create a real run that terminates with `engine_not_configured`,
-never fixture findings or fake test evidence. Configure the composition only after the real
-worker implementations are integrated. No API key or Docker call occurs merely by importing the app.
+`backend.api.composition.LedgerLiteEngine` wires the A1/A2/A3 implementations. `create_app()`
+installs it when execution is explicitly enabled. No key, image pull, model request, scanner call,
+or target execution occurs just by importing the app. Set backend-only environment variables:
 
-The async engine methods are:
+| Variable | Required value |
+| --- | --- |
+| `PROOFLOOP_EXECUTION_ENABLED` | `1` to enable real composition; otherwise runs fail `engine_not_configured` |
+| `PROOFLOOP_VERIFIER_IMAGE` | Reviewed, locally installed immutable Docker image ID `sha256:<64 lowercase hex>` |
+| `PROOFLOOP_MANIFEST_SHA256` | Independently reviewed SHA-256 of `verifier_tests/manifest.json` bytes |
+| `OPENAI_API_KEY` | Backend-only credential; never put in frontend configuration |
+| `OPENAI_MODEL` | Explicit supported OpenAI Responses model selected by operator |
+| `SEMGREP_EXECUTABLE` | Optional absolute executable path; defaults to `semgrep` on backend PATH |
+| `PROOFLOOP_DOCKER_HOST` | Optional local Unix socket; defaults to `unix:///var/run/docker.sock` |
+| `PROOFLOOP_RUNS_DIR` | Optional private persistence root; defaults to ignored `runs/` |
 
-- `discover(run_id, target) -> Finding | None`: pin the approved source/suite/policy context;
-  run a complete real scan. Return no finding only for a completed scan without a selected finding;
-  an incomplete scan must raise an explicit failure, never silently appear clean.
-- `reproduce(run_id, finding) -> BaselineReceipt`: independently reproduce against the immutable
-  baseline. Return the canonical `BaselineResult` as `result` plus opaque `evidence` references,
-  including evidence of unsuccessful reproduction. Keep artifacts in the engine's evidence store.
-- `generate_patch(run_id, finding, attempt, feedback) -> PatchProposal`: call the defender with
-  the pinned source and deterministic feedback. The proposal's attempt must match the request.
-- `apply_patch(run_id, patch) -> None`: trusted diff admission, frozen original, disposable workspace.
-  Returning successfully means the patch was applied; proposals alone do not qualify.
-- `verify(run_id) -> StageResult`: run complete required security and functional checks.
-- `challenge(run_id, ChallengeRequest) -> StageResult`: admit at most `max_challenges` proposals
-  against trusted templates/policy IDs, execute independently, and return the independent final
-  verdict across all required security/functional/adversarial evidence. Unknown policy IDs and
-  unsupported challenges must fail closed. Rechallenge reruns required checks on the exact patch;
-  historical passing evidence cannot stand in for new execution.
+The coordinator's `scripts/dev_backend.py` launcher loads an allowlist from ignored `.env`.
+Direct Uvicorn startup requires those variables already present in the process environment;
+API modules do not evaluate shell text or load arbitrary dotenv keys. Use one API worker.
+Missing/invalid configured inputs produce safe codes such as `defender_configuration_missing`,
+`invalid_execution_pins`, `approved_inputs_unavailable`, or `approved_inputs_invalid`, never
+exception text or configuration values. A manifest pin must be reviewed out of band; deriving
+approval from whichever files happen to be present defeats the trust boundary.
 
-`StageResult` is an internal receipt, not a replacement for the provider or API contracts. It holds
-an independently determined verdict, canonical `VerificationSummary`, evidence references,
-`complete`, and `patch_sha256` (SHA-256 of the proposal's UTF-8 diff bytes). `complete` MUST come
-from the independent verifier checking frozen required test identities, outcomes, baseline,
-source/patch/policy/suite/runner bindings, and artifact integrity. Never derive it from model output
-or counters. The orchestrator additionally rejects stale patch hashes, empty evidence, incomplete
-receipts, zero required suite totals, and partial pass counts. It never upgrades another verdict.
+The reviewed HTTP-compatible A1 suite v2 is integrated. Its `suite_version` is read from the
+pinned manifest; no test version is hardcoded. Reviewed manifest file hash:
+`2e426b9ffb46e0f9168c0327332ef4394728ceb0215ea11af59008f4a1018765`.
+The original v1 trailing-space invalid-identity case is not transport stable and correctly prevents
+baseline reproduction over HTTP. No tests are skipped or weakened in composition to hide it.
 
-Engine methods must be cancellation-cooperative and must not perform blocking IO on the event loop.
-Wrap bounded synchronous provider/runner operations off-loop; their own timeouts and process
-cleanup remain required because cancellation cannot stop a Python thread. Default outer stage
-budget is 120 seconds and maximum concurrent runs is four. Configure budgets to encompass the
-runner's own cleanup deadline. No engine context or raw exception is serialized publicly.
+## Real execution path
 
-## Existing worker contracts to reuse
+1. Read only A2's four curated `SOURCE_FILES`, checking every byte against the approved manifest's
+   original hashes. Never read or give a provider `reference_secure.py`, provider keys, or tests.
+   Freeze trusted suite bytes, local policy, scanner rules, runner code, and image identity.
+2. Materialize an immutable disposable copy for `SemgrepScanner.scan_with_details`. Require
+   complete diagnostics, exact source coverage, no skips, and pinned rules. Select only A3's
+   `proofloop.ledgerlite.invoice-missing-ownership` finding in the mutable app path. Clean scans
+   return an honest inconclusive run, never a fabricated finding.
+3. Run A2 Docker baseline and `baseline_reproduced`. Infrastructure failures are errors;
+   timeout/output-limit/incomplete evidence is inconclusive. Preserve evidence even on failure.
+4. Call the real `OpenAIDefender` with immutable source, selected finding, attempt number, and
+   independent failed-test feedback. Each call has 30-second timeout, zero HTTP retries, and the
+   provider's 8192 output-token cap. The request's 1..10 patch-attempt limit remains authoritative.
+5. Apply the proposed unified diff through A2's strict `apply_unified_diff`, against the frozen
+   original and `PATCH_ALLOWLIST`. No shell patching or model-supplied commands.
+6. Completely rescan the patched source. Run the independent frozen test suite in Docker and
+   consume A2 `evaluate_patch`, preserving its verdict. Counts only summarize actual test IDs;
+   they do not decide acceptance. Patch/source/policy/manifest/runner/image hashes remain bound.
+7. Execute one admitted `ledgerlite_frozen_suite` challenge (within every valid `max_challenges`
+   budget). Rerun both baseline and patched suites freshly, including all security, functional,
+   and adversarial tests. This is the explicit deterministic challenge mode, not model-generated
+   attack code. Unknown policy IDs fail closed. The sole approved policy ID is
+   `ledgerlite-object-authorization-v1`; an empty list uses this local policy.
+8. Retry rejected independent tests within budget, preserving each attempt. Save content-addressed
+   artifacts, publish the independently derived terminal status, and release in-memory context.
 
-A1: curated LedgerLite source, patch allowlist, frozen required test manifest, baseline expectations,
-and trusted HTTP test assertions. Never run the developer checkout or let the patch alter tests.
+AkashML and Senso are optional and are not invoked by this core composition. No hosted-policy or
+sponsor inference success is claimed. The reviewed local policy is versioned in composition code
+and hash-bound to every manifest. Optional future adapters must preserve these trust boundaries.
 
-A2: immutable snapshot, isolated patch application, independent runner and deterministic verifier.
-A2 now exposes `SourceSnapshot.capture(root, allowed_files)`,
-`apply_unified_diff(original, diff, allowed_files=...) -> PreparedPatch`,
-`DockerRunner.run(snapshot, trusted_suite, manifest, limits, phase=..., deadline=...)`,
-`baseline_reproduced(evidence, manifest)`, and
-`evaluate_patch(prepared_patch, manifest, baseline, patched) -> VerificationResult`.
-`Verifier.verify_patch(original, replacements_or_diff, trusted_suite, manifest, limits)`
-is the combined baseline/patch convenience entry point. The integration adapter must use these
-trusted entry points instead of duplicating patch parsing or verdict reduction. Map its verdict into
-`StageResult` and retain/reconstruct the pinned execution context for rechallenge.
+## Internal interfaces and bounds
 
-A3: reuse existing `SemgrepScanner.scan_repository(Path) -> ScanResult`,
-`OpenAIDefender.generate_patch(SourceSnapshot, Finding, list[str]) -> PatchProposal`,
-`AkashAttacker.generate_challenges(target, SecurityPolicy, list[ChallengeResult])`, and
-`SensoPolicyStore.retrieve_security_policy` / `retrieve_policy_sources` DTOs. These synchronous
-providers never supply execution verdicts. Instantiate attempt-scoped defenders as required by
-the concrete implementation. A complete scan, authoritative policies, and trusted challenge
-admission are composition responsibilities; the engine must not invent missing results.
+`create_app(orchestrator=Orchestrator(store, engine))` remains available for dependency injection.
+The async `ExecutionEngine` methods are `discover`, `reproduce`, `generate_patch`, `apply_patch`,
+`verify`, and `challenge`; exact signatures are in `backend/engine/orchestrator.py`.
 
-## Persistence and operation
+`DiscoveryReceipt` retains the canonical optional finding plus scanner/context evidence references.
+`BaselineReceipt` retains canonical `BaselineResult` plus baseline references. `StageResult`
+retains canonical counts, the independent verdict, completeness, references, and the SHA-256 of
+exact proposal diff bytes. Only A2's reducer can establish complete verified/rejected test results.
+The orchestrator additionally rejects missing evidence, stale patch identity, zero totals, incomplete
+receipts, and partial pass counts. Neither static scans nor model claims can upgrade a verdict.
 
-`PROOFLOOP_RUNS_DIR` defaults to ignored `runs/`. Run manifests are atomic JSON replacements with
-private permissions and fsync before replace. They retain ordered canonical events, every proposed
-patch, application status, every verification/challenge round, evidence references, and safe failure
-codes. Only one API process may own a store; multi-process/multi-host scheduling is unsupported.
-An app restart marks unfinished manifests `error/execution_interrupted` rather than resuming stale
-engine context. Completed runs remain readable. Rechallenge after restart needs the adapter to
-reconstruct and validate its immutable context; otherwise it must fail explicitly.
+Synchronous scanner/provider/runner work runs off the event loop through at most four live worker
+slots. Cancellation does not forcibly kill Python threads; each real adapter has its own bounded
+IO/process cleanup. Docker gets 25 seconds of execution and a 45-second total operation deadline,
+plus its bounded cleanup. The app allows 180 seconds per lifecycle stage and four active runs.
+The model adapter has no automatic retry. Rechallenge consumes no model call in deterministic mode.
 
-Event cursors are opaque run-scoped sequence positions; retain the tail cursor to poll new events.
-Analytics exclude fixtures and include failed/incomplete rounds in denominators. `required_suites`
-is an aggregate family; template-specific breakdown requires coordinated engine metadata.
-Public errors omit provider exception text, credentials, host paths, and traceback. Evidence
-references are opaque IDs; no new download endpoint is introduced.
+Completed context is reconstructed on demand from persisted source/policy/test/rules/runner/image
+pins and the exact saved patch. Changes or corrupt context artifacts fail closed. Rechallenge always
+executes fresh containers, never reuses previous test outcomes. Active interrupted runs become
+`error/execution_interrupted` on API restart rather than resuming half-finished work.
 
-## Verification and current blockers
+## Persistence, visibility, and validation
 
-Unit-test engines are explicitly marked test doubles and live only in backend/tests. They are
-never installed by production composition and do not constitute real security execution evidence.
-The lifecycle/API can be validated without keys or attacks. Real execution remains blocked until
-A1/A2/A3 are integrated, an engine adapter is supplied, Docker is available, and provider
-configuration is present. No claim of a real verified patch is made by this branch.
+Run manifests use private atomic JSON replacement. They retain ordered events, all proposed patches,
+application status, every verification/challenge round, safe failures, and opaque evidence references.
+Artifacts live under `runs/artifacts`, use content-derived IDs, and are checked against SHA-256 on read.
+Configured credentials are redacted, including encoded process output, before artifact persistence;
+artifact hashes describe those stored redacted bytes. No download endpoint exposes raw host paths.
+Baseline/patch execution artifacts retain test IDs/phases, stdout/stderr, exit codes, durations, and
+execution/source/manifest identities. The public report exposes opaque references only.
+
+Only one API process may own a store. Event cursors are run-scoped sequence positions; retain the tail
+cursor for polling. Analytics exclude fixture runs and include incomplete/failed rounds in denominators.
+`required_suites` is currently aggregate, not a fabricated template-specific breakdown.
+
+Composition tests use explicitly named unit provider/runner doubles, exercising the real snapshot,
+patcher, reducer, artifact store, and orchestrator without paid calls or target execution. They do not
+prove real container/model success. Real acceptance is performed separately by the integration
+coordinator using reviewed runtime pins and a bounded paid run. Passing a finite public synthetic
+fixture suite is not universal security or real authentication verification.
+
+
+Validated on this branch: 265 combined backend/provider/sandbox tests passed, 8 opt-in cases
+skipped; Ruff, formatting, and generated-contract drift checks passed. A real Semgrep discovery
+smoke using the isolated Semgrep runtime found the approved LedgerLite BOLA rule with complete
+four-file coverage, persisted two evidence references, and used suite `ledgerlite-v2`. This smoke
+made no provider/model request and does not constitute patch verification. No paid calls were
+made by this worker; end-to-end paid acceptance belongs to the coordinator.

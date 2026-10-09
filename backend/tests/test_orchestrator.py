@@ -21,6 +21,7 @@ from backend.api.schemas import (
 )
 from backend.engine.orchestrator import (
     BaselineReceipt,
+    DiscoveryReceipt,
     InvalidTransition,
     Orchestrator,
     StageResult,
@@ -41,7 +42,9 @@ class UnitTestEngine:
     async def discover(self, run_id, target):
         self.calls.append("discover")
         await asyncio.sleep(self.delay)
-        return Finding(id="unit_finding", title="Unit test only", severity="high")
+        return DiscoveryReceipt(
+            finding=Finding(id="unit_finding", title="Unit test only", severity="high")
+        )
 
     async def reproduce(self, run_id, finding):
         return BaselineReceipt(

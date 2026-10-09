@@ -18,9 +18,13 @@ def create_app(*, orchestrator=None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(application):
-        service = orchestrator or Orchestrator(
-            RunStore(Path(os.getenv("PROOFLOOP_RUNS_DIR", "runs")))
-        )
+        if orchestrator is None:
+            from backend.api.composition import configured_engine
+
+            store = RunStore(Path(os.getenv("PROOFLOOP_RUNS_DIR", "runs")))
+            service = Orchestrator(store, configured_engine(store), stage_timeout=180)
+        else:
+            service = orchestrator
         application.state.orchestrator = service
         service.recover()
         try:

@@ -1,22 +1,23 @@
 # Developer B validation — 2026-10-09
 
 Branch: feat/product-dashboard. Integrated origin/feat/security-engine through
-bb5eddf using a normal merge. No A-owned implementation or frozen DTO edits.
+bb5eddf and origin/feat/release-integration through f5d067a using normal merges.
+No new A-owned implementation or frozen DTO edits.
 The user's latest instruction authorized tests and integration checks.
 
 ## Automated results
 
 | Check | Result |
 |---|---|
-| Linux backend: python -m pytest | 319 passed, 8 opt-in skipped |
+| Linux backend: python -m pytest | 324 passed, 8 opt-in skipped |
 | B adapters: pytest backend/telemetry/tests backend/reports/tests guild/tests | 18 passed |
-| Frontend: npm test | 14 passed |
+| Frontend: npm test | 15 passed |
 | Frontend: npm run lint | Passed |
 | Frontend: npm run build | Passed; includes TypeScript compilation |
 | Ruff check backend scripts demo_target verifier_tests sandbox guild | Passed |
 | python -m scripts.export_contracts --check | Current |
 
-351 passing tests across these suites. Provider/network behavior in B unit tests
+357 passing tests across these suites. Provider/network behavior in B unit tests
 uses explicitly named doubles; these are not receipts for actual sponsor calls.
 The eight backend skips are opt-in acceptance suites, not asserted successes.
 
@@ -41,12 +42,17 @@ Fixture preview remains explicitly labeled and execution controls disabled.
 
 Saved screenshots in design/ show the labeled fixture preview, not executed proof.
 
+The merged lead release separately records a real model/Docker/Semgrep browser
+run and successful rechallenge in docs/evidence/release-browser-acceptance.json.
+That is the lead's execution receipt, not a fresh local run by Developer B.
+
 ## Pending live acceptance
 
 - Configure A's sandbox/provider environment for a successful fresh end-to-end
   vulnerability/patch/challenge run. Local Docker daemon was unavailable.
-- ClickHouse password remains user-deferred; real ingestion, SQL performance
-  and orchestrator feedback hookup are unverified.
+- ClickHouse password remains user-deferred; real ingestion and SQL performance
+  are unverified. The merged release supplies optional durable delivery; adaptive
+  orchestrator recommendations still require compatible history and coordination.
 - Guild hosted deployment and approved API routes are pending access/coordination.
 - ElevenLabs key, approved briefing routes and real generated audio are pending.
 - Shared CURRENT.md/docs milestone updates require team coordination; this owned

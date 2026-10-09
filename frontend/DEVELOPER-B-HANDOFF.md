@@ -1,7 +1,10 @@
 # Developer B implementation handoff
 
 Branch: `feat/product-dashboard`. Developer A's `origin/feat/security-engine`
-through `bb5eddf` was merged cleanly at the user's request. New implementation
+through `bb5eddf`, then release-integration through `f5d067a`, were merged at the
+user's request. Merge reconciliation preserved the lead's challenge eligibility,
+repeated artifact keys, aggregate analytics semantics and telemetry delivery.
+New implementation
 edits are confined to B-owned paths. Shared Pydantic, OpenAPI and generated
 TypeScript contracts are unchanged.
 Coordinate the following changes with A; this file is a proposal, not a frozen API.
@@ -57,9 +60,11 @@ Explicit connect/configuration and initialize_schema at startup/migration time;
 never connect on import. Install the optional telemetry/requirements.txt dependency
 and coordinate root lock/config updates. Use a dedicated runtime account and TLS.
 
-Proposed hookup: A persists events first, calls insert_security_events in a
-worker/threadpool, and replays persisted batches after TelemetryUnavailable.
-Coordinate routing the existing analytics endpoint to
+The merged release provides TelemetryDelivery: persisted local manifests supply
+batches to one background worker; ambiguous insert failures retain replay offsets.
+Enable explicitly with PROOFLOOP_TELEMETRY_ENABLED=1 after schema initialization.
+See backend/telemetry/README.md and scripts/telemetry.py. Coordinate routing the
+existing analytics endpoint to
 query_security_analytics(AnalyticsFilters(run_id=...)); failure-pattern queries
 are context-restricted, historical and intended for A's orchestrator.
 
@@ -140,8 +145,8 @@ No secret values were read, printed or committed. Never put secrets into VITE_*.
 
 The user's later instruction explicitly authorized tests and branch integration.
 Frontend production build (including TypeScript), ESLint, Ruff and exported schema
-checks passed. Automated checks: 319 backend tests passed in Linux (8 opt-in
-skipped), 18 B adapter tests passed, and 14 frontend tests passed. See VALIDATION.md
+checks passed. Automated checks: 324 backend tests passed in Linux (8 opt-in
+skipped), 18 B adapter tests passed, and 15 frontend tests passed. See VALIDATION.md
 for commands and the Windows environment limitation.
 
 Desktop and 390px phone layouts were reviewed in Chrome. A real local API run

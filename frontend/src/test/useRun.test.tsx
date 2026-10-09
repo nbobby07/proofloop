@@ -18,6 +18,8 @@ const runDouble: RunResponse = {
   source: "execution",
   status: "verified",
   events: [],
+  baseline: { reproduced: true, observed_status: 200 },
+  patch: { attempt: 1, diff: "Unit transport double; no applied patch" },
   verification: {
     security_passed: 1,
     security_total: 1,
@@ -78,6 +80,20 @@ describe("run lifecycle", () => {
     expect(result.current.run?.verification).toBeNull();
     expect(result.current.report).toBeNull();
     expect(api.getReport).toHaveBeenCalledTimes(1);
+  });
+  it("does not submit a challenge for an execution error without reproduced baseline and patch", async () => {
+    vi.mocked(api.getRun).mockResolvedValue({
+      ...runDouble,
+      status: "error",
+      baseline: null,
+      patch: null,
+      verification: null,
+    });
+    const { result } = renderHook(() => useRun(true));
+    act(() => result.current.open("run_unit"));
+    await waitFor(() => expect(result.current.run?.status).toBe("error"));
+    await act(async () => result.current.challenge());
+    expect(api.challengeRun).not.toHaveBeenCalled();
   });
   it("drains short paginated pages, deduplicates IDs and preserves delivery order", async () => {
     vi.mocked(api.getRunEvents)

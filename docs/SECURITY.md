@@ -1,6 +1,6 @@
 # Security boundaries
 
-This scaffold has no scanning or code-execution engine. The following are required design boundaries for future implementation, all **PLANNED** until tested.
+The LedgerLite execution engine implements the following boundaries. Actual tests, unexecuted paths and residual limitations are recorded in `INTEGRATION.md` and `sandbox/VALIDATION.md`.
 
 ## Authorization and trust
 
@@ -24,7 +24,7 @@ AI-generated source, diffs, attack specifications, model messages, retrieved doc
 - Original and trusted tests mounted read-only, writable disposable target copy only where needed. Pin image/dependency versions. No package downloads during verification.
 - Docker is an isolation layer that must be configured and tested, not an assurance by itself. An unavailable runner or violated boundary produces an explicit failure and stops execution.
 
-No Docker image is provided yet: choose its target/runtime and resource limits after the immutable test plan is agreed. Never turn the absence of runner setup into fake test results.
+The reviewed `sandbox/Dockerfile` requires a digest-pinned Python base; runtime accepts only its reviewed local image ID. Never turn the absence of runner setup into fake test results.
 
 ## Verdicts and evidence
 

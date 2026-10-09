@@ -2,7 +2,7 @@
 
 Event details supplied by the team: Cyberdefense Hackathon, San Francisco, October 9, 2026. Deadline: **4:30 PM Pacific (America/Los_Angeles; UTC-07:00)**. Confirm the organizer's submission portal separately.
 
-- [ ] Accessible GitHub repository: `https://github.com/nbobby07/proofloop` after publication; private initially. Arrange judge access or explicitly authorize a visibility change.
+- [x] Public GitHub repository: https://github.com/nbobby07/proofloop. Owner-authorized visibility change and unauthenticated HTTP 200 verified.
 - [ ] Short demo video with shareable URL: TODO.
 - [ ] Description of what was built: update with actual completed features, not roadmap.
 - [ ] Technologies used: React, TypeScript, Vite, Tailwind, Python, FastAPI, Pydantic, pytest; add Docker/sponsors only once used successfully.
@@ -16,3 +16,7 @@ Event details supplied by the team: Cyberdefense Hackathon, San Francisco, Octob
 - [ ] Submit before 4:30 PM Pacific.
 
 Initial scaffold description: "ProofLoop establishes a shared security-verification API contract and local dashboard foundation. Security execution and sponsor integrations are planned." Replace this only as real implementation milestones are verified. Pi does not need an integration.
+
+Integration update: the full application and live browser evidence are recorded in
+[RELEASE-INTEGRATION.md](RELEASE-INTEGRATION.md). Video, contact collection, portal
+work and submission are deferred at the user's request. No submission has occurred.

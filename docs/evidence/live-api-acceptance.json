@@ -1,0 +1,1550 @@
+{
+  "model": "gpt-6-luna",
+  "run": {
+    "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+    "status": "verified",
+    "target": "LedgerLite",
+    "source": "execution",
+    "finding": {
+      "id": "sg_540ef20e6788d914722c79c57bfe7168",
+      "title": "proofloop.ledgerlite.invoice-missing-ownership: demo_target/ledgerlite/app.py:28",
+      "severity": "high"
+    },
+    "baseline": {
+      "reproduced": true,
+      "observed_status": 200
+    },
+    "patch": {
+      "attempt": 2,
+      "diff": "--- a/demo_target/ledgerlite/app.py\n+++ b/demo_target/ledgerlite/app.py\n@@ -19,12 +19,14 @@\n \n     @app.get(\"/invoices/{invoice_id}\")\n     def invoice(invoice_id: str, x_synthetic_identity: str | None = Header(default=None)):\n-        if x_synthetic_identity not in USERS:\n+        user = USERS.get(x_synthetic_identity)\n+        if user is None:\n             raise HTTPException(status_code=401, detail=\"Synthetic identity required\")\n         record = INVOICES.get(invoice_id)\n         if record is None:\n             raise HTTPException(status_code=404, detail=\"Invoice not found\")\n-        # INTENTIONAL BOLA: authenticated synthetic users can access any owner's invoice.\n+        if user.get(\"role\") != \"administrator\" and record.get(\"owner_id\") != x_synthetic_identity:\n+            raise HTTPException(status_code=403, detail=\"Invoice access denied\")\n         return {\"id\": invoice_id, **record, \"source\": \"fixture\"}\n \n     return app\n"
+    },
+    "verification": {
+      "security_passed": 6,
+      "security_total": 6,
+      "functional_passed": 22,
+      "functional_total": 22,
+      "adversarial_passed": 16,
+      "adversarial_total": 16
+    },
+    "events": [
+      {
+        "event_id": "event_00000001",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:08.947572Z",
+        "stage": "pending",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Run scheduled.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000002",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:08.948971Z",
+        "stage": "pending",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage pending finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000003",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:08.949830Z",
+        "stage": "discovering",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage discovering started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000004",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:17.694880Z",
+        "stage": "discovering",
+        "event_type": "finding_discovered",
+        "severity": "info",
+        "message": "Scanner finding selected.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000005",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:17.695454Z",
+        "stage": "discovering",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage discovering finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000006",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:17.695821Z",
+        "stage": "reproducing",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage reproducing started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000007",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:24.800465Z",
+        "stage": "reproducing",
+        "event_type": "baseline_reproduced",
+        "severity": "info",
+        "message": "Independent baseline reproduced.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000008",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:24.801399Z",
+        "stage": "reproducing",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage reproducing finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000009",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:24.801959Z",
+        "stage": "generating_patch",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage generating_patch started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000010",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:28.718813Z",
+        "stage": "generating_patch",
+        "event_type": "patch_proposed",
+        "severity": "info",
+        "message": "Patch attempt 1 proposed.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000011",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:28.721066Z",
+        "stage": "generating_patch",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage generating_patch finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000012",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:28.722507Z",
+        "stage": "applying_patch",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage applying_patch started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000013",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:28.728240Z",
+        "stage": "applying_patch",
+        "event_type": "patch_applied",
+        "severity": "info",
+        "message": "Patch applied in isolated workspace.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000014",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:28.730514Z",
+        "stage": "applying_patch",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage applying_patch finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000015",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:28.731560Z",
+        "stage": "verifying",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage verifying started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000016",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:37.337522Z",
+        "stage": "verifying",
+        "event_type": "test_completed",
+        "severity": "info",
+        "message": "Independent verification returned rejected.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000017",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:37.338576Z",
+        "stage": "verifying",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage verifying finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000018",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:37.339393Z",
+        "stage": "retrying",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage retrying started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000019",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:37.340035Z",
+        "stage": "retrying",
+        "event_type": "retry_scheduled",
+        "severity": "info",
+        "message": "Retry scheduled within attempt budget.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000020",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:37.340732Z",
+        "stage": "retrying",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage retrying finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000021",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:37.341499Z",
+        "stage": "generating_patch",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage generating_patch started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000022",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:42.011849Z",
+        "stage": "generating_patch",
+        "event_type": "patch_proposed",
+        "severity": "info",
+        "message": "Patch attempt 2 proposed.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000023",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:42.014118Z",
+        "stage": "generating_patch",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage generating_patch finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000024",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:42.016173Z",
+        "stage": "applying_patch",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage applying_patch started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000025",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:42.021119Z",
+        "stage": "applying_patch",
+        "event_type": "patch_applied",
+        "severity": "info",
+        "message": "Patch applied in isolated workspace.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000026",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:42.023409Z",
+        "stage": "applying_patch",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage applying_patch finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000027",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:42.024746Z",
+        "stage": "verifying",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage verifying started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000028",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:50.243874Z",
+        "stage": "verifying",
+        "event_type": "test_completed",
+        "severity": "info",
+        "message": "Independent verification returned verified.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000029",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:50.245546Z",
+        "stage": "verifying",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage verifying finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000030",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:50.246703Z",
+        "stage": "challenging",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage challenging started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000031",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:17:01.687592Z",
+        "stage": "challenging",
+        "event_type": "test_completed",
+        "severity": "info",
+        "message": "Independent verification returned verified.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000032",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:17:01.688987Z",
+        "stage": "challenging",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage challenging finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000033",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:17:01.690178Z",
+        "stage": "verified",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage verified started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000034",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:17:01.691178Z",
+        "stage": "verified",
+        "event_type": "run_completed",
+        "severity": "info",
+        "message": "Run finished: verified.",
+        "source": "execution",
+        "metadata": {}
+      }
+    ]
+  },
+  "report": {
+    "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+    "source": "execution",
+    "status": "verified",
+    "summary": "Run verified.",
+    "verification": {
+      "security_passed": 6,
+      "security_total": 6,
+      "functional_passed": 22,
+      "functional_total": 22,
+      "adversarial_passed": 16,
+      "adversarial_total": 16
+    },
+    "evidence": [
+      {
+        "artifact_id": "evidence_3719cd2917ef573329403d4c7d76d5306c37a33f514cdba7a56d65fc55f43af7",
+        "sha256": "3719cd2917ef573329403d4c7d76d5306c37a33f514cdba7a56d65fc55f43af7",
+        "description": "Pinned LedgerLite execution context."
+      },
+      {
+        "artifact_id": "evidence_6b2281d4471d82cb24e70fa8f6b70724923304f2b4e8369fd5c7c762d7888f4a",
+        "sha256": "6b2281d4471d82cb24e70fa8f6b70724923304f2b4e8369fd5c7c762d7888f4a",
+        "description": "Complete scanner diagnostics and source coverage."
+      },
+      {
+        "artifact_id": "evidence_2b510e85877ef56d277cc869598f811cebba024d164755c41987f6e74d3bb6ab",
+        "sha256": "2b510e85877ef56d277cc869598f811cebba024d164755c41987f6e74d3bb6ab",
+        "description": "Independent baseline execution evidence."
+      },
+      {
+        "artifact_id": "evidence_b3413294d523717768e832dcd88dd2c1984bf2a4683f9709e336280afa83b2d5",
+        "sha256": "b3413294d523717768e832dcd88dd2c1984bf2a4683f9709e336280afa83b2d5",
+        "description": "Complete scanner diagnostics and source coverage."
+      },
+      {
+        "artifact_id": "evidence_a70191d1fbc2b36ed54baec3b847cca53957714bd7cda9765e45c4fc0669d7dc",
+        "sha256": "a70191d1fbc2b36ed54baec3b847cca53957714bd7cda9765e45c4fc0669d7dc",
+        "description": "Independent patched execution evidence."
+      },
+      {
+        "artifact_id": "evidence_1627136e7c86fc3c8ad8e848434e0e73b7991b69d3d3560c9a58877d4aa414a6",
+        "sha256": "1627136e7c86fc3c8ad8e848434e0e73b7991b69d3d3560c9a58877d4aa414a6",
+        "description": "Independent patch verdict and bound evidence."
+      },
+      {
+        "artifact_id": "evidence_aa3c33266388b0ff34d2d56fdfc0292a0e30c818e4fead4526eab58c27f4f99a",
+        "sha256": "aa3c33266388b0ff34d2d56fdfc0292a0e30c818e4fead4526eab58c27f4f99a",
+        "description": "Complete scanner diagnostics and source coverage."
+      },
+      {
+        "artifact_id": "evidence_64ac091d67e4f71cffecaaa11f353ce565e88361c5c699a925b973750331f91e",
+        "sha256": "64ac091d67e4f71cffecaaa11f353ce565e88361c5c699a925b973750331f91e",
+        "description": "Independent patched execution evidence."
+      },
+      {
+        "artifact_id": "evidence_217035cf2aa63513b1c019e431c2c626a598f374fe449177b591bf250f9136ae",
+        "sha256": "217035cf2aa63513b1c019e431c2c626a598f374fe449177b591bf250f9136ae",
+        "description": "Independent patch verdict and bound evidence."
+      },
+      {
+        "artifact_id": "evidence_945831fb1c6d485027f33626e81892022bfca4067c7b60027eb30086af4b057b",
+        "sha256": "945831fb1c6d485027f33626e81892022bfca4067c7b60027eb30086af4b057b",
+        "description": "Admitted frozen deterministic challenge; no sponsor inference."
+      },
+      {
+        "artifact_id": "evidence_c8e12f03567e721e472535dcc410dc2b1807951362f77669fab96779f81c1e89",
+        "sha256": "c8e12f03567e721e472535dcc410dc2b1807951362f77669fab96779f81c1e89",
+        "description": "Independent baseline execution evidence."
+      },
+      {
+        "artifact_id": "evidence_aa3c33266388b0ff34d2d56fdfc0292a0e30c818e4fead4526eab58c27f4f99a",
+        "sha256": "aa3c33266388b0ff34d2d56fdfc0292a0e30c818e4fead4526eab58c27f4f99a",
+        "description": "Complete scanner diagnostics and source coverage."
+      },
+      {
+        "artifact_id": "evidence_ae1d979af0aaafe76aed555b2cc3a93c2d984299ec6e6d8a4d9fcc78b8eb9b8b",
+        "sha256": "ae1d979af0aaafe76aed555b2cc3a93c2d984299ec6e6d8a4d9fcc78b8eb9b8b",
+        "description": "Independent patched execution evidence."
+      },
+      {
+        "artifact_id": "evidence_1bfb9cc9f0393a579cedf1866d99e86f4955a9627784aae041e77cdeb12eba8f",
+        "sha256": "1bfb9cc9f0393a579cedf1866d99e86f4955a9627784aae041e77cdeb12eba8f",
+        "description": "Independent patch verdict and bound evidence."
+      }
+    ],
+    "limitations": [
+      "Results cover only the frozen executed suites; not universal security."
+    ]
+  },
+  "events": {
+    "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+    "source": "execution",
+    "events": [
+      {
+        "event_id": "event_00000001",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:08.947572Z",
+        "stage": "pending",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Run scheduled.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000002",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:08.948971Z",
+        "stage": "pending",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage pending finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000003",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:08.949830Z",
+        "stage": "discovering",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage discovering started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000004",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:17.694880Z",
+        "stage": "discovering",
+        "event_type": "finding_discovered",
+        "severity": "info",
+        "message": "Scanner finding selected.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000005",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:17.695454Z",
+        "stage": "discovering",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage discovering finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000006",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:17.695821Z",
+        "stage": "reproducing",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage reproducing started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000007",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:24.800465Z",
+        "stage": "reproducing",
+        "event_type": "baseline_reproduced",
+        "severity": "info",
+        "message": "Independent baseline reproduced.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000008",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:24.801399Z",
+        "stage": "reproducing",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage reproducing finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000009",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:24.801959Z",
+        "stage": "generating_patch",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage generating_patch started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000010",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:28.718813Z",
+        "stage": "generating_patch",
+        "event_type": "patch_proposed",
+        "severity": "info",
+        "message": "Patch attempt 1 proposed.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000011",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:28.721066Z",
+        "stage": "generating_patch",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage generating_patch finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000012",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:28.722507Z",
+        "stage": "applying_patch",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage applying_patch started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000013",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:28.728240Z",
+        "stage": "applying_patch",
+        "event_type": "patch_applied",
+        "severity": "info",
+        "message": "Patch applied in isolated workspace.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000014",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:28.730514Z",
+        "stage": "applying_patch",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage applying_patch finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000015",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:28.731560Z",
+        "stage": "verifying",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage verifying started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000016",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:37.337522Z",
+        "stage": "verifying",
+        "event_type": "test_completed",
+        "severity": "info",
+        "message": "Independent verification returned rejected.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000017",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:37.338576Z",
+        "stage": "verifying",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage verifying finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000018",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:37.339393Z",
+        "stage": "retrying",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage retrying started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000019",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:37.340035Z",
+        "stage": "retrying",
+        "event_type": "retry_scheduled",
+        "severity": "info",
+        "message": "Retry scheduled within attempt budget.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000020",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:37.340732Z",
+        "stage": "retrying",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage retrying finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000021",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:37.341499Z",
+        "stage": "generating_patch",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage generating_patch started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000022",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:42.011849Z",
+        "stage": "generating_patch",
+        "event_type": "patch_proposed",
+        "severity": "info",
+        "message": "Patch attempt 2 proposed.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000023",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:42.014118Z",
+        "stage": "generating_patch",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage generating_patch finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000024",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:42.016173Z",
+        "stage": "applying_patch",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage applying_patch started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000025",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:42.021119Z",
+        "stage": "applying_patch",
+        "event_type": "patch_applied",
+        "severity": "info",
+        "message": "Patch applied in isolated workspace.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000026",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:42.023409Z",
+        "stage": "applying_patch",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage applying_patch finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000027",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:42.024746Z",
+        "stage": "verifying",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage verifying started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000028",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:50.243874Z",
+        "stage": "verifying",
+        "event_type": "test_completed",
+        "severity": "info",
+        "message": "Independent verification returned verified.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000029",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:50.245546Z",
+        "stage": "verifying",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage verifying finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000030",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:16:50.246703Z",
+        "stage": "challenging",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage challenging started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000031",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:17:01.687592Z",
+        "stage": "challenging",
+        "event_type": "test_completed",
+        "severity": "info",
+        "message": "Independent verification returned verified.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000032",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:17:01.688987Z",
+        "stage": "challenging",
+        "event_type": "stage_completed",
+        "severity": "info",
+        "message": "Stage challenging finished.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000033",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:17:01.690178Z",
+        "stage": "verified",
+        "event_type": "stage_started",
+        "severity": "info",
+        "message": "Stage verified started.",
+        "source": "execution",
+        "metadata": {}
+      },
+      {
+        "event_id": "event_00000034",
+        "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+        "timestamp": "2026-10-09T19:17:01.691178Z",
+        "stage": "verified",
+        "event_type": "run_completed",
+        "severity": "info",
+        "message": "Run finished: verified.",
+        "source": "execution",
+        "metadata": {}
+      }
+    ],
+    "next_cursor": "cnVuX2M0MmJlZmQ1OWJiNjQwZDliZmYwZjcxYTdkMzA2NTQ2OjM0"
+  },
+  "analytics": {
+    "source": "execution",
+    "run_count": 1,
+    "verified_count": 1,
+    "rejected_count": 0,
+    "failure_patterns": [
+      {
+        "challenge_family": "required_suites",
+        "failures": 1,
+        "executions": 3
+      }
+    ]
+  },
+  "rechallenge": {
+    "run": {
+      "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+      "status": "verified",
+      "target": "LedgerLite",
+      "source": "execution",
+      "finding": {
+        "id": "sg_540ef20e6788d914722c79c57bfe7168",
+        "title": "proofloop.ledgerlite.invoice-missing-ownership: demo_target/ledgerlite/app.py:28",
+        "severity": "high"
+      },
+      "baseline": {
+        "reproduced": true,
+        "observed_status": 200
+      },
+      "patch": {
+        "attempt": 2,
+        "diff": "--- a/demo_target/ledgerlite/app.py\n+++ b/demo_target/ledgerlite/app.py\n@@ -19,12 +19,14 @@\n \n     @app.get(\"/invoices/{invoice_id}\")\n     def invoice(invoice_id: str, x_synthetic_identity: str | None = Header(default=None)):\n-        if x_synthetic_identity not in USERS:\n+        user = USERS.get(x_synthetic_identity)\n+        if user is None:\n             raise HTTPException(status_code=401, detail=\"Synthetic identity required\")\n         record = INVOICES.get(invoice_id)\n         if record is None:\n             raise HTTPException(status_code=404, detail=\"Invoice not found\")\n-        # INTENTIONAL BOLA: authenticated synthetic users can access any owner's invoice.\n+        if user.get(\"role\") != \"administrator\" and record.get(\"owner_id\") != x_synthetic_identity:\n+            raise HTTPException(status_code=403, detail=\"Invoice access denied\")\n         return {\"id\": invoice_id, **record, \"source\": \"fixture\"}\n \n     return app\n"
+      },
+      "verification": {
+        "security_passed": 6,
+        "security_total": 6,
+        "functional_passed": 22,
+        "functional_total": 22,
+        "adversarial_passed": 16,
+        "adversarial_total": 16
+      },
+      "events": [
+        {
+          "event_id": "event_00000001",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:08.947572Z",
+          "stage": "pending",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Run scheduled.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000002",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:08.948971Z",
+          "stage": "pending",
+          "event_type": "stage_completed",
+          "severity": "info",
+          "message": "Stage pending finished.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000003",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:08.949830Z",
+          "stage": "discovering",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Stage discovering started.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000004",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:17.694880Z",
+          "stage": "discovering",
+          "event_type": "finding_discovered",
+          "severity": "info",
+          "message": "Scanner finding selected.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000005",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:17.695454Z",
+          "stage": "discovering",
+          "event_type": "stage_completed",
+          "severity": "info",
+          "message": "Stage discovering finished.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000006",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:17.695821Z",
+          "stage": "reproducing",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Stage reproducing started.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000007",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:24.800465Z",
+          "stage": "reproducing",
+          "event_type": "baseline_reproduced",
+          "severity": "info",
+          "message": "Independent baseline reproduced.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000008",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:24.801399Z",
+          "stage": "reproducing",
+          "event_type": "stage_completed",
+          "severity": "info",
+          "message": "Stage reproducing finished.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000009",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:24.801959Z",
+          "stage": "generating_patch",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Stage generating_patch started.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000010",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:28.718813Z",
+          "stage": "generating_patch",
+          "event_type": "patch_proposed",
+          "severity": "info",
+          "message": "Patch attempt 1 proposed.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000011",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:28.721066Z",
+          "stage": "generating_patch",
+          "event_type": "stage_completed",
+          "severity": "info",
+          "message": "Stage generating_patch finished.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000012",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:28.722507Z",
+          "stage": "applying_patch",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Stage applying_patch started.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000013",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:28.728240Z",
+          "stage": "applying_patch",
+          "event_type": "patch_applied",
+          "severity": "info",
+          "message": "Patch applied in isolated workspace.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000014",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:28.730514Z",
+          "stage": "applying_patch",
+          "event_type": "stage_completed",
+          "severity": "info",
+          "message": "Stage applying_patch finished.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000015",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:28.731560Z",
+          "stage": "verifying",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Stage verifying started.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000016",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:37.337522Z",
+          "stage": "verifying",
+          "event_type": "test_completed",
+          "severity": "info",
+          "message": "Independent verification returned rejected.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000017",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:37.338576Z",
+          "stage": "verifying",
+          "event_type": "stage_completed",
+          "severity": "info",
+          "message": "Stage verifying finished.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000018",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:37.339393Z",
+          "stage": "retrying",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Stage retrying started.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000019",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:37.340035Z",
+          "stage": "retrying",
+          "event_type": "retry_scheduled",
+          "severity": "info",
+          "message": "Retry scheduled within attempt budget.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000020",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:37.340732Z",
+          "stage": "retrying",
+          "event_type": "stage_completed",
+          "severity": "info",
+          "message": "Stage retrying finished.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000021",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:37.341499Z",
+          "stage": "generating_patch",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Stage generating_patch started.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000022",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:42.011849Z",
+          "stage": "generating_patch",
+          "event_type": "patch_proposed",
+          "severity": "info",
+          "message": "Patch attempt 2 proposed.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000023",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:42.014118Z",
+          "stage": "generating_patch",
+          "event_type": "stage_completed",
+          "severity": "info",
+          "message": "Stage generating_patch finished.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000024",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:42.016173Z",
+          "stage": "applying_patch",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Stage applying_patch started.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000025",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:42.021119Z",
+          "stage": "applying_patch",
+          "event_type": "patch_applied",
+          "severity": "info",
+          "message": "Patch applied in isolated workspace.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000026",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:42.023409Z",
+          "stage": "applying_patch",
+          "event_type": "stage_completed",
+          "severity": "info",
+          "message": "Stage applying_patch finished.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000027",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:42.024746Z",
+          "stage": "verifying",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Stage verifying started.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000028",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:50.243874Z",
+          "stage": "verifying",
+          "event_type": "test_completed",
+          "severity": "info",
+          "message": "Independent verification returned verified.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000029",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:50.245546Z",
+          "stage": "verifying",
+          "event_type": "stage_completed",
+          "severity": "info",
+          "message": "Stage verifying finished.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000030",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:16:50.246703Z",
+          "stage": "challenging",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Stage challenging started.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000031",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:17:01.687592Z",
+          "stage": "challenging",
+          "event_type": "test_completed",
+          "severity": "info",
+          "message": "Independent verification returned verified.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000032",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:17:01.688987Z",
+          "stage": "challenging",
+          "event_type": "stage_completed",
+          "severity": "info",
+          "message": "Stage challenging finished.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000033",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:17:01.690178Z",
+          "stage": "verified",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Stage verified started.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000034",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:17:01.691178Z",
+          "stage": "verified",
+          "event_type": "run_completed",
+          "severity": "info",
+          "message": "Run finished: verified.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000035",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:17:01.992604Z",
+          "stage": "verified",
+          "event_type": "stage_completed",
+          "severity": "info",
+          "message": "Stage verified finished.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000036",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:17:01.994494Z",
+          "stage": "challenging",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Stage challenging started.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000037",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:17:19.358462Z",
+          "stage": "challenging",
+          "event_type": "test_completed",
+          "severity": "info",
+          "message": "Independent verification returned verified.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000038",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:17:19.359509Z",
+          "stage": "challenging",
+          "event_type": "stage_completed",
+          "severity": "info",
+          "message": "Stage challenging finished.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000039",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:17:19.360253Z",
+          "stage": "verified",
+          "event_type": "stage_started",
+          "severity": "info",
+          "message": "Stage verified started.",
+          "source": "execution",
+          "metadata": {}
+        },
+        {
+          "event_id": "event_00000040",
+          "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+          "timestamp": "2026-10-09T19:17:19.360948Z",
+          "stage": "verified",
+          "event_type": "run_completed",
+          "severity": "info",
+          "message": "Run finished: verified.",
+          "source": "execution",
+          "metadata": {}
+        }
+      ]
+    },
+    "report": {
+      "run_id": "run_c42befd59bb640d9bff0f71a7d306546",
+      "source": "execution",
+      "status": "verified",
+      "summary": "Run verified.",
+      "verification": {
+        "security_passed": 6,
+        "security_total": 6,
+        "functional_passed": 22,
+        "functional_total": 22,
+        "adversarial_passed": 16,
+        "adversarial_total": 16
+      },
+      "evidence": [
+        {
+          "artifact_id": "evidence_3719cd2917ef573329403d4c7d76d5306c37a33f514cdba7a56d65fc55f43af7",
+          "sha256": "3719cd2917ef573329403d4c7d76d5306c37a33f514cdba7a56d65fc55f43af7",
+          "description": "Pinned LedgerLite execution context."
+        },
+        {
+          "artifact_id": "evidence_6b2281d4471d82cb24e70fa8f6b70724923304f2b4e8369fd5c7c762d7888f4a",
+          "sha256": "6b2281d4471d82cb24e70fa8f6b70724923304f2b4e8369fd5c7c762d7888f4a",
+          "description": "Complete scanner diagnostics and source coverage."
+        },
+        {
+          "artifact_id": "evidence_2b510e85877ef56d277cc869598f811cebba024d164755c41987f6e74d3bb6ab",
+          "sha256": "2b510e85877ef56d277cc869598f811cebba024d164755c41987f6e74d3bb6ab",
+          "description": "Independent baseline execution evidence."
+        },
+        {
+          "artifact_id": "evidence_b3413294d523717768e832dcd88dd2c1984bf2a4683f9709e336280afa83b2d5",
+          "sha256": "b3413294d523717768e832dcd88dd2c1984bf2a4683f9709e336280afa83b2d5",
+          "description": "Complete scanner diagnostics and source coverage."
+        },
+        {
+          "artifact_id": "evidence_a70191d1fbc2b36ed54baec3b847cca53957714bd7cda9765e45c4fc0669d7dc",
+          "sha256": "a70191d1fbc2b36ed54baec3b847cca53957714bd7cda9765e45c4fc0669d7dc",
+          "description": "Independent patched execution evidence."
+        },
+        {
+          "artifact_id": "evidence_1627136e7c86fc3c8ad8e848434e0e73b7991b69d3d3560c9a58877d4aa414a6",
+          "sha256": "1627136e7c86fc3c8ad8e848434e0e73b7991b69d3d3560c9a58877d4aa414a6",
+          "description": "Independent patch verdict and bound evidence."
+        },
+        {
+          "artifact_id": "evidence_aa3c33266388b0ff34d2d56fdfc0292a0e30c818e4fead4526eab58c27f4f99a",
+          "sha256": "aa3c33266388b0ff34d2d56fdfc0292a0e30c818e4fead4526eab58c27f4f99a",
+          "description": "Complete scanner diagnostics and source coverage."
+        },
+        {
+          "artifact_id": "evidence_64ac091d67e4f71cffecaaa11f353ce565e88361c5c699a925b973750331f91e",
+          "sha256": "64ac091d67e4f71cffecaaa11f353ce565e88361c5c699a925b973750331f91e",
+          "description": "Independent patched execution evidence."
+        },
+        {
+          "artifact_id": "evidence_217035cf2aa63513b1c019e431c2c626a598f374fe449177b591bf250f9136ae",
+          "sha256": "217035cf2aa63513b1c019e431c2c626a598f374fe449177b591bf250f9136ae",
+          "description": "Independent patch verdict and bound evidence."
+        },
+        {
+          "artifact_id": "evidence_945831fb1c6d485027f33626e81892022bfca4067c7b60027eb30086af4b057b",
+          "sha256": "945831fb1c6d485027f33626e81892022bfca4067c7b60027eb30086af4b057b",
+          "description": "Admitted frozen deterministic challenge; no sponsor inference."
+        },
+        {
+          "artifact_id": "evidence_c8e12f03567e721e472535dcc410dc2b1807951362f77669fab96779f81c1e89",
+          "sha256": "c8e12f03567e721e472535dcc410dc2b1807951362f77669fab96779f81c1e89",
+          "description": "Independent baseline execution evidence."
+        },
+        {
+          "artifact_id": "evidence_aa3c33266388b0ff34d2d56fdfc0292a0e30c818e4fead4526eab58c27f4f99a",
+          "sha256": "aa3c33266388b0ff34d2d56fdfc0292a0e30c818e4fead4526eab58c27f4f99a",
+          "description": "Complete scanner diagnostics and source coverage."
+        },
+        {
+          "artifact_id": "evidence_ae1d979af0aaafe76aed555b2cc3a93c2d984299ec6e6d8a4d9fcc78b8eb9b8b",
+          "sha256": "ae1d979af0aaafe76aed555b2cc3a93c2d984299ec6e6d8a4d9fcc78b8eb9b8b",
+          "description": "Independent patched execution evidence."
+        },
+        {
+          "artifact_id": "evidence_1bfb9cc9f0393a579cedf1866d99e86f4955a9627784aae041e77cdeb12eba8f",
+          "sha256": "1bfb9cc9f0393a579cedf1866d99e86f4955a9627784aae041e77cdeb12eba8f",
+          "description": "Independent patch verdict and bound evidence."
+        },
+        {
+          "artifact_id": "evidence_945831fb1c6d485027f33626e81892022bfca4067c7b60027eb30086af4b057b",
+          "sha256": "945831fb1c6d485027f33626e81892022bfca4067c7b60027eb30086af4b057b",
+          "description": "Admitted frozen deterministic challenge; no sponsor inference."
+        },
+        {
+          "artifact_id": "evidence_45ece284589f795a439c8415cd2046384e5c5347e9556ef7dec549da9dd67f92",
+          "sha256": "45ece284589f795a439c8415cd2046384e5c5347e9556ef7dec549da9dd67f92",
+          "description": "Independent baseline execution evidence."
+        },
+        {
+          "artifact_id": "evidence_aa3c33266388b0ff34d2d56fdfc0292a0e30c818e4fead4526eab58c27f4f99a",
+          "sha256": "aa3c33266388b0ff34d2d56fdfc0292a0e30c818e4fead4526eab58c27f4f99a",
+          "description": "Complete scanner diagnostics and source coverage."
+        },
+        {
+          "artifact_id": "evidence_06f3ec1cc31c441e5b1fd2d7c0b2702f9260461029e48427a851fbefe7d7a8bd",
+          "sha256": "06f3ec1cc31c441e5b1fd2d7c0b2702f9260461029e48427a851fbefe7d7a8bd",
+          "description": "Independent patched execution evidence."
+        },
+        {
+          "artifact_id": "evidence_6339f1a1f8f1610929c6221b6c23ac28d2d5cc6ce8e0cf515819c50424245ca7",
+          "sha256": "6339f1a1f8f1610929c6221b6c23ac28d2d5cc6ce8e0cf515819c50424245ca7",
+          "description": "Independent patch verdict and bound evidence."
+        }
+      ],
+      "limitations": [
+        "Results cover only the frozen executed suites; not universal security."
+      ]
+    }
+  },
+  "execution_identity_checks": [
+    {
+      "execution_id": "a8e16eef53bc47519544a0629f0f4b67",
+      "phase": "baseline",
+      "status": "completed",
+      "source_sha256": "4798758fa0918eb02f1f7ad7adbba3f62b098f203327b7ccde89760be7d5a1d4",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 37,
+        "failed": 7
+      }
+    },
+    {
+      "execution_id": "d002b1b666164691bb785c647eedecd5",
+      "phase": "patched",
+      "status": "completed",
+      "source_sha256": "51652b3aa68911843dc074dc5315d6c4b85f7fc1b7849218a97fc30ad0919620",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 37,
+        "failed": 7
+      }
+    },
+    {
+      "execution_id": "8d39fd0ae5964907b5802ebeb84031c8",
+      "phase": "patched",
+      "status": "completed",
+      "source_sha256": "c6ccb15e236fde1f9436b164facd8ccc211b18016388f3b9a7d9aa5c12eaa951",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 44
+      }
+    },
+    {
+      "execution_id": "b25d91768c9240b88dd162e337696b93",
+      "phase": "baseline",
+      "status": "completed",
+      "source_sha256": "4798758fa0918eb02f1f7ad7adbba3f62b098f203327b7ccde89760be7d5a1d4",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 37,
+        "failed": 7
+      }
+    },
+    {
+      "execution_id": "b2feb1cda55e42779d554232c602fd46",
+      "phase": "patched",
+      "status": "completed",
+      "source_sha256": "c6ccb15e236fde1f9436b164facd8ccc211b18016388f3b9a7d9aa5c12eaa951",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 44
+      }
+    },
+    {
+      "execution_id": "4f5ad28410524b3a86e867564234cc8a",
+      "phase": "baseline",
+      "status": "completed",
+      "source_sha256": "4798758fa0918eb02f1f7ad7adbba3f62b098f203327b7ccde89760be7d5a1d4",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 37,
+        "failed": 7
+      }
+    },
+    {
+      "execution_id": "3656032250474ce79cb3e9125431b192",
+      "phase": "patched",
+      "status": "completed",
+      "source_sha256": "c6ccb15e236fde1f9436b164facd8ccc211b18016388f3b9a7d9aa5c12eaa951",
+      "manifest_sha256": "740fdae699141930e90b32df7d7f959602808ef69759bd5a8aebba11d4220b49",
+      "outcomes": {
+        "passed": 44
+      }
+    }
+  ]
+}

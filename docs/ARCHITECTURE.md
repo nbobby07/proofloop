@@ -1,6 +1,6 @@
 # Architecture
 
-The current system is a local framework foundation. The pipeline below is **PLANNED**.
+The core LedgerLite loop is implemented on `feat/security-engine`. Optional sponsor stages remain deferred; actual acceptance evidence is in `INTEGRATION.md`.
 
 ```mermaid
 flowchart LR
@@ -11,7 +11,7 @@ flowchart LR
   B --> D[OpenAI patch proposal]
   D --> P[Allowlisted patch application]
   P --> V[Independent Docker verification]
-  V --> A[AkashML bounded challenges]
+  V --> A[Reviewed frozen-suite challenge]
   A --> V
   V --> E[Deterministic verdict and evidence]
   E --> R[Security regression suite]
@@ -30,15 +30,15 @@ flowchart LR
 4. Request a defensive patch proposal using source, finding, and previous deterministic feedback. Validate its structure and path allowlist before use.
 5. Create a disposable source copy and apply the patch. Reject symlinks/path traversal, disallowed files, oversized diffs, and attempts to alter trusted verifier/policy/test inputs.
 6. Scan patched source, then run frozen security and functional suites in Docker with isolation and bounded resources. Record all required tests, not only favorable outcomes.
-7. Retrieve authoritative Senso policy sources and ClickHouse failure patterns. Akash proposes bounded challenge specifications against approved test templates. Deterministic policy checks admit challenges; telemetry influences selection but never verdicts.
+7. Admit one reviewed frozen-suite challenge using a pinned local policy, then rerun baseline and patched tests in fresh containers. Optional Senso/ClickHouse/Akash selection is deferred; provider output can never define the trusted suite or verdict.
 8. Execute challenges independently. Any failing required check rejects the current patch; missing/skipped/timeout evidence is inconclusive. Retry within a fixed budget, preserving every attempt.
 9. Independent verifier emits a final verdict bound to target, patch, policy, suite, and artifact hashes. `verified` covers the executed suite only. Save admissible attacks as regression tests through a trusted review path; generated proposals cannot edit frozen tests during the run.
 10. Produce reports; send redacted evidence to a real hosted Guild reviewer. Optional narration is derived from actual completed run evidence. These steps cannot replace deterministic verdicts.
 
 ## Modules and handoffs
 
-`backend/api/` owns wire models and routes; `engine/` owns orchestration/scanning/patching/verifying; `providers/` defines typed external contracts; `storage/` will persist local run manifests; `telemetry/` and `reports/` are B's adapters. Frontend imports generated API interfaces and does not access provider secrets. Cross-owner imports into `providers/contracts.py` require coordinated changes.
+`backend/api/` owns wire models and routes; `engine/` owns orchestration/scanning/patching/verifying; `providers/` defines typed external contracts; `storage/` persists local run manifests and hash-bound artifacts; `telemetry/` and `reports/` are B's adapters. Frontend imports generated API interfaces and does not access provider secrets. Cross-owner imports into `providers/contracts.py` require coordinated changes.
 
 Each event has one canonical schema. Consumers preserve id, UTC timestamp, source, and lifecycle stage. Fixture telemetry stays separate. Evidence is local and redacted by default; remote destinations require deliberate approval and product-specific access configuration.
 
-No execution runner, agent, microservice, database server, or paid integration is included in this scaffold. JSON schemas validate structure; they do not prove execution or security.
+The core uses a local reviewed policy and fresh frozen-suite challenges. AkashML/Senso/ClickHouse/Guild/narration paths in the roadmap are not part of core composition. No database server is required. JSON schemas validate structure; they do not prove execution or security.

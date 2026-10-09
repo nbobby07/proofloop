@@ -1,53 +1,55 @@
 # ProofLoop current state
 
-Updated: October 9, 2026. Submission deadline: **4:30 PM America/Los_Angeles**.
+Updated October 9, 2026. Submission deadline: 4:30 PM America/Los_Angeles.
 
-## Objective
+The full application is integrated on `feat/release-integration` in `proofloop-release`.
+Pinned backend: `bb5eddf1c413a96557c5c2c25c30bbe9c4ea3f98`.
+Pinned dashboard: `942607b6026fe7dc1de6f6c10c68ce8211036c05`.
+All worker histories and worktrees are preserved; Developer B's branch is unchanged.
 
-Establish a reproducible shared foundation for a two-person team. Next, demonstrate authorized vulnerability reproduction, isolated remediation, and independent adversarial verification. A passing suite is scoped evidence, never universal security.
+## Verified
 
-## Architecture
+React → FastAPI → real Semgrep/OpenAI → isolated Docker → persisted report works.
+Browser run `run_2cd6645e223d4febb9e3c3b8d75293d4` reproduced BOLA, rejected the first
+model patch, and accepted the second after all 44 checks and a fresh challenge.
+Browser Challenge Again cleared the old result and completed another fresh 44/44
+suite; final report has 19 hash-validated references. All seven API v1 routes remain
+contract-compatible. Failures/retries are retained. Passing is scoped to executed tests.
 
-React/TypeScript/Vite/Tailwind dashboard → FastAPI/Pydantic API → PLANNED bounded orchestration → immutable target plus disposable Docker copies → trusted verification suites → evidence/events. External integrations are PLANNED. `source: fixture` is mandatory for preview data.
+Default tests: 324 passed / 8 opt-in skipped. Additional real Docker/Semgrep tests:
+21 passed. Ruff, contracts, frontend lint/build pass. See
+[release integration](docs/RELEASE-INTEGRATION.md) and its evidence receipts.
 
-## Ownership
+## Optional integrations
 
-- A (`feat/security-engine`): engine, providers, API, storage, backend tests, demo target, verifier tests, sandbox.
-- B (`feat/product-dashboard`): frontend, ClickHouse telemetry, narration, Guild integration.
-- Shared files: coordinate before editing contracts, docs, scripts, root configuration, and `.github/`.
+ClickHouse delivery now reads persisted canonical events on a background worker;
+explicit initialization/replay/query commands are supplied. Delivery boundaries are
+tested with doubles, but credentials are absent and live ingestion is unverified.
+The core and local analytics work without it. ElevenLabs is now verified live through
+optional evidence-bound briefing routes. Guild, AkashML and Senso remain unverified
+live. None can override the verifier.
 
-## Completed milestones
+## Delivery
 
-- Framework scaffold, live health route, local CORS, dashboard with explicit fixture labels.
-- Typed provider contracts without external calls; planned routes return 501.
-- Canonical Pydantic models, generated schemas/OpenAPI/TypeScript, representative fixture.
-- Ownership rules, security boundaries, installation guidance, and key-free CI workflow.
-- Private GitHub repository created; both feature branches pushed; main protection configured for CI checks and one review.
-- Validation and GitHub publication details are recorded in `docs/SETUP-RESULTS.md` after setup checks.
+The owner authorized public GitHub visibility; unauthenticated access was verified.
+The final PR must pass backend/frontend CI and obtain one approving review before
+merge. Main has not yet been updated. PRs #1/#3 stay open until that merge.
+Do not delete branches or worktrees. Submission/video/contact work is deferred at
+the user's request; no submission is attempted in this integration task.
 
-## Active tasks
+## Sponsor follow-up
 
-- A: implement allowlisted LedgerLite target and trusted baseline/functional tests first; then isolate execution and add deterministic verdicts.
-- B: evolve the dashboard against frozen contracts; add loading/error/lifecycle displays and execution-source separation.
+See [SPONSOR-ACTIVATION.md](docs/SPONSOR-ACTIVATION.md): ElevenLabs now generated real
+MP3s from completed reports and passed browser play/pause/replay/transcript checks.
+Old audio returns 409 after rechallenge. Live mode and selected run survive refresh.
+A fresh model-backed run again rejected its first patch and verified its second on
+44/44 checks; fresh rechallenge also passed. Tests now total 328 passed / 8 skipped.
+ClickHouse service ownership is unverified: the prior claim was imported from B's
+handoff, not independently observed. No ClickHouse service was created in this chat.
+Human review was requested from boaaaat on PR #4. Submission remains out of scope.
 
-## Blockers
 
-- Runtime provider credentials/models, Docker runner availability, and sponsor product access need separate configuration before real integrations.
-- Team member names/emails, second developer GitHub handle, and demo-video URL have not been provided.
-- Repository collaboration access and hackathon judge access must be configured manually once identities are known.
-
-## Decisions
-
-- No full engine, paid API requests, scanning, or attack execution in setup.
-- Use a private GitHub repository initially; visibility changes require explicit authorization.
-- Keep framework dependencies small. Docker is required only when implementing the runner.
-- Pydantic is the wire-contract authority; generated artifacts are checked for drift.
-- Semgrep runtime scanning and Guardian development review are separate integrations.
-- Senso development memory is distinct from authoritative application policy; Git remains the code source of truth.
-
-## Next steps
-
-1. Each developer clones separately, selects their feature branch, and validates local startup.
-2. Coordinate the first target, policies, event semantics, and frozen test manifest.
-3. Ship a deterministic local verification loop before adding model calls or sponsor analytics.
-4. Record actual sponsor evidence and prepare submission before 4:30 PM Pacific.
+Latest pinned dashboard follow-up: `f9643d3c0b2bffb23784683a2272d13da61cd262`.
+It includes the redesigned workspace plus adapter/frontend tests, merged without
+modifying Developer B's branch. Final combined validation: 346 Python tests passed,
+8 skipped; 16 frontend tests passed. CI now includes all those suites.

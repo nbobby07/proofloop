@@ -1,31 +1,102 @@
-import { ConnectionBadge } from '../components/ConnectionBadge'
-import { FixturePreview } from '../components/FixturePreview'
-import { useBackendHealth } from '../hooks/useBackendHealth'
-import { API_BASE_URL } from '../services/api'
+import { lazy, Suspense, useState } from "react";
+import fixtureJson from "../../../contracts/example-run.json";
+import { AppShell } from "../components/AppShell";
+import type { Page } from "../components/AppShell";
+import { useBackendHealth } from "../hooks/useBackendHealth";
+import { runPayload } from "../services/validation";
+import { useRun } from "../features/execution/useRun";
+import { RunControls } from "../features/execution/RunControls";
+import { SecurityArena } from "../features/execution/SecurityArena";
+import { EventStream } from "../features/execution/EventStream";
+import { EvidenceReport } from "../features/evidence/EvidenceReport";
+import { BriefingPanel } from "../features/briefing/BriefingPanel";
+import { IncidentBriefingPlayer } from "../features/briefing/IncidentBriefingPlayer";
+import { GuildAuditPanel } from "../features/audit/GuildAuditPanel";
+import { SecurityHistory } from "../features/history/SecurityHistory";
+import { IntegrationStatus } from "../features/integrations/IntegrationStatus";
 
-const pipeline = ['Discover', 'Reproduce', 'Patch', 'Verify', 'Challenge']
+import { readSelection, saveSelection } from "../features/execution/session";
+
+const fixtureRun = runPayload(fixtureJson);
+const AnalyticsDashboard = lazy(() =>
+  import("../features/analytics/AnalyticsDashboard").then((module) => ({
+    default: module.AnalyticsDashboard,
+  })),
+);
 
 export function Dashboard() {
-  const { status, error, retry } = useBackendHealth()
-  return <div className="app-shell">
-    <aside className="sidebar">
-      <a className="brand" href="#workspace" aria-label="ProofLoop home"><span className="brand-mark" aria-hidden="true">↻</span>ProofLoop</a>
-      <p className="sidebar-label">Workspace</p>
-      <a className="nav-active" href="#workspace"><span aria-hidden="true">◈</span> Overview</a>
-      <div className="sidebar-footer"><span className="tag">FOUNDATION</span><p>Cyberdefense Hackathon<br />October 9, 2026</p></div>
-    </aside>
-    <main id="workspace">
-      <header className="topbar"><span>Verification workspace <span className="muted">/ Overview</span></span><ConnectionBadge status={status} /></header>
-      <div className="content">
-        <div className="hero"><div><p className="eyebrow">Proof, before confidence.</p><h1>Security that shows<br />its work.</h1><p className="subtitle">Autonomous adversarial security verification.</p></div><div className="hero-note"><span className="tag">SETUP PHASE</span><p>The foundation is ready.<br />The security engine is planned.</p></div></div>
-        <section className="panel principle"><span className="principle-icon" aria-hidden="true">◎</span><div><h2>Independent verification is the verdict.</h2><p>Agents propose attacks and fixes. Executed tests and deterministic rules decide whether a patch passes.</p></div></section>
-        <section className="pipeline" aria-label="Planned execution pipeline">{pipeline.map((stage, index) => <div key={stage}><span className="step-number">0{index + 1}</span><strong>{stage}</strong><span className="planned-label">PLANNED</span></div>)}</section>
-        <div className="dashboard-grid"><FixturePreview /><div className="right-column">
-          <section className="panel"><p className="eyebrow">Live infrastructure</p><h2>Backend health</h2><p className="body-copy">The health check is the only active API operation.</p><dl className="health-details"><dt>Endpoint</dt><dd><code>/api/health</code></dd><dt>Server</dt><dd><code>{API_BASE_URL}</code></dd></dl>{error && <p className="error-message" role="alert">{error}</p>}<button onClick={retry} disabled={status === 'checking'}>Refresh connection <span aria-hidden="true">↗</span></button></section>
-          <section className="panel"><p className="eyebrow">Execution status</p><h2>Awaiting the engine</h2><p className="body-copy">Run creation and challenges will be available after isolated execution and evidence collection are implemented.</p><button disabled>Start security run <span aria-hidden="true">→</span></button><p className="scope-note">Sponsor integrations are planned. No paid API calls are made in this scaffold.</p></section>
-        </div></div>
-        <footer className="page-footer"><span>ProofLoop · Development foundation</span><span>Passing a suite does not prove universal security.</span></footer>
-      </div>
-    </main>
-  </div>
+  const [fixture, updateFixture] = useState(() => readSelection("source") !== "execution");
+  const setFixture = (value: boolean) => {
+    saveSelection("source", value ? "fixture" : "execution");
+    updateFixture(value);
+  };
+  const [page, setPage] = useState<Page>("arena");
+  const health = useBackendHealth();
+  const live = useRun(!fixture);
+  const run = fixture ? fixtureRun : live.run;
+  const events = fixture ? (fixtureRun.events ?? []) : live.events;
+  const openHistoryRun = (id: string) => {
+    setFixture(false);
+    live.open(id);
+    setPage("arena");
+  };
+  return (
+    <AppShell
+      page={page}
+      navigate={setPage}
+      fixture={fixture}
+      setFixture={setFixture}
+      status={health.status}
+    >
+      {!fixture && live.error && (
+        <div className="notice error" role="alert">
+          <span>!</span>
+          <div>
+            {live.error}
+            {run && (
+              <small>Last known data is retained; it may be stale.</small>
+            )}
+          </div>
+          <button onClick={live.refresh}>Retry</button>
+        </div>
+      )}
+      {page === "arena" && (
+        <>
+          <RunControls
+            fixture={fixture}
+            live={live}
+            run={run}
+            connection={health.status}
+          />
+          <SecurityArena run={run} events={events} />
+          <div className="evidence-layout">
+            <EvidenceReport
+              run={run}
+              report={fixture ? null : live.report}
+              reportError={live.reportError}
+              fixture={fixture}
+            />
+            <EventStream events={events} fixture={fixture} />
+          </div>
+        </>
+      )}
+      {page === "analytics" && (
+        <Suspense fallback={<p className="empty-copy">Loading analytics…</p>}>
+          <AnalyticsDashboard key={String(fixture)} fixture={fixture} />
+        </Suspense>
+      )}
+      {page === "history" && (
+        <SecurityHistory history={live.history} open={openHistoryRun} />
+      )}
+      {page === "integrations" && <IntegrationStatus health={health} />}
+      {page === "integrations" && (
+        <div className="sponsor-grid">
+          <GuildAuditPanel />
+          {!fixture && live.report ? (
+            <BriefingPanel key={JSON.stringify(live.report)} report={live.report} />
+          ) : <IncidentBriefingPlayer />}
+        </div>
+      )}
+    </AppShell>
+  );
 }

@@ -64,3 +64,20 @@ Fixture data must retain fixture labels at every consumer boundary. It must not 
 ## Coordinated changes
 
 Agree on changes, edit Pydantic, run `python -m scripts.export_contracts`, then `npm run contracts` in frontend. Run backend tests, frontend lint/build, and drift checks. Commit canonical and generated files together. Additive changes still require coordination; breaking changes require an explicit contract revision before either developer depends on them.
+
+## Optional incident briefing extension
+
+The seven existing v1 response models are unchanged. New endpoints use canonical
+BriefingRequest/BriefingResponse and never accept arbitrary narration text:
+
+- GET /api/runs/{run_id}/briefing returns unavailable, not_generated, generating,
+  ready or error, with the exact current report_sha256.
+- POST the same path with {"report_sha256":"<expected SHA-256>"} returns 202;
+  stale/incomplete reports or capacity conflicts return 409. An unconfigured optional
+  provider returns status unavailable without affecting execution.
+- GET /api/audio/{artifact_id} serves allowlisted audio/mpeg only while its report
+  identity is current. Old audio returns 409 after rechallenge. Missing files return 404.
+
+The frontend independently hashes the displayed report, validates the returned
+identity, and clears its player when the report is invalidated. Current audio cannot
+be mistaken for a new verdict. Fixture and unfinished reports are never exported.

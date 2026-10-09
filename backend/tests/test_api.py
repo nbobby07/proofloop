@@ -2,11 +2,11 @@ import pytest
 from fastapi.testclient import TestClient
 
 from backend.api.main import create_app
-from backend.api.schemas import ErrorResponse
 
 
 @pytest.fixture
-def client():
+def client(tmp_path, monkeypatch):
+    monkeypatch.setenv("PROOFLOOP_RUNS_DIR", str(tmp_path))
     with TestClient(create_app()) as test_client:
         yield test_client
 
@@ -15,24 +15,6 @@ def test_health(client):
     response = client.get("/api/health")
     assert response.status_code == 200
     assert response.json() == {"status": "ok", "service": "proofloop"}
-
-
-@pytest.mark.parametrize(
-    "method,path,payload",
-    [
-        ("post", "/api/runs", {"target": "LedgerLite"}),
-        ("get", "/api/runs/example-001", None),
-        ("get", "/api/runs/example-001/events", None),
-        ("get", "/api/runs/example-001/report", None),
-        ("post", "/api/runs/example-001/challenge", {}),
-        ("get", "/api/analytics", None),
-    ],
-)
-def test_planned_routes_fail_explicitly(client, method, path, payload):
-    response = client.request(method, path, json=payload)
-    assert response.status_code == 501
-    assert ErrorResponse.model_validate(response.json()).error.code == "not_implemented"
-    assert "verified" not in response.json()
 
 
 @pytest.mark.parametrize(

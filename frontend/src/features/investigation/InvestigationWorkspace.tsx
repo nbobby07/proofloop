@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { WorkspaceEvidence } from "./WorkspaceEvidence";
 import type { RefObject } from "react";
 import { LayoutGroup, motion, useReducedMotion } from "motion/react";
 import { Tabs } from "radix-ui";
@@ -86,6 +87,9 @@ export function InvestigationWorkspace({
           </div>
         )}
       </div>
+      {run.target === "LedgerLite Workspace" && run.source === "execution" && (
+        <WorkspaceEvidence key={run.run_id} run={run} />
+      )}
       <LayoutGroup id="investigation-evidence">
         <Tabs.Root
           value={view}

@@ -133,6 +133,22 @@ export function resultCopy(run: RunResponse, events: SecurityEvent[]) {
         "This is illustrative contract data. No attacks or tests in this preview were executed.",
       tone: "preview",
     };
+  if (
+    run.target === "LedgerLite Workspace" &&
+    run.status === "inconclusive" &&
+    events.some(
+      (e) =>
+        e.event_type === "run_completed" &&
+        e.message.includes("no_reproducible_finding"),
+    )
+  )
+    return {
+      label: "Audit complete",
+      title: "No reproducible vulnerability found.",
+      description:
+        "The executed checks did not establish a security failure. Review the scanner findings, generated challenges and execution evidence below. This is not a claim of universal security.",
+      tone: "pending",
+    };
   const counts = checkCounts(run);
   const priorFailure = events.some(
     (event) =>

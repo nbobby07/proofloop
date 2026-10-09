@@ -102,6 +102,13 @@ class ClickHouseClient:
         "policy_hash",
         "finding_key",
         "baseline_reproduced",
+        "provider",
+        "activity",
+        "target_revision",
+        "environment",
+        "model",
+        "cost_reservation_usd",
+        "measured_cost_usd",
         "inserted_at",
     ]
 
@@ -190,6 +197,13 @@ class ClickHouseClient:
                     int(meta["reproduced"])
                     if type(meta.get("reproduced")) is bool and meta.get("executed") is True
                     else None,
+                    _text(meta.get("provider")),
+                    _text(meta.get("activity")),
+                    _text(meta.get("target_revision"), 64),
+                    _text(meta.get("environment")),
+                    _text(meta.get("model")),
+                    _duration(meta.get("cost_reservation_usd")),
+                    _duration(meta.get("measured_cost_usd")),
                     now,
                 ]
             )

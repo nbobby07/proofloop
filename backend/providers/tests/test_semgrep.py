@@ -205,6 +205,14 @@ def test_real_ledgerlite_missing_ownership_rule(tmp_path):
         ),
         "wrong_owner_field": secure.replace('record["owner_id"]', 'record["invoice_id"]'),
         "non_denial_guard": secure.replace("status_code=403", "status_code=200"),
+        "identity_guard": secure.replace(
+            'user["role"] != "administrator"', 'x_synthetic_identity != "administrator"'
+        ),
+        "demorgan_guard": secure.replace(
+            'user["role"] != "administrator" and record["owner_id"] != x_synthetic_identity',
+            'not (x_synthetic_identity == "administrator" '
+            'or record["owner_id"] == x_synthetic_identity)',
+        ),
         "out_of_scope": vulnerable,
     }
     for name, source in cases.items():

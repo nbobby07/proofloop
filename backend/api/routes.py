@@ -15,6 +15,7 @@ from backend.api.schemas import (
     CreateRunRequest,
     ErrorResponse,
     EventsResponse,
+    ExecutionDetails,
     FailurePattern,
     HealthResponse,
     ReportResponse,
@@ -171,6 +172,21 @@ def analytics(
 
 
 # Additive optional feature routes; the existing seven API v1 responses are unchanged.
+
+
+@router.get("/runs/{run_id}/execution", response_model=ExecutionDetails)
+def execution_details(run_id: RunId, http_request: Request):
+    record = record_for(http_request, run_id)
+    engine = getattr(http_request.app.state.orchestrator.engine, "workspace", None)
+    entries = engine.entries(run_id) if hasattr(engine, "entries") else []
+    budget = engine.budget.summary() if hasattr(engine, "budget") else {}
+    return ExecutionDetails(
+        run_id=run_id,
+        target=record.run.target,
+        execution_mode=record.request.execution_mode,
+        entries=entries,
+        budget=budget,
+    )
 
 
 @router.get("/telemetry/analytics", response_model=TelemetryAnalyticsResponse)

@@ -141,6 +141,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/runs/{run_id}/execution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Execution Details */
+        get: operations["execution_details_api_runs__run_id__execution_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/runs/{run_id}/report": {
         parameters: {
             query?: never;
@@ -260,15 +277,21 @@ export interface components {
         /** CreateRunRequest */
         CreateRunRequest: {
             /**
+             * Execution Mode
+             * @default local
+             * @enum {string}
+             */
+            execution_mode: "local" | "local_akash";
+            /**
              * Max Attempts
              * @default 3
              */
             max_attempts: number;
             /**
              * Target
-             * @constant
+             * @enum {string}
              */
-            target: "LedgerLite";
+            target: "LedgerLite" | "LedgerLite Workspace";
         };
         /** ErrorDetail */
         ErrorDetail: {
@@ -293,7 +316,7 @@ export interface components {
          * EventType
          * @enum {string}
          */
-        EventType: "stage_started" | "stage_completed" | "finding_discovered" | "baseline_reproduced" | "patch_proposed" | "patch_applied" | "test_completed" | "challenge_proposed" | "retry_scheduled" | "run_completed" | "run_failed";
+        EventType: "provider_activity" | "stage_started" | "stage_completed" | "finding_discovered" | "baseline_reproduced" | "patch_proposed" | "patch_applied" | "test_completed" | "challenge_proposed" | "retry_scheduled" | "run_completed" | "run_failed";
         /** EventsResponse */
         EventsResponse: {
             /** Events */
@@ -312,6 +335,32 @@ export interface components {
             description: string;
             /** Sha256 */
             sha256: string;
+        };
+        /** ExecutionDetails */
+        ExecutionDetails: {
+            /** Budget */
+            budget?: {
+                [key: string]: components["schemas"]["JsonValue"];
+            };
+            /** Entries */
+            entries?: {
+                [key: string]: components["schemas"]["JsonValue"];
+            }[];
+            /**
+             * Execution Mode
+             * @enum {string}
+             */
+            execution_mode: "local" | "local_akash";
+            /** Run Id */
+            run_id: string;
+            /**
+             * Source
+             * @default execution
+             * @constant
+             */
+            source: "execution";
+            /** Target */
+            target: string;
         };
         /** FailurePattern */
         FailurePattern: {
@@ -335,6 +384,11 @@ export interface components {
          * @enum {string}
          */
         FindingSeverity: "info" | "low" | "medium" | "high" | "critical";
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
         /** HealthResponse */
         HealthResponse: {
             /**
@@ -451,6 +505,19 @@ export interface components {
              * @constant
              */
             storage: "clickhouse";
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Context */
+            ctx?: Record<string, never>;
+            /** Input */
+            input?: unknown;
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
         };
         /** VerificationSummary */
         VerificationSummary: {
@@ -967,6 +1034,37 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    execution_details_api_runs__run_id__execution_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ExecutionDetails"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

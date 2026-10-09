@@ -317,6 +317,20 @@ class Orchestrator:
             if engine is None:
                 raise EngineUnavailable()
             run_id = record.run.run_id
+            bind = getattr(engine, "bind", None)
+            if bind:
+                loop = asyncio.get_running_loop()
+
+                def activity(message, metadata):
+                    def deliver():
+                        if record.run.status not in TERMINAL:
+                            self.emit(
+                                record, EventType.PROVIDER_ACTIVITY, message, metadata=metadata
+                            )
+
+                    loop.call_soon_threadsafe(deliver)
+
+                bind(run_id, activity)
             if rechallenge:
                 self._begin_verification(record, True)
                 result = await self._call(engine.challenge, run_id, challenge_request)

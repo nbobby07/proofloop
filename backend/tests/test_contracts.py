@@ -43,6 +43,7 @@ def test_openapi_is_current_and_has_all_routes():
         "/api/runs",
         "/api/runs/{run_id}",
         "/api/runs/{run_id}/events",
+        "/api/runs/{run_id}/execution",
         "/api/runs/{run_id}/report",
         "/api/runs/{run_id}/challenge",
         "/api/analytics",

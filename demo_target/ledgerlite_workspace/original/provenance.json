@@ -1,0 +1,23 @@
+{
+  "source": "execution",
+  "provider": "openai",
+  "model": "gpt-6-luna",
+  "request_id": "resp_020787afecbec513016ac96dbb43c887d0ae937eb69aca6c1e",
+  "generated_at": "2026-10-09T22:42:27.686679+00:00",
+  "source_sha256": "417321a2b4263c9d52015ca3cbbadbf2e54400c164da033a4d718dca800bb9fb",
+  "prompt_sha256": "65c666246a5e1bfb87b7e757e0388d199b6df833e3b3a8e7ca70d28a705c1576",
+  "usage": {
+    "input_tokens": 1090,
+    "input_tokens_details": {
+      "cache_write_tokens": 1087,
+      "cached_tokens": 0
+    },
+    "output_tokens": 4355,
+    "output_tokens_details": {
+      "reasoning_tokens": 0
+    },
+    "total_tokens": 5445
+  },
+  "intent": "correctness-focused generation",
+  "audited": false
+}

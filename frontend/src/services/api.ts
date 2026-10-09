@@ -10,6 +10,7 @@ import type {
 } from "../types";
 import {
   analyticsPayload,
+  briefingPayload,
   challengePayload,
   eventsPayload,
   healthPayload,
@@ -137,3 +138,8 @@ export const getAnalytics = (
   );
 export const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "The operation could not complete.";
+
+export const getBriefing = (id: string, signal?: AbortSignal) =>
+  request(`${runPath(id)}/briefing`, briefingPayload, signal);
+export const generateBriefing = (id: string, digest: string, signal?: AbortSignal) =>
+  request(`${runPath(id)}/briefing`, briefingPayload, signal, {report_sha256: digest});

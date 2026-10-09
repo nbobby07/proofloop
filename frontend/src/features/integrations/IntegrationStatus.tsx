@@ -53,7 +53,7 @@ export function IntegrationStatus({
           ],
           [
             "ElevenLabs",
-            "Narration adapter · credentials and audio route pending",
+            "Evidence-bound briefing routes · availability checked for each completed report",
           ],
           [
             "Semgrep / Akash / OpenAI / Senso",

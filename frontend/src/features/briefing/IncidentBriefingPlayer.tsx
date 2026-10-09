@@ -77,8 +77,8 @@ export function IncidentBriefingPlayer({ audio }: { audio?: BriefingAudio }) {
           </p>
           <button disabled>Play incident briefing</button>
           <p className="fine-print">
-            PLANNED connection · A must expose generation status and an
-            allowlisted audio URL. No provider execution is claimed.
+            Open a completed live report to generate narration. Previous audio is
+            unavailable while a fresh verification is running.
           </p>
         </>
       )}

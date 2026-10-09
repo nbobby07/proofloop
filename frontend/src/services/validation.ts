@@ -178,3 +178,16 @@ export function analyticsPayload(v: unknown): AnalyticsResponse {
   }
   return o as unknown as AnalyticsResponse;
 }
+
+export function briefingPayload(v: unknown): import('../types').BriefingResponse {
+  const o = object(v);
+  id(o.run_id);
+  if (o.source !== 'execution' || !['unavailable', 'not_generated', 'generating', 'ready', 'error'].includes(String(o.status))) fail();
+  if (!/^[a-f0-9]{64}$/.test(String(o.report_sha256))) fail();
+  if (o.status === 'ready') {
+    if (!/^briefing_[a-f0-9]{64}$/.test(String(o.artifact_id))) fail();
+    if (o.audio_path !== `/api/audio/${o.artifact_id}`) fail();
+    string(o.transcript, 10000);
+  }
+  return o as unknown as import('../types').BriefingResponse;
+}

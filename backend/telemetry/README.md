@@ -6,7 +6,9 @@ in the backend environment; coordinate shared dependency locking with A.
 
 Configuration: existing `CLICKHOUSE_HOST`, `CLICKHOUSE_PORT`, `CLICKHOUSE_USER`,
 `CLICKHOUSE_PASSWORD`, `CLICKHOUSE_SECURE`; optional `CLICKHOUSE_DATABASE=default`.
-The discovered Cloud host is `kvjim2jp8d.us-east-2.aws.clickhouse.cloud`, port 8443.
+Developer B's handoff reports `kvjim2jp8d.us-east-2.aws.clickhouse.cloud`, port 8443.
+Its creator, account, and ownership are unverified; do not treat it as an authorized
+configured service until its owner confirms access.
 Read credentials from the ignored environment only. No dotenv loader is installed
 here: A owns backend configuration/loading. Never put secrets in VITE variables.
 

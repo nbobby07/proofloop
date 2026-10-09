@@ -189,3 +189,19 @@ class ErrorDetail(ContractModel):
 
 class ErrorResponse(ContractModel):
     error: ErrorDetail
+
+
+class BriefingRequest(ContractModel):
+    """Only the expected evidence identity, never arbitrary narration text."""
+
+    report_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class BriefingResponse(ContractModel):
+    run_id: Identifier
+    source: Literal["execution"] = "execution"
+    status: Literal["unavailable", "not_generated", "generating", "ready", "error"]
+    report_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_id: Identifier | None = None
+    audio_path: str | None = None
+    transcript: str | None = None

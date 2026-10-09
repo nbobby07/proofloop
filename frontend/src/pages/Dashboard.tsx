@@ -10,15 +10,22 @@ import { SecurityArena } from "../features/execution/SecurityArena";
 import { EventStream } from "../features/execution/EventStream";
 import { EvidenceReport } from "../features/evidence/EvidenceReport";
 import { AnalyticsDashboard } from "../features/analytics/AnalyticsDashboard";
+import { BriefingPanel } from "../features/briefing/BriefingPanel";
 import { IncidentBriefingPlayer } from "../features/briefing/IncidentBriefingPlayer";
 import { GuildAuditPanel } from "../features/audit/GuildAuditPanel";
 import { SecurityHistory } from "../features/history/SecurityHistory";
 import { IntegrationStatus } from "../features/integrations/IntegrationStatus";
 
+import { readSelection, saveSelection } from "../features/execution/session";
+
 const fixtureRun = runPayload(fixtureJson);
 
 export function Dashboard() {
-  const [fixture, setFixture] = useState(true);
+  const [fixture, updateFixture] = useState(() => readSelection("source") !== "execution");
+  const setFixture = (value: boolean) => {
+    saveSelection("source", value ? "fixture" : "execution");
+    updateFixture(value);
+  };
   const [page, setPage] = useState<Page>("arena");
   const health = useBackendHealth();
   const live = useRun(!fixture);
@@ -79,7 +86,9 @@ export function Dashboard() {
       {(page === "arena" || page === "integrations") && (
         <div className="sponsor-grid">
           <GuildAuditPanel />
-          <IncidentBriefingPlayer />
+          {!fixture && live.report ? (
+            <BriefingPanel key={JSON.stringify(live.report)} report={live.report} />
+          ) : <IncidentBriefingPlayer />}
         </div>
       )}
     </AppShell>

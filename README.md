@@ -16,7 +16,8 @@ frozen checks, and passed a fresh user-triggered rechallenge. Execution is opt-i
 missing dependencies produce an explicit error. Fixture preview stays visibly labeled.
 
 ClickHouse has optional persisted-event delivery; live database access is unverified.
-Guild, ElevenLabs, AkashML and Senso adapters are preserved but unverified live.
+ElevenLabs now provides real report-bound audio with play/pause/replay and transcript.
+Guild, AkashML and Senso adapters remain unverified live.
 See [release results and exact pinned commits](docs/RELEASE-INTEGRATION.md).
 
 ## Architecture and stack
@@ -129,7 +130,7 @@ When changing ports, update the browser API URL and CORS origins together. Shell
 
 ## Sponsor roadmap
 
-Semgrep has real local execution evidence. OpenAI defender live acceptance is tracked in the integration record. AkashML and Senso adapters are implemented but unverified with credentials. ClickHouse delivery is wired behind an explicit opt-in and never required by execution. Guild and narration remain optional adapters without routes. Pi sponsors the overall award and needs no API. OpenAI defender and optional ElevenLabs narration are additional tools. [Sponsor contracts and official reference links](docs/SPONSORS.md) describe integration readiness requirements.
+Semgrep has real local execution evidence. OpenAI defender live acceptance is tracked in the integration record. AkashML and Senso adapters are implemented but unverified with credentials. ClickHouse delivery is wired behind an explicit opt-in and never required by execution. Guild remains an optional adapter without routes; ElevenLabs now has evidence-bound briefing and audio routes. Pi sponsors the overall award and needs no API. OpenAI defender and optional ElevenLabs narration are additional tools. [Sponsor contracts and official reference links](docs/SPONSORS.md) describe integration readiness requirements.
 
 Submission deadline: **October 9, 2026, 4:30 PM Pacific**. [Sprint](docs/SPRINT.md) and [submission checklist](docs/SUBMISSION.md) track the remaining work.
 
@@ -159,3 +160,5 @@ health response proves API availability, not execution readiness. Model proposal
 can fail or be rejected; the independent verifier and saved evidence determine the
 outcome. See [runtime boundaries](backend/api/INTEGRATION.md) and
 [optional ClickHouse setup](backend/telemetry/README.md).
+
+[Live ElevenLabs setup, browser evidence, and current sponsor blockers](docs/SPONSOR-ACTIVATION.md).

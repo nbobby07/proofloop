@@ -4,9 +4,12 @@ import base64
 from typing import Annotated
 
 from fastapi import APIRouter, HTTPException, Path, Query, Request
+from fastapi.responses import FileResponse
 
 from backend.api.schemas import (
     AnalyticsResponse,
+    BriefingRequest,
+    BriefingResponse,
     ChallengeRequest,
     ChallengeResponse,
     CreateRunRequest,
@@ -19,6 +22,7 @@ from backend.api.schemas import (
     RunStatus,
     Source,
 )
+from backend.reports.narrator import NarrationUnavailable
 
 router = APIRouter(prefix="/api")
 RunId = Annotated[str, Path(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_-]+$")]
@@ -162,3 +166,45 @@ def analytics(
         rejected_count=sum(r.run.status == RunStatus.REJECTED for r in records),
         failure_patterns=patterns,
     )
+
+
+# Additive optional feature routes; the existing seven API v1 responses are unchanged.
+
+
+def briefing_operation(request: Request, run_id: str, expected_digest: str | None = None):
+    record_for(request, run_id)
+    try:
+        service = request.app.state.briefings
+        return (
+            service.generate(run_id, expected_digest) if expected_digest else service.status(run_id)
+        )
+    except ValueError:
+        conflict("A completed current execution report and available capacity are required.")
+
+
+@router.get("/runs/{run_id}/briefing", response_model=BriefingResponse, responses=PLANNED_ERRORS)
+def get_briefing(run_id: RunId, http_request: Request) -> BriefingResponse:
+    return briefing_operation(http_request, run_id)
+
+
+@router.post(
+    "/runs/{run_id}/briefing",
+    response_model=BriefingResponse,
+    status_code=202,
+    responses=PLANNED_ERRORS,
+)
+async def create_briefing(
+    run_id: RunId, request: BriefingRequest, http_request: Request
+) -> BriefingResponse:
+    return briefing_operation(http_request, run_id, expected_digest=request.report_sha256)
+
+
+@router.get("/audio/{artifact_id}", response_class=FileResponse, responses=PLANNED_ERRORS)
+def get_audio(artifact_id: RunId, http_request: Request):
+    try:
+        path, _ = http_request.app.state.briefings.media(artifact_id)
+        return FileResponse(path, media_type="audio/mpeg", headers={"Cache-Control": "no-store"})
+    except ValueError:
+        conflict("Audio does not match the current completed report.")
+    except (KeyError, OSError, NarrationUnavailable):
+        raise HTTPException(404, {"code": "not_found", "message": "Audio unavailable."}) from None

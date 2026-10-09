@@ -1,0 +1,80 @@
+{
+  "date": "2026-10-09",
+  "storage": "ClickHouse Cloud",
+  "organization": "NB's Organization",
+  "service": "ProofLoop",
+  "initial_replay": {
+    "events": 252,
+    "rounds": 23
+  },
+  "after_fresh_browser_challenge": {
+    "source": "execution",
+    "storage": "clickhouse",
+    "analytics": {
+      "source": "execution",
+      "run_count": 6,
+      "verified_count": 4,
+      "rejected_count": 2,
+      "failure_patterns": [
+        {
+          "challenge_family": "required_suites",
+          "failures": 10,
+          "executions": 24
+        }
+      ]
+    },
+    "event_count": 258,
+    "pending_events": 0,
+    "incomplete_rounds": 0,
+    "mean_patch_attempts": 2.3333333333333335,
+    "mean_verification_duration_ms": 5865.571428571428,
+    "latest_event_at": "2026-10-09T22:13:28.581580Z",
+    "query_ms": 285.94712499761954
+  },
+  "matches_local_analytics": true,
+  "query_samples_ms": [
+    255.29,
+    261.99,
+    260.47,
+    252.11,
+    285.95
+  ],
+  "median_snapshot_ms": 260.47,
+  "runtime_grants": [
+    "GRANT SELECT, INSERT ON default.proofloop_events TO proofloop_runtime"
+  ],
+  "fresh_challenge": {
+    "run_id": "run_b79f04fcd8114bf7b215a49e4286175e",
+    "source": "execution",
+    "status": "verified",
+    "verification": {
+      "security_passed": 6,
+      "security_total": 6,
+      "functional_passed": 22,
+      "functional_total": 22,
+      "adversarial_passed": 16,
+      "adversarial_total": 16
+    }
+  },
+  "scope": "Six actual recorded runs; no fixture/sample insertions or large-scale benchmark. Snapshot timing includes SQL requests and network overhead. Repeated replay and restart retain 258 deduplicated events.",
+  "cloud_console_query_ms": 5,
+  "cloud_console_query": "https://console.clickhouse.cloud/services/70520fa3-c3c8-44ae-8641-b3ee8c379636/console/query/0e396048-120f-4511-885f-76e5e973d066",
+  "responsive": [
+    {
+      "width": 1280,
+      "page_width": 1280
+    },
+    {
+      "width": 390,
+      "page_width": 390
+    }
+  ],
+  "validation": {
+    "python_passed": 355,
+    "python_opt_in_skipped": 8,
+    "frontend_passed": 29,
+    "lint": "pass",
+    "contracts": "current",
+    "production_build": "pass"
+  }
+}

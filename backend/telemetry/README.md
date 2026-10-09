@@ -1,114 +1,75 @@
-# ClickHouse adapter — implemented, live execution UNVERIFIED
+# ClickHouse telemetry — live verified October 9, 2026
 
-`ClickHouseClient` implements the existing `ClickHouseTelemetry` protocol without
-modifying API routes or provider DTOs. Install `backend/telemetry/requirements.txt`
-in the backend environment; coordinate shared dependency locking with A.
+ProofLoop now delivers real persisted execution events to ClickHouse Cloud and reads
+SQL-backed analytics in the website. NB's Organization owns the newly created
+ProofLoop service. This replaces the earlier unverified host from the old handoff;
+that old service was not used or changed.
 
-Configuration: existing `CLICKHOUSE_HOST`, `CLICKHOUSE_PORT`, `CLICKHOUSE_USER`,
-`CLICKHOUSE_PASSWORD`, `CLICKHOUSE_SECURE`; optional `CLICKHOUSE_DATABASE=default`.
-Developer B's handoff reports `kvjim2jp8d.us-east-2.aws.clickhouse.cloud`, port 8443.
-Its creator, account, and ownership are unverified; do not treat it as an authorized
-configured service until its owner confirms access.
-Read credentials from the ignored environment only. No dotenv loader is installed
-here: A owns backend configuration/loading. Never put secrets in VITE variables.
+## What runs
 
-Integration: construct `ClickHouseConfig.from_env()`, call `ClickHouseClient.connect`,
-and explicitly call `initialize_schema()` once using a migration-capable account.
-Use a restricted runtime account afterward. A persists canonical events before
-calling `insert_security_events`, in a worker/threadpool (the adapter is synchronous).
-Bound batches to 1000, flush before adaptive queries, replay persisted events on
-failure. No durable queue is claimed in this module. Never synthesize success after
-`TelemetryUnavailable`; A should return a safe service-unavailable response.
+- `TelemetryDelivery` reads the durable local run manifests, batches at most 1000
+  events, and advances a cursor only after an acknowledged insert. Restart replays
+  retained manifests; `ReplacingMergeTree` with `FINAL` deduplicates run/event IDs.
+- Only `source=execution` events are admitted. Free-form messages, arbitrary metadata,
+  credentials and source code are not exported. Only the documented scalar dimensions
+  in `ClickHouseClient.columns` are sent. Fixture batches are rejected atomically.
+- A single lock serializes the synchronous driver across background delivery and API
+  reads. SQL runs in workers, outside the security execution event loop.
+- `GET /api/telemetry/analytics` returns actual SQL counts, event coverage, pending local
+  events, incomplete rounds, mean proposals and mean verification-stage duration.
+  The measured query time includes network/driver work for the complete snapshot.
+- The Analytics page prefers cloud results and labels them **Live from ClickHouse**.
+  If unavailable, it clears the cloud snapshot and explicitly labels local fallback.
+  `/api/analytics` remains the unchanged local endpoint. Integrations tests SQL access
+  independently of the backend health badge.
 
-## Proposed metadata convention — requires producer agreement
+These are descriptive metrics. They do not select attacks, modify verifier inputs or
+assign verdicts. `required_suites` outcomes describe aggregate verification rounds,
+not individual assertions. Only explicit `fail` values count as failures; other
+consistent recorded outcomes remain in denominators. Conflicting identities are
+excluded rather than guessed. No high-volume benchmark or adaptive attack selection
+is claimed for this six-run dataset.
 
-All metadata is optional for ingestion. Unavailable dimensions remain unavailable.
+## Setup and local runtime
 
-| Field | Meaning |
-|---|---|
-| sequence | Unique monotonic integer within a run, across retries/challenges |
-| target | Allowlisted target identifier |
-| test_execution_id | Stable unique ID for one scheduled check; retries get new IDs |
-| suite | security / functional / adversarial / baseline |
-| challenge_family | Stable allowlisted attack family |
-| outcome | pass / fail / timeout / error / skipped / missing |
-| executed | True only when execution actually began |
-| attempt | Patch attempt number |
-| duration_ms | Backend-measured duration |
-| patch_hash, suite_hash, policy_hash | Lowercase SHA-256 of exact execution inputs |
-| finding_key | Stable recurrence identity |
-| reproduced | Boolean on baseline outcome records |
+Install the optional pinned adapter: `python -m pip install -r backend/telemetry/requirements.txt`.
+Set backend-only `CLICKHOUSE_HOST`, `CLICKHOUSE_PORT=8443`, `CLICKHOUSE_USER`,
+`CLICKHOUSE_PASSWORD`, `CLICKHOUSE_SECURE=true`, and `CLICKHOUSE_DATABASE=default`.
+The ignored `.env` uses a restricted runtime user with SELECT/INSERT on
+`default.proofloop_events`; credentials are never VITE variables or committed files.
 
-Emit exactly one terminal outcome record for every required scheduled check,
-including missing/skipped/timeouts. The v1 `executions` pattern denominator means
-recorded outcome records, including incomplete results; it is NOT a count of
-successful executions. Failure numerator includes only explicit `fail` outcomes.
-Unknown outcomes remain in denominators. Extended internal metrics separate actual
-starts and incomplete checks. Missing records cannot be inferred.
+Schema creation is an explicit administration step (`python -m scripts.telemetry initialize`)
+using a migration-capable user. The runtime user deliberately cannot initialize schema.
+An ignored mode-0600 `.env.clickhouse-admin` retains the original migration credential.
+Enable `PROOFLOOP_TELEMETRY_ENABLED=1` and restart the backend launcher. Replay and
+query commands remain available: `python -m scripts.telemetry replay` and
+`python -m scripts.telemetry query`. A background worker normally handles delivery.
 
-Pass/fail metadata without executed=true is normalized to unknown. Average patch
-attempts covers all observed runs, including zero-attempt and in-progress runs;
-it is not a terminal-run-only success metric. Verification timing requires exactly
-one start/completion pair per run/attempt; repeated/absent pairs stay incomplete.
-Coordinate schema.sql package-data inclusion before distributing a non-editable wheel.
+The tested local preview uses frontend port 5192, proxying to backend port 8002.
+Its persisted storage is this worktree's `runs/`; the release backend on 8001 is
+unchanged. The cloud service uses one fixed 8 GiB replica with 15-minute idling.
+Access is restricted to the workstation's current IP; moving networks may require
+an authorized IP-list update. No payment method or paid-plan upgrade was added.
+The account showed 300 active trial credits and no prepaid credits at inspection.
 
-Events without complete unique sequence metadata contribute to run_count but
-cannot establish verified/rejected current-state counts. Timestamp ties cannot
-silently establish order. Metadata conflicts for the same test execution are
-excluded from family metrics; producer correction needs a coordinated convention.
+## Actual acceptance
 
-Production insertion rejects fixture batches atomically. Messages and arbitrary
-metadata are never exported; only documented scalar dimensions are retained.
-The producer must redact/approve these dimensions before external transmission.
-Queries use FINAL for event-id deduplication, with bound run/context parameters.
-High-volume benchmarking/materialized views are PLANNED, not claimed.
+Initial replay acknowledged 252 real events from six existing model/Docker/Semgrep
+executions: four verified and two rejected. SQL reported 10 failed rounds out of 23.
+Repeated replay and backend restart left deduplicated counts unchanged. A fresh
+browser Challenge on `run_b79f04fcd8114bf7b215a49e4286175e` completed 44/44 checks;
+automatic delivery increased SQL totals to 258 events and 24 rounds, with zero
+pending events. No sample rows or invented security executions were inserted.
 
-`query_failure_patterns(run_id)` uses 30 days of compatible target/suite/policy
-history, requires three recorded outcomes per family, and returns at most ten
-families ranked by observed failure rate. Missing context returns an empty list.
-A controls admission, challenge budget, policy and verdict. Record query results
-and selection rationale in A's evidence store.
+Receipts and screenshots: `frontend/design/clickhouse/`. Actual API snapshot latency
+was measured and recorded there; it is a small-data network-inclusive measurement,
+not a throughput or scale claim. Unit tests use explicit doubles and make no cloud calls.
 
-## Release wiring and validation
+## Boundaries and remaining limits
 
-The release integrates `TelemetryDelivery` with the FastAPI lifespan. Enable with
-`PROOFLOOP_TELEMETRY_ENABLED=1`; it is disabled by default. Every batch is read from
-an atomically persisted local manifest, delivered in a single background worker,
-and limited to 1000 events. Failed/ambiguous inserts retain the cursor for replay.
-Restart replays retained manifests; `FINAL` deduplicates by run and event ID.
-Local manifests must be retained as the durable outbox. There is no separate queue.
-SQL and connection operations run outside the async request loop. Database outages
-never block security execution or the local `/api/analytics` endpoint.
-
-The producer now records canonical `sequence`, approved `target`, patch `attempt`
-and exact proposal `patch_hash`. Each completed independent verification round
-adds a unique `test_execution_id`, `suite=required_suites`, matching challenge
-family, and an honest outcome/completeness flag. These are aggregate round metrics,
-NOT individual-check counts. Missing individual-check, timing, suite/policy context
-and baseline dimensions stay unavailable. Context-based adaptive recommendations
-remain unused. Infrastructure failures without a receipt do not invent test records.
-Local analytics include all recorded attempt/round failures and incomplete outcomes;
-ClickHouse patterns count only explicit fail outcomes in the failure numerator.
-
-Setup from the repository root with the backend environment active:
-
-```sh
-python -m pip install -r backend/telemetry/requirements.txt
-# Set CLICKHOUSE_HOST/USER/PASSWORD and TLS settings in the ignored .env.
-python -m scripts.telemetry initialize
-# Then enable PROOFLOOP_TELEMETRY_ENABLED=1 and restart the backend.
-python -m scripts.telemetry replay
-python -m scripts.telemetry query
-python -m scripts.telemetry query --run-id YOUR_RUN_ID
-```
-
-Initialization is an explicit administrative step and is never called by requests.
-The query CLI reads actual SQL results or exits with a safe unavailable error.
-Release tests use explicitly synthetic driver doubles for persistence-before-delivery,
-ambiguous insert replay, stable IDs, batching, fixture exclusion, secret projection,
-worker-thread execution and graceful outages. No live database credentials were
-available during release validation; no live connection or ingestion is claimed.
-
-Adapter unit tests pass, covering evidence admission, safe SQL boundaries and
-provider-error handling. No live SQL requests or ingestion checks have been
-executed. See frontend/VALIDATION.md for results and remaining access requirements.
+Historical comparisons require matching target, suite and policy context. The
+`query_failure_patterns` helper remains unused because the core producer does not
+supply all those context dimensions. Missing granular dimensions stay unavailable.
+The UI provides inspection guidance from aggregate failures, not model-generated
+recommendations. The local manifests remain the durable evidence source. Database
+outages affect cloud analytics but never turn incomplete verification into success.

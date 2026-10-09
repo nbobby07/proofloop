@@ -179,15 +179,53 @@ export function analyticsPayload(v: unknown): AnalyticsResponse {
   return o as unknown as AnalyticsResponse;
 }
 
-export function briefingPayload(v: unknown): import('../types').BriefingResponse {
+export function telemetryPayload(
+  v: unknown,
+): import("../types").TelemetryAnalyticsResponse {
+  const o = object(v);
+  if (o.source !== "execution" || o.storage !== "clickhouse") fail();
+  const analytics = analyticsPayload(o.analytics);
+  if (analytics.source !== "execution") fail();
+  for (const field of ["event_count", "pending_events", "incomplete_rounds"])
+    count(o[field]);
+  for (const field of [
+    "query_ms",
+    "mean_patch_attempts",
+    "mean_verification_duration_ms",
+  ]) {
+    if (field !== "query_ms" && optional(o[field])) continue;
+    if (
+      typeof o[field] !== "number" ||
+      !Number.isFinite(o[field]) ||
+      o[field] < 0
+    )
+      fail();
+  }
+  if (
+    !optional(o.latest_event_at) &&
+    !Number.isFinite(Date.parse(string(o.latest_event_at)))
+  )
+    fail();
+  return o as unknown as import("../types").TelemetryAnalyticsResponse;
+}
+
+export function briefingPayload(
+  v: unknown,
+): import("../types").BriefingResponse {
   const o = object(v);
   id(o.run_id);
-  if (o.source !== 'execution' || !['unavailable', 'not_generated', 'generating', 'ready', 'error'].includes(String(o.status))) fail();
+  if (
+    o.source !== "execution" ||
+    !["unavailable", "not_generated", "generating", "ready", "error"].includes(
+      String(o.status),
+    )
+  )
+    fail();
   if (!/^[a-f0-9]{64}$/.test(String(o.report_sha256))) fail();
-  if (o.status === 'ready') {
+  if (o.status === "ready") {
     if (!/^briefing_[a-f0-9]{64}$/.test(String(o.artifact_id))) fail();
     if (o.audio_path !== `/api/audio/${o.artifact_id}`) fail();
     string(o.transcript, 10000);
   }
-  return o as unknown as import('../types').BriefingResponse;
+  return o as unknown as import("../types").BriefingResponse;
 }

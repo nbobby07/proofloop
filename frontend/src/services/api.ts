@@ -16,6 +16,7 @@ import {
   healthPayload,
   reportPayload,
   runPayload,
+  telemetryPayload,
 } from "./validation";
 
 export const API_BASE_URL = (
@@ -139,7 +140,16 @@ export const getAnalytics = (
 export const errorMessage = (error: unknown) =>
   error instanceof Error ? error.message : "The operation could not complete.";
 
+export const getCloudAnalytics = (signal?: AbortSignal) =>
+  request("/api/telemetry/analytics", telemetryPayload, signal);
+
 export const getBriefing = (id: string, signal?: AbortSignal) =>
   request(`${runPath(id)}/briefing`, briefingPayload, signal);
-export const generateBriefing = (id: string, digest: string, signal?: AbortSignal) =>
-  request(`${runPath(id)}/briefing`, briefingPayload, signal, {report_sha256: digest});
+export const generateBriefing = (
+  id: string,
+  digest: string,
+  signal?: AbortSignal,
+) =>
+  request(`${runPath(id)}/briefing`, briefingPayload, signal, {
+    report_sha256: digest,
+  });

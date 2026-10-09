@@ -21,8 +21,10 @@ from backend.api.schemas import (
     RunResponse,
     RunStatus,
     Source,
+    TelemetryAnalyticsResponse,
 )
 from backend.reports.narrator import NarrationUnavailable
+from backend.telemetry.client import TelemetryUnavailable
 
 router = APIRouter(prefix="/api")
 RunId = Annotated[str, Path(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_-]+$")]
@@ -169,6 +171,20 @@ def analytics(
 
 
 # Additive optional feature routes; the existing seven API v1 responses are unchanged.
+
+
+@router.get("/telemetry/analytics", response_model=TelemetryAnalyticsResponse)
+def cloud_analytics(http_request: Request) -> TelemetryAnalyticsResponse:
+    delivery = getattr(http_request.app.state, "telemetry", None)
+    if delivery is None:
+        raise HTTPException(503, {"code": "not_implemented", "message": "ClickHouse is disabled."})
+    try:
+        return delivery.analytics()
+    except (TelemetryUnavailable, ValueError):
+        raise HTTPException(
+            503,
+            {"code": "internal_error", "message": "ClickHouse analytics are unavailable."},
+        ) from None
 
 
 def briefing_operation(request: Request, run_id: str, expected_digest: str | None = None):

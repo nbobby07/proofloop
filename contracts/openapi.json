@@ -703,6 +703,92 @@
         "title": "Source",
         "type": "string"
       },
+      "TelemetryAnalyticsResponse": {
+        "additionalProperties": false,
+        "description": "SQL results only; local fallback never masquerades as cloud telemetry.",
+        "properties": {
+          "analytics": {
+            "$ref": "#/components/schemas/AnalyticsResponse"
+          },
+          "event_count": {
+            "minimum": 0.0,
+            "title": "Event Count",
+            "type": "integer"
+          },
+          "incomplete_rounds": {
+            "minimum": 0.0,
+            "title": "Incomplete Rounds",
+            "type": "integer"
+          },
+          "latest_event_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Event At"
+          },
+          "mean_patch_attempts": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Patch Attempts"
+          },
+          "mean_verification_duration_ms": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Verification Duration Ms"
+          },
+          "pending_events": {
+            "minimum": 0.0,
+            "title": "Pending Events",
+            "type": "integer"
+          },
+          "query_ms": {
+            "minimum": 0.0,
+            "title": "Query Ms",
+            "type": "number"
+          },
+          "source": {
+            "const": "execution",
+            "default": "execution",
+            "title": "Source",
+            "type": "string"
+          },
+          "storage": {
+            "const": "clickhouse",
+            "default": "clickhouse",
+            "title": "Storage",
+            "type": "string"
+          }
+        },
+        "required": [
+          "analytics",
+          "event_count",
+          "pending_events",
+          "incomplete_rounds",
+          "query_ms"
+        ],
+        "title": "TelemetryAnalyticsResponse",
+        "type": "object"
+      },
       "VerificationSummary": {
         "additionalProperties": false,
         "properties": {
@@ -1465,6 +1551,24 @@
           }
         },
         "summary": "Get Report"
+      }
+    },
+    "/api/telemetry/analytics": {
+      "get": {
+        "operationId": "cloud_analytics_api_telemetry_analytics_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetryAnalyticsResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Cloud Analytics"
       }
     }
   }

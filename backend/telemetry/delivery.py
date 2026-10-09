@@ -3,7 +3,12 @@
 import asyncio
 import logging
 import os
+import threading
+from datetime import UTC
+from time import perf_counter
 
+from backend.api.schemas import TelemetryAnalyticsResponse
+from backend.providers.contracts import AnalyticsFilters
 from backend.storage.runs import RunStore
 from backend.telemetry.client import ClickHouseClient, ClickHouseConfig
 
@@ -27,8 +32,13 @@ class TelemetryDelivery:
         self.stop = asyncio.Event()
         self.task = None
         self.last_error: str | None = None
+        self.lock = threading.RLock()
 
     def flush(self) -> int:
+        with self.lock:
+            return self._flush()
+
+    def _flush(self) -> int:
         # This method is synchronous and must be called from a worker or the CLI.
         if self.client is None:
             self.client = self.connect()
@@ -45,6 +55,37 @@ class TelemetryDelivery:
                 self.offsets[record.run.run_id] = offset
                 delivered += len(batch)
         return delivered
+
+    def analytics(self) -> TelemetryAnalyticsResponse:
+        # Shared synchronous driver access is serialized with delivery. FastAPI invokes
+        # the read route in its threadpool, never on the async execution loop.
+        with self.lock:
+            if self.client is None:
+                self.client = self.connect()
+            started = perf_counter()
+            filters = AnalyticsFilters()
+            analytics = self.client.query_security_analytics(filters)
+            metrics = self.client.query_extended_metrics(filters)
+            latest = metrics["latest_event_at"] if metrics["event_count"] else None
+            # The table column is explicitly DateTime64(..., 'UTC'); some driver
+            # versions decode UTC values without tzinfo.
+            if latest is not None and latest.tzinfo is None:
+                latest = latest.replace(tzinfo=UTC)
+            pending = sum(
+                max(0, len(record.run.events) - self.offsets.get(record.run.run_id, 0))
+                for record in self.store.all()
+                if record.run.source == "execution"
+            )
+            return TelemetryAnalyticsResponse(
+                analytics=analytics,
+                event_count=metrics["event_count"],
+                pending_events=pending,
+                incomplete_rounds=metrics["incomplete_checks"],
+                mean_patch_attempts=metrics["mean_patch_attempts"],
+                mean_verification_duration_ms=metrics["mean_verification_duration_ms"],
+                latest_event_at=latest,
+                query_ms=(perf_counter() - started) * 1000,
+            )
 
     async def _run(self) -> None:
         while not self.stop.is_set():
@@ -70,7 +111,12 @@ class TelemetryDelivery:
             await self.task
         if self.client:
             try:
-                await asyncio.to_thread(self.client.close)
+
+                def close_client():
+                    with self.lock:
+                        self.client.close()
+
+                await asyncio.to_thread(close_client)
             except Exception:
                 pass
 

@@ -1,4 +1,4 @@
-"""Cross-platform backend launcher; loads only non-secret development settings."""
+"""Cross-platform backend launcher; loads explicit backend-only local configuration."""
 
 import os
 from pathlib import Path
@@ -6,7 +6,20 @@ from pathlib import Path
 import uvicorn
 
 ROOT = Path(__file__).resolve().parents[1]
-SETTINGS = {"PROOFLOOP_BACKEND_HOST", "PROOFLOOP_BACKEND_PORT", "PROOFLOOP_CORS_ORIGINS"}
+SETTINGS = {
+    "PROOFLOOP_BACKEND_HOST",
+    "PROOFLOOP_BACKEND_PORT",
+    "PROOFLOOP_CORS_ORIGINS",
+    "PROOFLOOP_EXECUTION_ENABLED",
+    "PROOFLOOP_VERIFIER_IMAGE",
+    "PROOFLOOP_MANIFEST_SHA256",
+    "PROOFLOOP_DOCKER_HOST",
+    "PROOFLOOP_RUNS_DIR",
+    "SEMGREP_EXECUTABLE",
+    "OPENAI_API_KEY",
+    "OPENAI_MODEL",
+    "SSL_CERT_FILE",
+}
 
 
 def main() -> None:

@@ -1,1 +1,5 @@
-"""PLANNED: normalize real Semgrep findings; incomplete scans are explicit failures."""
+"""Runtime scanner entry points, independent of Semgrep Guardian development tooling."""
+
+from backend.providers.semgrep_client import ScanFinding, ScanReport, SemgrepScanner
+
+__all__ = ["SemgrepScanner", "ScanReport", "ScanFinding"]

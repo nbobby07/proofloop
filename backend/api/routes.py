@@ -1,8 +1,9 @@
-"""Health is live. Planned routes fail explicitly without creating security results."""
+"""Contract-compatible execution routes; dependencies are injected by the app lifespan."""
 
-from typing import Annotated, NoReturn
+import base64
+from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Path, Query
+from fastapi import APIRouter, HTTPException, Path, Query, Request
 
 from backend.api.schemas import (
     AnalyticsResponse,
@@ -11,9 +12,12 @@ from backend.api.schemas import (
     CreateRunRequest,
     ErrorResponse,
     EventsResponse,
+    FailurePattern,
     HealthResponse,
     ReportResponse,
     RunResponse,
+    RunStatus,
+    Source,
 )
 
 router = APIRouter(prefix="/api")
@@ -26,14 +30,19 @@ PLANNED_ERRORS = {
 }
 
 
-def planned() -> NoReturn:
-    raise HTTPException(
-        status_code=501,
-        detail={
-            "code": "not_implemented",
-            "message": "PLANNED: security execution is not enabled.",
-        },
-    )
+def service(request: Request):
+    return request.app.state.orchestrator
+
+
+def record_for(request: Request, run_id: str):
+    try:
+        return service(request).store.get(run_id)
+    except KeyError as exc:
+        raise HTTPException(404, {"code": "not_found", "message": "Run not found."}) from exc
+
+
+def conflict(message: str):
+    raise HTTPException(409, {"code": "conflict", "message": message})
 
 
 @router.get("/health", response_model=HealthResponse, tags=["health"])
@@ -42,27 +51,67 @@ def health() -> HealthResponse:
 
 
 @router.post("/runs", response_model=RunResponse, status_code=202, responses=PLANNED_ERRORS)
-def create_run(request: CreateRunRequest) -> RunResponse:
-    planned()
+async def create_run(request: CreateRunRequest, http_request: Request) -> RunResponse:
+    from backend.engine.orchestrator import RunConflict
+
+    try:
+        return service(http_request).create(request)
+    except RunConflict as exc:
+        conflict(str(exc))
 
 
 @router.get("/runs/{run_id}", response_model=RunResponse, responses=PLANNED_ERRORS)
-def get_run(run_id: RunId) -> RunResponse:
-    planned()
+def get_run(run_id: RunId, http_request: Request) -> RunResponse:
+    return record_for(http_request, run_id).run
 
 
 @router.get("/runs/{run_id}/events", response_model=EventsResponse, responses=PLANNED_ERRORS)
 def get_events(
     run_id: RunId,
+    http_request: Request,
     cursor: Annotated[str | None, Query(max_length=256)] = None,
     limit: Annotated[int, Query(ge=1, le=200)] = 100,
 ) -> EventsResponse:
-    planned()
+    run = record_for(http_request, run_id).run
+    offset = 0
+    if cursor:
+        try:
+            decoded = base64.b64decode(cursor, altchars=b"-_", validate=True).decode()
+            owner, position = decoded.split(":")
+            offset = int(position)
+            if owner != run_id or offset < 0 or offset > len(run.events):
+                raise ValueError()
+        except (ValueError, UnicodeError) as exc:
+            raise HTTPException(
+                422, {"code": "invalid_request", "message": "Invalid event cursor."}
+            ) from exc
+    events = run.events[offset : offset + limit]
+    end = offset + len(events)
+    # Retain the tail cursor so clients can poll newly appended events.
+    next_cursor = (
+        base64.urlsafe_b64encode(f"{run_id}:{end}".encode()).decode() if events else cursor
+    )
+    return EventsResponse(run_id=run_id, source=run.source, events=events, next_cursor=next_cursor)
 
 
 @router.get("/runs/{run_id}/report", response_model=ReportResponse, responses=PLANNED_ERRORS)
-def get_report(run_id: RunId) -> ReportResponse:
-    planned()
+def get_report(run_id: RunId, http_request: Request) -> ReportResponse:
+    from backend.storage.runs import TERMINAL
+
+    record = record_for(http_request, run_id)
+    run = record.run
+    if run.status not in TERMINAL:
+        conflict("Run has not completed.")
+    return ReportResponse(
+        run_id=run_id,
+        source=run.source,
+        status=run.status,
+        summary=f"Run {run.status}."
+        + (f" Failure code: {record.failure_code}." if record.failure_code else ""),
+        verification=run.verification,
+        evidence=record.evidence,
+        limitations=["Results cover only the frozen executed suites; not universal security."],
+    )
 
 
 @router.post(
@@ -71,12 +120,45 @@ def get_report(run_id: RunId) -> ReportResponse:
     status_code=202,
     responses=PLANNED_ERRORS,
 )
-def challenge(run_id: RunId, request: ChallengeRequest) -> ChallengeResponse:
-    planned()
+async def challenge(
+    run_id: RunId, request: ChallengeRequest, http_request: Request
+) -> ChallengeResponse:
+    from backend.engine.orchestrator import RunConflict
+
+    record_for(http_request, run_id)
+    try:
+        service(http_request).rechallenge(run_id, request)
+    except RunConflict as exc:
+        conflict(str(exc))
+    return ChallengeResponse(run_id=run_id)
 
 
 @router.get("/analytics", response_model=AnalyticsResponse, responses=PLANNED_ERRORS)
 def analytics(
+    http_request: Request,
     run_id: Annotated[str | None, Query(pattern=r"^[A-Za-z0-9_-]+$", max_length=128)] = None,
 ) -> AnalyticsResponse:
-    planned()
+    records = [record_for(http_request, run_id)] if run_id else service(http_request).store.all()
+    records = [r for r in records if r.run.source == Source.EXECUTION]
+    # Keep every verification/challenge execution, including incomplete and timed-out rounds.
+    attempts = [a for r in records for a in r.attempts]
+    outcomes = [v.verdict for a in attempts for v in a.verifications]
+    outcomes.extend(a.verdict for a in attempts if not a.verifications)
+    patterns = (
+        [
+            FailurePattern(
+                challenge_family="required_suites",
+                executions=len(outcomes),
+                failures=sum(verdict != RunStatus.VERIFIED for verdict in outcomes),
+            )
+        ]
+        if attempts
+        else []
+    )
+    return AnalyticsResponse(
+        source=Source.EXECUTION,
+        run_count=len(records),
+        verified_count=sum(r.run.status == RunStatus.VERIFIED for r in records),
+        rejected_count=sum(r.run.status == RunStatus.REJECTED for r in records),
+        failure_patterns=patterns,
+    )

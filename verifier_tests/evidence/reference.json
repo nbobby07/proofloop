@@ -1,0 +1,1112 @@
+{
+  "baseline_reproduced": false,
+  "collected": [
+    "verifier_tests/test_ledgerlite.py::test_owner_access[inv-1001]",
+    "verifier_tests/test_ledgerlite.py::test_owner_access[inv-2047]",
+    "verifier_tests/test_ledgerlite.py::test_owner_access[inv-7319]",
+    "verifier_tests/test_ledgerlite.py::test_owner_access[inv-8523]",
+    "verifier_tests/test_ledgerlite.py::test_owner_access[inv-9013]",
+    "verifier_tests/test_ledgerlite.py::test_owner_access[inv-9907]",
+    "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-1001]",
+    "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-2047]",
+    "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-7319]",
+    "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-8523]",
+    "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-9013]",
+    "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-9907]",
+    "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-1001]",
+    "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-2047]",
+    "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-7319]",
+    "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-8523]",
+    "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-9013]",
+    "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-9907]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-missing-alice]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-missing-bob]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-missing-administrator]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-0000-alice]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-0000-bob]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-0000-administrator]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-1002-alice]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-1002-bob]",
+    "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-1002-administrator]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-None]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-mallory]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-Administrator]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-alice bob]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-None]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-mallory]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-Administrator]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-alice bob]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-None]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-mallory]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-Administrator]",
+    "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-alice bob]",
+    "verifier_tests/test_ledgerlite.py::test_health",
+    "verifier_tests/test_ledgerlite.py::test_access_sequence_preserves_functionality"
+  ],
+  "complete": true,
+  "counts": {
+    "failed": 0,
+    "passed": 44,
+    "required": 44
+  },
+  "data_label": "SYNTHETIC FIXTURE",
+  "expectation_met": true,
+  "inputs_unchanged": true,
+  "isolation": "local subprocess and in-process TestClient; not a sandbox",
+  "probe": {
+    "request": {
+      "method": "GET",
+      "path": "/invoices/inv-2047",
+      "synthetic_identity": "alice"
+    },
+    "response": {
+      "body": {
+        "detail": "Invoice access denied"
+      },
+      "status_code": 403
+    },
+    "unauthorized_access_reproduced": false
+  },
+  "probe_exit_code": 0,
+  "pytest_exit_code": 0,
+  "pytest_stderr": "",
+  "pytest_stdout": "............................................                             [100%]\n44 passed in 0.17s\n",
+  "results": [
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.05421562498668209,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.002083375002257526,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.00012466698535718024,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_owner_access[inv-1001]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0002025419962592423,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0011384999961592257,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 9.524999768473208e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_owner_access[inv-2047]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00016570801381021738,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0009199999913107604,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.00011158300912939012,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_owner_access[inv-7319]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00017795799067243934,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0009889590146485716,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.00012024998432025313,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_owner_access[inv-8523]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001898749906104058,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0010238329996354878,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 9.133300045505166e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_owner_access[inv-9013]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00015637499745935202,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0009567920060362667,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.7958003859967e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_owner_access[inv-9907]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00014908300363458693,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0011063339770771563,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 9.695798507891595e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-1001]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001757080026436597,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0009571659902576357,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.624998736195266e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-2047]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001553750189486891,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008313340076711029,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.387499838136137e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-7319]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00015279100625775754,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.000787582976045087,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.02910071797669e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-8523]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001465829845983535,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0007982089882716537,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.075000368990004e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-9013]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00014437499339692295,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.004257042019162327,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.433300536125898e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_cross_account_denied[inv-9907]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00015029197675175965,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008474999922327697,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.30409990157932e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-1001]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00017583300359547138,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008763330115471035,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.67500202730298e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-2047]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00015829200856387615,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008026249997783452,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.212501415982842e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-7319]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00015154201537370682,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0007652500062249601,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 7.924999226815999e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-8523]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00014074999489821494,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0007822920160833746,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.166601764969528e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-9013]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00014466600259765983,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0007741250155959278,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 7.94160005170852e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_administrator_access[inv-9907]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001899579947348684,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0007833749987185001,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.491598418913782e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-missing-alice]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00018783300765790045,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0007485410023946315,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.450000314041972e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-missing-bob]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00018499998259358108,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0007695420063100755,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.233299013227224e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-missing-administrator]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00018554198322817683,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.000769499980378896,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.641602471470833e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-0000-alice]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00018754199845716357,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0007657909882254899,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.308302494697273e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-0000-bob]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00018175001605413854,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0007577500073239207,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.679201710037887e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-0000-administrator]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00018716699560172856,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0007842089980840683,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.399999933317304e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-1002-alice]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00018437500693835318,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008173329988494515,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.00010341699817217886,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-1002-bob]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00022408401127904654,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008599589928053319,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 9.012498776428401e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_nonexistent_invoice[inv-1002-administrator]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00019820898887701333,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008186250051949173,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.524997974745929e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-None]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00018283299868926406,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.001247665990376845,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.499997784383595e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00018395899678580463,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008438330260105431,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.00011666701175272465,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-mallory]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00023116599186323583,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0009395829983986914,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 9.795799269340932e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-Administrator]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00019995798356831074,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0009313339833170176,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.82500025909394e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-1001-alice bob]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00018887498299591243,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0009538340091239661,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 8.699999307282269e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-None]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0001832089910749346,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0008707500237505883,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.0001027089892886579,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00021216599270701408,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0010680419800337404,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.0004461249918676913,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-mallory]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0005253329873085022,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.00127162502030842,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 9.883299935609102e-05,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-Administrator]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00020616597612388432,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.001335667009698227,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.0001084580144379288,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-2047-alice bob]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00022879199241288006,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0011523750144988298,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.00010112498421221972,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-None]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00024570798268541694,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0009660829964559525,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.00010041601490229368,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0004639580147340894,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0011226670176256448,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.00010716699762269855,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-mallory]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0005361669755075127,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.00510158299584873,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.00021349999587982893,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-Administrator]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00027749998844228685,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0034250839962624013,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.00032745799398981035,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_invalid_identity[inv-missing-alice bob]"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.0004554170009214431,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.0036520840076263994,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.00014641598681919277,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_health"
+    },
+    {
+      "phases": [
+        {
+          "duration_seconds": 0.00014024999109096825,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "setup"
+        },
+        {
+          "duration_seconds": 0.017082542006392032,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "call"
+        },
+        {
+          "duration_seconds": 0.0016188340086955577,
+          "failure": null,
+          "outcome": "passed",
+          "phase": "teardown"
+        }
+      ],
+      "test_id": "verifier_tests/test_ledgerlite.py::test_access_sequence_preserves_functionality"
+    }
+  ],
+  "runtime": {
+    "packages": {
+      "fastapi": "0.143.0",
+      "httpx2": "2.13.1",
+      "pydantic": "2.14.0",
+      "pytest": "9.1.1",
+      "starlette": "1.7.0"
+    },
+    "python": "3.13.0 (v3.13.0:60403a5409f, Oct  7 2024, 00:37:40) [Clang 15.0.0 (clang-1500.3.9.4)]"
+  },
+  "schema_version": 1,
+  "scope": "frozen LedgerLite suite only; no platform security verdict",
+  "source": "execution",
+  "suite_manifest_sha256": "2e426b9ffb46e0f9168c0327332ef4394728ceb0215ea11af59008f4a1018765",
+  "suite_passed": true,
+  "target": "LedgerLite",
+  "target_file_sha256": {
+    "demo_target/ledgerlite/data.py": "6a7ab82c5adb2bb2e2d88aaa4a22a08a4ae6003dd7fae4d8adb85e9807ad7a31",
+    "demo_target/ledgerlite/reference_secure.py": "e13cb031e8813cbfafd5faf0f30e0bb29e6e64691892fbd204a80816f82efe35"
+  },
+  "variant": "reference"
+}

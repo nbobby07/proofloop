@@ -1,0 +1,56 @@
+rules:
+  - id: proofloop.python.sql-formatted-query
+    languages: [python]
+    severity: ERROR
+    message: SQL query constructed with string interpolation; use bound parameters.
+    metadata:
+      category: security
+      cwe: ["CWE-89: SQL Injection"]
+      impact: HIGH
+    pattern-either:
+      - pattern: $DB.execute(f"...", ...)
+      - pattern: $DB.execute("..." % ..., ...)
+      - pattern: $DB.execute("...".format(...), ...)
+      - pattern: $DB.execute("..." + ..., ...)
+  - id: proofloop.python.dynamic-eval
+    languages: [python]
+    severity: ERROR
+    message: Dynamic evaluation requires independent review of the input trust boundary.
+    metadata:
+      category: security
+      cwe: ["CWE-95: Eval Injection"]
+      impact: HIGH
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: exec(...)
+  - id: proofloop.ledgerlite.invoice-missing-ownership
+    languages: [python]
+    severity: ERROR
+    message: LedgerLite invoice response lacks its owner-or-administrator denial guard; reproduce BOLA independently.
+    metadata:
+      category: security
+      cwe: ["CWE-639: Authorization Bypass Through User-Controlled Key"]
+      impact: HIGH
+      scope: LedgerLite synthetic invoice handler; discovery only, never a security verdict.
+    paths:
+      include:
+        - "**/demo_target/ledgerlite/app.py"
+    patterns:
+      - pattern-inside: |
+          @app.get("/invoices/{invoice_id}")
+          def invoice(...):
+              ...
+              $RECORD = INVOICES.get(invoice_id)
+              ...
+      - pattern: |
+          return {"id": invoice_id, **$RECORD, "source": "fixture"}
+      - pattern-not-inside: |
+          def invoice(...):
+              ...
+              $USER = USERS[x_synthetic_identity]
+              ...
+              if $USER["role"] != "administrator" and $RECORD["owner_id"] != x_synthetic_identity:
+                  raise HTTPException(status_code=403, ...)
+              ...
+              return {"id": invoice_id, **$RECORD, "source": "fixture"}
+              ...

@@ -16,7 +16,7 @@ dev = ["pytest>=8,<10", "httpx2>=2.13,<3", "ruff>=0.12,<1", "jsonschema>=4.23,<5
 include = ["backend*"]
 
 [tool.pytest.ini_options]
-testpaths = ["backend/tests"]
+testpaths = ["backend/tests", "backend/providers/tests", "sandbox/tests"]
 addopts = "-q"
 
 [tool.ruff]

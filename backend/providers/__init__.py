@@ -1,1 +1,1 @@
-"""PLANNED external providers. No SDKs or inference calls are installed in the scaffold."""
+"""Bounded backend provider adapters. Credentials are read only when clients are constructed."""

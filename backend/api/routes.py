@@ -20,9 +20,9 @@ router = APIRouter(prefix="/api")
 RunId = Annotated[str, Path(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9_-]+$")]
 PLANNED_ERRORS = {
     501: {"model": ErrorResponse, "description": "PLANNED: engine/integration not implemented"},
-    404: {"model": ErrorResponse},
-    409: {"model": ErrorResponse},
-    422: {"model": ErrorResponse},
+    404: {"model": ErrorResponse, "description": "Run not found"},
+    409: {"model": ErrorResponse, "description": "Run state conflict"},
+    422: {"model": ErrorResponse, "description": "Request validation failed"},
 }
 
 

@@ -705,7 +705,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Run not found"
           },
           "409": {
             "content": {
@@ -715,7 +715,7 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Run state conflict"
           },
           "422": {
             "content": {
@@ -725,7 +725,7 @@
                 }
               }
             },
-            "description": "Unprocessable Content"
+            "description": "Request validation failed"
           },
           "501": {
             "content": {
@@ -794,7 +794,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Run not found"
           },
           "409": {
             "content": {
@@ -804,7 +804,7 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Run state conflict"
           },
           "422": {
             "content": {
@@ -814,7 +814,7 @@
                 }
               }
             },
-            "description": "Unprocessable Content"
+            "description": "Request validation failed"
           },
           "501": {
             "content": {
@@ -866,7 +866,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Run not found"
           },
           "409": {
             "content": {
@@ -876,7 +876,7 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Run state conflict"
           },
           "422": {
             "content": {
@@ -886,7 +886,7 @@
                 }
               }
             },
-            "description": "Unprocessable Content"
+            "description": "Request validation failed"
           },
           "501": {
             "content": {
@@ -948,7 +948,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Run not found"
           },
           "409": {
             "content": {
@@ -958,7 +958,7 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Run state conflict"
           },
           "422": {
             "content": {
@@ -968,7 +968,7 @@
                 }
               }
             },
-            "description": "Unprocessable Content"
+            "description": "Request validation failed"
           },
           "501": {
             "content": {
@@ -1049,7 +1049,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Run not found"
           },
           "409": {
             "content": {
@@ -1059,7 +1059,7 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Run state conflict"
           },
           "422": {
             "content": {
@@ -1069,7 +1069,7 @@
                 }
               }
             },
-            "description": "Unprocessable Content"
+            "description": "Request validation failed"
           },
           "501": {
             "content": {
@@ -1121,7 +1121,7 @@
                 }
               }
             },
-            "description": "Not Found"
+            "description": "Run not found"
           },
           "409": {
             "content": {
@@ -1131,7 +1131,7 @@
                 }
               }
             },
-            "description": "Conflict"
+            "description": "Run state conflict"
           },
           "422": {
             "content": {
@@ -1141,7 +1141,7 @@
                 }
               }
             },
-            "description": "Unprocessable Content"
+            "description": "Request validation failed"
           },
           "501": {
             "content": {

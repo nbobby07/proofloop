@@ -22,6 +22,7 @@ React/TypeScript/Vite/Tailwind dashboard → FastAPI/Pydantic API → PLANNED bo
 - Typed provider contracts without external calls; planned routes return 501.
 - Canonical Pydantic models, generated schemas/OpenAPI/TypeScript, representative fixture.
 - Ownership rules, security boundaries, installation guidance, and key-free CI workflow.
+- Private GitHub repository created; both feature branches pushed; main protection configured for CI checks and one review.
 - Validation and GitHub publication details are recorded in `docs/SETUP-RESULTS.md` after setup checks.
 
 ## Active tasks

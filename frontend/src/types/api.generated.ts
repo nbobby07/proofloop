@@ -379,7 +379,7 @@ export interface operations {
                     "application/json": components["schemas"]["AnalyticsResponse"];
                 };
             };
-            /** @description Not Found */
+            /** @description Run not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -388,7 +388,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Conflict */
+            /** @description Run state conflict */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -397,7 +397,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Unprocessable Content */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -459,7 +459,7 @@ export interface operations {
                     "application/json": components["schemas"]["RunResponse"];
                 };
             };
-            /** @description Not Found */
+            /** @description Run not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -468,7 +468,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Conflict */
+            /** @description Run state conflict */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -477,7 +477,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Unprocessable Content */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -517,7 +517,7 @@ export interface operations {
                     "application/json": components["schemas"]["RunResponse"];
                 };
             };
-            /** @description Not Found */
+            /** @description Run not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -526,7 +526,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Conflict */
+            /** @description Run state conflict */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -535,7 +535,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Unprocessable Content */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -579,7 +579,7 @@ export interface operations {
                     "application/json": components["schemas"]["ChallengeResponse"];
                 };
             };
-            /** @description Not Found */
+            /** @description Run not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -588,7 +588,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Conflict */
+            /** @description Run state conflict */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -597,7 +597,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Unprocessable Content */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -640,7 +640,7 @@ export interface operations {
                     "application/json": components["schemas"]["EventsResponse"];
                 };
             };
-            /** @description Not Found */
+            /** @description Run not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -649,7 +649,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Conflict */
+            /** @description Run state conflict */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -658,7 +658,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Unprocessable Content */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;
@@ -698,7 +698,7 @@ export interface operations {
                     "application/json": components["schemas"]["ReportResponse"];
                 };
             };
-            /** @description Not Found */
+            /** @description Run not found */
             404: {
                 headers: {
                     [name: string]: unknown;
@@ -707,7 +707,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Conflict */
+            /** @description Run state conflict */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -716,7 +716,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description Unprocessable Content */
+            /** @description Request validation failed */
             422: {
                 headers: {
                     [name: string]: unknown;

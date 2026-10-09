@@ -18,7 +18,7 @@ Validated locally on October 9, 2026 with Python 3.13 and Node 24.4.1. The repos
 | `.env.example` | Empty credential placeholders; no real credentials |
 | Git ignore checks | Credentials, venv, dependencies, run data, disposable workspaces, generated reports ignored; `.env.example` tracked |
 
-Initial checks caught a contract-test path error and deprecated lint/test dependencies. These were fixed before publication. No scanning, inference, attack execution, or sponsor API request was made. Backend scaffold tests are not security verification tests.
+Initial checks caught a contract-test path error and deprecated lint/test dependencies. These were fixed before publication. The first remote CI run then caught Python 3.11 versus 3.13 HTTP 422 description drift; route error descriptions are now explicit so OpenAPI exports are reproducible across both versions. No scanning, inference, attack execution, or sponsor API request was made. Backend scaffold tests are not security verification tests.
 
 Inspect current remote state and CI with:
 
@@ -28,4 +28,4 @@ git ls-remote --heads origin main feat/security-engine feat/product-dashboard
 gh run list --workflow ci.yml
 ```
 
-The setup handoff records the initial commit hash, remote branch checks, final CI result, and any branch-protection limitation. Provider credentials, collaborator access, team contacts, and submission video remain manual setup. The full tracked directory inventory is in `REPOSITORY-TREE.txt`.
+Private repository creation and both feature-branch pushes succeeded. Main branch protection requires the backend/frontend CI checks and one approving review; force pushes and deletion are disabled. The setup handoff records the initial commit hash, final commit, and final CI result. Provider credentials, collaborator access, team contacts, and submission video remain manual setup. The full tracked directory inventory is in `REPOSITORY-TREE.txt`.

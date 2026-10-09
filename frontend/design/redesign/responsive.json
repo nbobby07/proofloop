@@ -1,0 +1,58 @@
+[
+  {
+    "bodyFont": "16px",
+    "headlineFont": "38px",
+    "pageWidth": 1440,
+    "primaryAction": "Challenge this fix",
+    "visibleTabs": [
+      "Overview",
+      "Code changes",
+      "Test results",
+      "Audit trail",
+      "Report"
+    ],
+    "width": 1440
+  },
+  {
+    "bodyFont": "16px",
+    "headlineFont": "36px",
+    "pageWidth": 1280,
+    "primaryAction": "Challenge this fix",
+    "visibleTabs": [
+      "Overview",
+      "Code changes",
+      "Test results",
+      "Audit trail",
+      "Report"
+    ],
+    "width": 1280
+  },
+  {
+    "bodyFont": "16px",
+    "headlineFont": "36px",
+    "pageWidth": 768,
+    "primaryAction": "Challenge this fix",
+    "visibleTabs": [
+      "Overview",
+      "Code changes",
+      "Test results",
+      "Audit trail",
+      "Report"
+    ],
+    "width": 768
+  },
+  {
+    "bodyFont": "16px",
+    "headlineFont": "32px",
+    "pageWidth": 390,
+    "primaryAction": "Challenge this fix",
+    "visibleTabs": [
+      "Overview",
+      "Code changes",
+      "Test results",
+      "Audit trail",
+      "Report"
+    ],
+    "width": 390
+  }
+]

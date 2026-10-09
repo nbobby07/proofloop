@@ -108,7 +108,8 @@ export function BriefingPanel({ report }: { report: ReportResponse }) {
         </div>
       </div>
       <p className="fine-print">
-        A narration of this completed report, with its counts and limitations.
+        A short spoken summary of the result, key counts and next step. Full
+        limitations remain in the written report.
       </p>
       <button
         disabled={

@@ -1,0 +1,131 @@
+{
+  "date": "2026-10-09",
+  "frontend": "http://127.0.0.1:5192",
+  "baseline_ui_commit": "9f617ca7ae05cadd7f9b19d74c4d2de0b4d2bd80",
+  "new_investigation": {
+    "run_id": "run_e1d06c5c91c34b3793fbff7674d28a2c",
+    "source": "execution",
+    "status": "rejected",
+    "baseline": {
+      "reproduced": true,
+      "observed_status": 200
+    },
+    "verification": {
+      "security_passed": 0,
+      "security_total": 6,
+      "functional_passed": 16,
+      "functional_total": 22,
+      "adversarial_passed": 15,
+      "adversarial_total": 16
+    },
+    "patch_attempt": 3,
+    "event_count": 43,
+    "report_references": 12,
+    "rounds": [
+      {
+        "event_id": "event_00000016",
+        "message": "Independent verification returned rejected.",
+        "metadata": {
+          "test_execution_id": "run_e1d06c5c91c34b3793fbff7674d28a2c_round_16",
+          "suite": "required_suites",
+          "challenge_family": "required_suites",
+          "outcome": "fail",
+          "executed": true,
+          "sequence": 16,
+          "target": "LedgerLite",
+          "attempt": 1,
+          "patch_hash": "bf234b07ad0d73b0c2e3499a72435a53c7186286fd15232eaef5aac3528dafef"
+        }
+      },
+      {
+        "event_id": "event_00000028",
+        "message": "Independent verification returned rejected.",
+        "metadata": {
+          "test_execution_id": "run_e1d06c5c91c34b3793fbff7674d28a2c_round_28",
+          "suite": "required_suites",
+          "challenge_family": "required_suites",
+          "outcome": "fail",
+          "executed": true,
+          "sequence": 28,
+          "target": "LedgerLite",
+          "attempt": 2,
+          "patch_hash": "8279d23c3f64422207fb74ed2cb6524f60a9cbd539dea0c224cbb034df874e83"
+        }
+      },
+      {
+        "event_id": "event_00000040",
+        "message": "Independent verification returned rejected.",
+        "metadata": {
+          "test_execution_id": "run_e1d06c5c91c34b3793fbff7674d28a2c_round_40",
+          "suite": "required_suites",
+          "challenge_family": "required_suites",
+          "outcome": "fail",
+          "executed": true,
+          "sequence": 40,
+          "target": "LedgerLite",
+          "attempt": 3,
+          "patch_hash": "9513a9906e1ee1bcc2b39aace397f98a78d366ad245c41e56542ac678c6dd9bf"
+        }
+      }
+    ]
+  },
+  "report_export": {
+    "run_id": "run_b79f04fcd8114bf7b215a49e4286175e",
+    "matches_backend": true,
+    "evidence_references": 19
+  },
+  "verified_baseline": {
+    "run_id": "run_b79f04fcd8114bf7b215a49e4286175e",
+    "status": "verified",
+    "source": "execution",
+    "baseline": {
+      "reproduced": true,
+      "observed_status": 200
+    },
+    "verification": {
+      "security_passed": 6,
+      "security_total": 6,
+      "functional_passed": 22,
+      "functional_total": 22,
+      "adversarial_passed": 16,
+      "adversarial_total": 16
+    },
+    "event_count": 40
+  },
+  "briefing_before_challenge": {
+    "status": "ready",
+    "report_sha256": "6befae092c47d0738a6a6e52bfaee12dc7ee578680441f4793f98b725f9404d9",
+    "audio_path": "/api/audio/briefing_973318408768f0015b83905ec97d24a21f8621a5a71c1bb33a3f969509d890fb"
+  },
+  "challenge": {
+    "old_audio_http_status": 409,
+    "run_id": "run_b79f04fcd8114bf7b215a49e4286175e",
+    "status": "verified",
+    "verification": {
+      "security_passed": 6,
+      "security_total": 6,
+      "functional_passed": 22,
+      "functional_total": 22,
+      "adversarial_passed": 16,
+      "adversarial_total": 16
+    },
+    "event_count": 46,
+    "new_rounds": [
+      {
+        "event_id": "event_00000043",
+        "message": "Independent verification returned verified.",
+        "metadata": {
+          "test_execution_id": "run_b79f04fcd8114bf7b215a49e4286175e_round_43",
+          "suite": "required_suites",
+          "challenge_family": "required_suites",
+          "outcome": "pass",
+          "executed": true,
+          "sequence": 43,
+          "target": "LedgerLite",
+          "attempt": 2,
+          "patch_hash": "8046e2fc95b96106a820e2f5691845c2b34ae8a491664d379fbf1ab781e1265c"
+        }
+      }
+    ]
+  }
+}

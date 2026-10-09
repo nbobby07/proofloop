@@ -51,7 +51,7 @@ export function IntegrationStatus({
           ],
           [
             "Semgrep / Akash / OpenAI / Senso",
-            "Developer A owns these integrations; status is not exposed by API v1",
+            "Availability is not exposed by the current API",
           ],
         ].map(([name, detail]) => (
           <div className="integration-row" key={name}>
@@ -59,7 +59,9 @@ export function IntegrationStatus({
               <strong>{name}</strong>
               <small>{detail}</small>
             </div>
-            <span className="badge">{name === "ElevenLabs" ? "See current briefing" : "Not verified"}</span>
+            <span className="badge">
+              {name === "ElevenLabs" ? "See current briefing" : "Not verified"}
+            </span>
           </div>
         ))}
       </section>

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { LayoutGroup, motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { motionTokens } from "../../components/motion";
 import { RecordedRounds } from "../execution/RecordedRounds";
 import { labels } from "../execution/lifecycle";
-import { Tabs, Tooltip } from "radix-ui";
+import { Tooltip } from "radix-ui";
 import type { ReportResponse, RunResponse, SecurityEvent } from "../../types";
 import { Icon } from "../../components/Icon";
 
@@ -102,14 +102,15 @@ export function EvidenceReport({
   reportError,
   fixture,
   events = [],
+  view = "results",
 }: {
-  events?: SecurityEvent[];
   run: RunResponse | null;
   report: ReportResponse | null;
   reportError: string | null;
   fixture: boolean;
+  events?: SecurityEvent[];
+  view?: "results" | "diff" | "report";
 }) {
-  const [tab, setTab] = useState("results");
   const reduced = useReducedMotion();
   const summary = run?.verification;
   const download = () => {
@@ -123,208 +124,198 @@ export function EvidenceReport({
     anchor.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
-  return (
-    <section className="panel evidence-panel">
-      <div className="section-heading">
-        <div className="heading-with-icon">
-          <span className="section-index">02</span>
-          <h2>Security evidence</h2>
+  if (view === "diff")
+    return (
+      <section className="technical-view">
+        <header className="technical-heading">
+          <h1>Code changes</h1>
+          <p>
+            The exact proposal supplied for this investigation. A patch is not a
+            verdict.
+          </p>
+        </header>
+        <div className="code-surface">
+          <PatchDiffViewer patch={run?.patch} />
         </div>
-        <span className="subtle-label">
-          {fixture ? "Fixture" : "Run evidence"}
-        </span>
-      </div>
-      <LayoutGroup id="evidence-tabs">
-        <Tabs.Root value={tab} onValueChange={setTab}>
-          <Tabs.List className="tabs" aria-label="Evidence views">
-            {[
-              ["results", "Verification"],
-              ["diff", "Code changes"],
-              ["report", "Evidence report"],
-            ].map(([value, label]) => (
-              <Tabs.Trigger value={value} key={value}>
-                {label}
-                {tab === value && (
-                  <motion.span
-                    className="tab-indicator"
-                    layoutId={reduced ? undefined : "evidence-active"}
-                    transition={{
-                      duration: reduced ? 0 : motionTokens.panel,
-                      ease: motionTokens.ease,
-                    }}
-                  />
-                )}
-              </Tabs.Trigger>
-            ))}
-          </Tabs.List>
-          <Tabs.Content value="results" className="evidence-content" forceMount>
-            <div
-              className={`verification-context context-${fixture ? "fixture" : (run?.status ?? "pending")}`}
-            >
-              <Icon name="shield" size={22} />
-              <div>
-                <strong>
-                  {fixture
-                    ? "Illustrative test results"
-                    : run
-                      ? labels[run.status]
-                      : "Awaiting independent execution"}
-                </strong>
-                <p>
-                  {fixture
-                    ? "Fixture preview · no checks executed"
-                    : run?.status === "challenging"
-                      ? "Previous counts cleared. Fresh verification is required."
-                      : summary
-                        ? `Patch attempt ${run?.patch?.attempt ?? "—"} · recorded suite counts`
-                        : "Results will appear when the backend records them."}
-                </p>
-              </div>
-            </div>
-            <div className="results-heading">
-              <span>Test suite</span>
-              <span>Passed / total</span>
-            </div>
-            {(["security", "functional", "adversarial"] as const).map(
-              (suite) => {
-                const passed = summary?.[`${suite}_passed`],
-                  total = summary?.[`${suite}_total`];
-                return (
-                  <div
-                    className={`suite-row ${passed !== undefined && total && passed < total ? "suite-incomplete" : ""}`}
-                    key={suite}
-                  >
-                    <div className="suite-name">
-                      <Icon
-                        name={
-                          suite === "security"
-                            ? "shield"
-                            : suite === "functional"
-                              ? "code"
-                              : "attack"
-                        }
-                      />
-                      <span>
-                        {suite}
-                        <small>
-                          {suite === "security"
-                            ? "Authorization boundaries"
-                            : suite === "functional"
-                              ? "Legitimate application behavior"
-                              : "Additional attack cases"}
-                        </small>
-                      </span>
-                    </div>
-                    <div className="suite-count">
-                      <span className="suite-outcome">
-                        {fixture
-                          ? "Preview"
-                          : passed === undefined || total === undefined
-                            ? "Pending"
-                            : !total
-                              ? "No checks"
-                              : passed < total
-                                ? "Not all passing"
-                                : "Recorded passing"}
-                      </span>
-                      <div className="suite-progress">
-                        <motion.span
-                          initial={false}
-                          animate={{
-                            width: total ? `${(passed! / total) * 100}%` : "0%",
-                          }}
-                          transition={{
-                            duration: reduced ? 0 : motionTokens.state,
-                          }}
-                        />
-                      </div>
-                      <strong>
-                        {passed ?? "—"}
-                        <span> / {total ?? "—"}</span>
-                      </strong>
-                    </div>
-                  </div>
-                );
-              },
-            )}
-            <div className="evidence-note">
-              <Icon name="info" />
-              <p>
-                {fixture
-                  ? "Illustrative counts. These tests have not been executed."
-                  : summary
-                    ? "Counts summarize recorded tests. The independent verifier determines the verdict."
-                    : "Waiting for independently executed verification results."}
-              </p>
-            </div>
-            <RecordedRounds events={events} />
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <button className="scope-explanation">
-                  <Icon name="shield" />
-                  About verification scope
-                  <Icon name="info" size={13} />
-                </button>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content className="tooltip-content" sideOffset={6}>
-                  Only the frozen executed suite is covered. Missing, skipped
-                  and timed-out checks cannot count as passing.
-                  <Tooltip.Arrow />
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
-          </Tabs.Content>
-          <Tabs.Content value="diff" className="diff-content" forceMount>
-            <PatchDiffViewer patch={run?.patch} />
-          </Tabs.Content>
-          <Tabs.Content value="report" className="evidence-content" forceMount>
-            {report ? (
-              <>
-                <div className="report-actions">
-                  <span className="subtle-label">Saved report</span>
-                  <button className="small-button" onClick={download}>
-                    <Icon name="download" />
-                    Download JSON
-                  </button>
-                </div>
-                <p className="report-summary">{report.summary}</p>
-                <h3>Evidence references</h3>
-                {report.evidence?.length ? (
-                  report.evidence.map((e, index) => (
-                    <div className="artifact" key={`${e.artifact_id}-${index}`}>
-                      <strong>{e.description}</strong>
-                      <code>{e.artifact_id}</code>
-                      <small>SHA-256 {e.sha256}</small>
-                    </div>
-                  ))
-                ) : (
-                  <p className="empty-copy">No artifact references supplied.</p>
-                )}
-                <h3>Scope & limitations</h3>
-                <ul className="limitations">
-                  {report.limitations.map((text, i) => (
-                    <li key={i}>{text}</li>
-                  ))}
-                </ul>
-              </>
+      </section>
+    );
+  if (view === "report")
+    return (
+      <section className="technical-view">
+        <header className="technical-heading">
+          <div>
+            <h1>Evidence report</h1>
+            <p>Saved evidence references, identities and verification scope.</p>
+          </div>
+          {report && (
+            <button className="primary" onClick={download}>
+              <Icon name="download" />
+              Export evidence report
+            </button>
+          )}
+        </header>
+        {report ? (
+          <>
+            <p className="report-summary">{report.summary}</p>
+            <section className="report-limitations">
+              <h2>Scope & limitations</h2>
+              <ul className="limitations">
+                {report.limitations.map((text, index) => (
+                  <li key={index}>{text}</li>
+                ))}
+              </ul>
+            </section>
+            <h2>
+              Evidence references{" "}
+              <span className="count-badge">
+                {report.evidence?.length ?? 0}
+              </span>
+            </h2>
+            {report.evidence?.length ? (
+              report.evidence.map((item, index) => (
+                <details
+                  className="artifact"
+                  key={`${item.artifact_id}-${index}`}
+                >
+                  <summary>{item.description}</summary>
+                  <code>{item.artifact_id}</code>
+                  <small>SHA-256 {item.sha256}</small>
+                </details>
+              ))
             ) : (
-              <div className="empty-state">
-                <Icon name="file" size={24} />
-                <h3>
-                  {reportError ? "Report unavailable" : "No saved report"}
-                </h3>
-                <p>
-                  {fixture
-                    ? "Fixture previews contain no executed evidence report."
-                    : (reportError ??
-                      "The completed run’s saved report will appear here.")}
-                </p>
-              </div>
+              <p className="empty-copy">No artifact references supplied.</p>
             )}
-          </Tabs.Content>
-        </Tabs.Root>
-      </LayoutGroup>
+          </>
+        ) : (
+          <div className="empty-state">
+            <Icon name="file" size={28} />
+            <h2>
+              {reportError ? "Report unavailable" : "No saved report yet"}
+            </h2>
+            <p>
+              {fixture
+                ? "Fixture previews contain no executed evidence report."
+                : (reportError ??
+                  "The completed run’s saved report will appear here.")}
+            </p>
+          </div>
+        )}
+      </section>
+    );
+  return (
+    <section className="technical-view">
+      <header className="technical-heading">
+        <h1>Test results</h1>
+        <p>
+          Recorded counts for the current patch. The independent verifier
+          determines the verdict.
+        </p>
+      </header>
+      <div
+        className={`verification-context context-${fixture ? "fixture" : (run?.status ?? "pending")}`}
+      >
+        <Icon name="shield" size={24} />
+        <div>
+          <strong>
+            {fixture
+              ? "Illustrative test results"
+              : run
+                ? labels[run.status]
+                : "Awaiting independent execution"}
+          </strong>
+          <p>
+            {fixture
+              ? "Illustrative counts. These tests have not been executed."
+              : run?.status === "challenging"
+                ? "Previous counts cleared. Fresh verification is required."
+                : summary
+                  ? `Current patch: attempt ${run?.patch?.attempt ?? "—"}`
+                  : "Results will appear when the backend records them."}
+          </p>
+        </div>
+      </div>
+      <div className="results-heading">
+        <span>Test suite</span>
+        <span>Passed / total</span>
+      </div>
+      {(["security", "functional", "adversarial"] as const).map((suite) => {
+        const passed = summary?.[`${suite}_passed`],
+          total = summary?.[`${suite}_total`];
+        return (
+          <div
+            className={`suite-row ${passed !== undefined && total && passed < total ? "suite-incomplete" : ""}`}
+            key={suite}
+          >
+            <div className="suite-name">
+              <Icon
+                name={
+                  suite === "security"
+                    ? "shield"
+                    : suite === "functional"
+                      ? "code"
+                      : "attack"
+                }
+              />
+              <span>
+                {suite}
+                <small>
+                  {suite === "security"
+                    ? "Authorization boundaries"
+                    : suite === "functional"
+                      ? "Legitimate application behavior"
+                      : "Additional attack cases"}
+                </small>
+              </span>
+            </div>
+            <div className="suite-count">
+              <span className="suite-outcome">
+                {fixture
+                  ? "Preview"
+                  : passed === undefined || total === undefined
+                    ? "Pending"
+                    : !total
+                      ? "No checks"
+                      : passed < total
+                        ? "Not all passing"
+                        : "Recorded passing"}
+              </span>
+              <div className="suite-progress">
+                <motion.span
+                  initial={false}
+                  animate={{
+                    width: total ? `${(passed! / total) * 100}%` : "0%",
+                  }}
+                  transition={{ duration: reduced ? 0 : motionTokens.state }}
+                />
+              </div>
+              <strong>
+                {passed ?? "—"}
+                <span> / {total ?? "—"}</span>
+              </strong>
+            </div>
+          </div>
+        );
+      })}
+      <p className="evidence-note">
+        Individual assertion names are not supplied in this view. Recorded round
+        outcomes and saved report references preserve the available evidence.
+      </p>
+      <RecordedRounds events={events} />
+      <Tooltip.Root>
+        <Tooltip.Trigger asChild>
+          <button className="scope-explanation">
+            <Icon name="info" />
+            About verification scope
+          </button>
+        </Tooltip.Trigger>
+        <Tooltip.Portal>
+          <Tooltip.Content className="tooltip-content" sideOffset={6}>
+            Only the frozen executed suite is covered. Missing, skipped and
+            timed-out checks cannot count as passing.
+            <Tooltip.Arrow />
+          </Tooltip.Content>
+        </Tooltip.Portal>
+      </Tooltip.Root>
     </section>
   );
 }

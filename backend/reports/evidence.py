@@ -6,6 +6,8 @@ import json
 from backend.api.schemas import ReportResponse
 
 TERMINAL = {"verified", "rejected", "inconclusive", "error"}
+SCRIPT_VERSION = "v2"
+DEFAULT_LIMITATION = "Results cover only the frozen executed suites; not universal security."
 
 
 def require_execution_report(report: ReportResponse) -> ReportResponse:
@@ -23,37 +25,44 @@ def report_digest(report: ReportResponse) -> str:
 
 
 def briefing_script(report: ReportResponse) -> str:
+    """A spoken decision summary; technical identities stay in the written report."""
     report = require_execution_report(report)
     outcomes = {
-        "verified": "The independent verifier reported verified for the executed suite.",
-        "rejected": "The independent verifier rejected the remediation.",
-        "inconclusive": "Verification is inconclusive because required evidence is incomplete.",
-        "error": "The run ended with an execution error. No passing verdict is established.",
+        "verified": "The patch passed independent verification.",
+        "rejected": "The patch did not pass independent verification.",
+        "inconclusive": "Verification is incomplete. There is not enough evidence for a verdict.",
+        "error": "An execution error interrupted verification. No passing result was established.",
     }
-    parts = [
-        f"ProofLoop incident briefing. Run {report.run_id}.",
-        "Saved report summary:",
-        report.summary,
-        outcomes[report.status],
-    ]
+    parts = [outcomes[report.status]]
     if report.verification:
         result = report.verification
-        for name in ("security", "functional", "adversarial"):
+        categories = ("security", "functional", "adversarial")
+        passed = sum(getattr(result, name + "_passed") for name in categories)
+        total = sum(getattr(result, name + "_total") for name in categories)
+        if report.status == "verified" and total > 0 and passed == total:
             parts.append(
-                f"{name.capitalize()} checks: {getattr(result, name + '_passed')} "
-                f"reported passing out of {getattr(result, name + '_total')} total."
+                f"All {total} recorded checks passed: {result.security_passed} security, "
+                f"{result.functional_passed} functional, "
+                f"and {result.adversarial_passed} adversarial."
             )
+        elif total > 0:
+            parts.append(f"The report records {passed} passing checks out of {total} required.")
+            if report.status in {"inconclusive", "error"}:
+                parts.append("Those counts do not establish a successful result.")
+        else:
+            parts.append("No check results are available in this report.")
     else:
-        parts.append("The saved report supplies no verification counts.")
-    # API v1 has no structured baseline/patch/challenge details in ReportResponse.
-    parts.append("Detailed reproduction and patch claims are limited to the saved summary.")
-    parts.append(
-        "Limitations: "
-        + (
-            " ".join(report.limitations)
-            if report.limitations
-            else "No specific limitations were supplied in this report."
-        )
-    )
-    parts.append("Passing the executed suite does not prove universal security.")
+        parts.append("Detailed check counts are unavailable in this report.")
+    # Never read raw summary/limitations/IDs: these may contain hashes, paths or error codes.
+    # The complete report stays unchanged and remains the authoritative detailed record.
+    parts.append("Passing these checks does not prove universal security.")
+    if any(limit.strip() != DEFAULT_LIMITATION for limit in report.limitations):
+        parts.append("Review the written report for additional limitations before relying on it.")
+    actions = {
+        "verified": "You can inspect the evidence or run another challenge.",
+        "rejected": "Inspect the failed checks before accepting this fix.",
+        "inconclusive": "Review the missing evidence before trying again.",
+        "error": "Check the audit trail for the cause before trying again.",
+    }
+    parts.append(actions[report.status])
     return " ".join(parts)

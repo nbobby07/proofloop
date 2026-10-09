@@ -1,160 +1,91 @@
-import { useState } from "react";
-import { Dialog } from "radix-ui";
-import { X } from "lucide-react";
 import type { RunResponse } from "../../types";
-import type { ConnectionStatus } from "../../hooks/useBackendHealth";
-import type { useRun } from "./useRun";
 import { canChallenge, terminal } from "./lifecycle";
 import { Icon } from "../../components/Icon";
-
+import type { EvidenceView } from "../investigation/model";
 export function RunControls({
-  fixture,
-  live,
   run,
-  connection,
+  busy,
+  challenge,
+  inspect,
+  useLive,
+  refresh,
 }: {
-  fixture: boolean;
-  live: ReturnType<typeof useRun>;
-  run: RunResponse | null;
-  connection: ConnectionStatus;
+  run: RunResponse;
+  busy: boolean;
+  challenge: () => void;
+  inspect: (view: EvidenceView) => void;
+  useLive: () => void;
+  refresh: () => void;
 }) {
-  const [input, setInput] = useState("");
-  const [showOpen, setShowOpen] = useState(false);
-  return (
-    <>
-      <div className="page-heading">
-        <div>
-          <p className="eyebrow page-kicker">
-            SECURITY OPERATIONS <span>/</span> VERIFICATION
-          </p>
-          <h1>
-            Security verification
-            <span className="heading-period" aria-hidden="true">
-              .
-            </span>
-          </h1>
-          <p className="support">
-            Reproduce the vulnerability. Review the patch. Inspect the evidence.
-          </p>
-        </div>
-        <div className="run-actions">
-          {!fixture && (
-            <Dialog.Root open={showOpen} onOpenChange={setShowOpen}>
-              <Dialog.Trigger asChild>
-                <button>
-                  <Icon name="history" />
-                  Open run
-                </button>
-              </Dialog.Trigger>
-              <Dialog.Portal>
-                <Dialog.Overlay className="dialog-overlay" />
-                <Dialog.Content className="dialog-content">
-                  <Dialog.Title>Open saved run</Dialog.Title>
-                  <Dialog.Description>
-                    Enter the run ID from a previous verification.
-                  </Dialog.Description>
-                  <form
-                    className="open-run"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      live.open(input);
-                      setShowOpen(false);
-                    }}
-                  >
-                    <label htmlFor="run-id">Run ID</label>
-                    <input
-                      id="run-id"
-                      value={input}
-                      onChange={(e) => setInput(e.target.value)}
-                      placeholder="run_…"
-                      pattern="[A-Za-z0-9_-]{1,128}"
-                      required
-                    />
-                    <button className="primary" disabled={live.busy}>
-                      Open run
-                      <Icon name="arrow" />
-                    </button>
-                  </form>
-                  <Dialog.Close className="dialog-close" aria-label="Close">
-                    <X size={16} />
-                  </Dialog.Close>
-                </Dialog.Content>
-              </Dialog.Portal>
-            </Dialog.Root>
-          )}
-          <button
-            className="challenge-action"
-            title="Invalidate the previous verdict and execute fresh independent challenges"
-            disabled={fixture || live.busy || !canChallenge(run)}
-            onClick={() => void live.challenge()}
-          >
-            <Icon name="refresh" />
-            {live.busyAction === "challenge"
-              ? "Requesting challenge…"
-              : "Challenge again"}
-          </button>
+  if (run.source === "fixture")
+    return (
+      <div className="outcome-actions">
+        <button className="primary" onClick={useLive}>
+          Use live backend <Icon name="arrow" />
+        </button>
+        <p className="action-help">
+          Switch to live mode to run the supported demonstration.
+        </p>
+      </div>
+    );
+  if (!terminal(run.status))
+    return (
+      <p className="action-help running-help">
+        You can inspect the evidence while this investigation runs.
+      </p>
+    );
+  if (run.status === "verified")
+    return (
+      <div className="outcome-actions">
+        <div className="button-row">
           <button
             className="primary"
-            disabled={
-              fixture ||
-              live.busy ||
-              (!!run && !terminal(run.status)) ||
-              connection !== "connected"
-            }
-            onClick={() => void live.start()}
+            disabled={busy || !canChallenge(run)}
+            onClick={challenge}
           >
-            <Icon name="play" />
-            {live.busyAction === "start" ? "Submitting…" : "Start verification"}
+            <Icon name="refresh" />
+            Challenge this fix
+          </button>
+          <button className="text-button" onClick={() => inspect("diff")}>
+            Review code changes <Icon name="arrow" />
           </button>
         </div>
+        <p className="action-help">
+          {canChallenge(run)
+            ? "Runs fresh challenges and replaces this verdict with a new result."
+            : "A reproduced baseline and an available patch are required before a fresh challenge."}
+        </p>
       </div>
-      {!fixture && run?.status === "challenging" && (
-        <div className="challenge-notice" role="status">
-          <Icon name="refresh" />
-          <div>
-            <strong>
-              {live.busyAction === "challenge"
-                ? "Requesting fresh challenges"
-                : "Fresh challenges in progress"}
-            </strong>
-            <p>
-              {live.busyAction === "challenge"
-                ? "Previous result withheld while the backend accepts the request."
-                : "Previous verdict invalidated. New events and independent verification must complete before a new result is recorded."}
-            </p>
-          </div>
-          <span className="badge">Awaiting verdict</span>
-        </div>
-      )}
-      <div className="run-strip">
-        <div>
-          <span className="eyebrow">CURRENT RUN</span>
-          <code>{run?.run_id ?? "No run selected"}</code>
-          {fixture && <span className="fixture-inline">Fixture</span>}
-        </div>
-        <div className="run-freshness">
-          <span className={live.polling && !fixture ? "dot fetching" : "dot"} />
-          <span>
-            {fixture
-              ? "Read-only preview"
-              : live.polling
-                ? "Fetching events"
-                : live.updatedAt
-                  ? `Updated ${live.updatedAt.toLocaleTimeString()}`
-                  : "Awaiting execution"}
-          </span>
-          {!fixture && run && (
-            <button
-              className="plain-icon"
-              title="Refresh run"
-              aria-label="Refresh run"
-              onClick={live.refresh}
-            >
-              <Icon name="refresh" />
-            </button>
-          )}
-        </div>
+    );
+  return (
+    <div className="outcome-actions">
+      <div className="button-row">
+        <button
+          className="primary"
+          onClick={() =>
+            inspect(run.status === "rejected" ? "results" : "audit")
+          }
+        >
+          {run.status === "rejected"
+            ? "Inspect failed checks"
+            : "Inspect recorded evidence"}
+          <Icon name="arrow" />
+        </button>
+        {canChallenge(run) ? (
+          <button onClick={challenge} disabled={busy}>
+            Challenge this fix
+          </button>
+        ) : (
+          <button className="text-button" onClick={refresh}>
+            Refresh evidence
+          </button>
+        )}
       </div>
-    </>
+      <p className="action-help">
+        {run.status === "rejected"
+          ? "Review the recorded outcomes and retained attempts before trying again."
+          : "Missing or interrupted checks cannot establish a passing result."}
+      </p>
+    </div>
   );
 }

@@ -1,114 +1,82 @@
 # ProofLoop design specification
 
-## Direction
+## Product direction
 
-An evidence review workspace for security engineers. The visual identity comes
-from the authorization boundary: a principal, a ruled boundary and a protected
-object. The hexagonal loop mark and connected pipeline use the same precise
-line geometry. Titles describe actual work: Security verification, Attack
-reproduction, Patch & remediation, Security evidence, Event stream.
+ProofLoop is a guided security investigation: **Find → Fix → Prove**. The default
+view explains the problem, what changed, what the independent verifier recorded,
+and the next useful action. The real backend verdict owns the outcome.
 
-## Palette and shape
+The old screen exposed actions, six lifecycle stages, attack/remediation panels,
+counts and logs simultaneously. The redesign establishes one reading order and
+moves advanced evidence into five predictable tabs. See [UX-REDESIGN.md](UX-REDESIGN.md)
+for diagnosis, implementation, screenshots and measured acceptance evidence.
+
+## Visual system
 
 | Role | Color | Application |
 |---|---|---|
-| Canvas | #0E1115 | Quiet graphite background |
-| Navigation | #0C0E12 | Persistent application shell |
-| Panel | #15191E | Evidence surfaces |
-| Structure | #2A3039 | Fine separators and boundaries |
-| Primary text | #E7E9EF | Warm neutral foreground |
-| Secondary text | #9AA3B2 | Context, timestamps and labels |
-| Action | #ACBDF5 | Primary action and selected navigation |
-| Attack | #F0A09A | Reproduction and failed evidence |
-| Defense | #A3B9ED | Patch proposals and remediation |
-| Success | #91C9AA | Recorded passing outcomes |
-| Incomplete / preview | #D6BD83 | Inconclusive or fixture labels |
+| Canvas | #F5F4F0 | Warm stone workspace |
+| Text | #1D252B | Headings and body |
+| Secondary | #616B72 | Supporting context |
+| Navigation | #222B31 | Quiet charcoal shell |
+| Action | #424CC7 | Dominant next action, selected tabs |
+| Failure | #A4473C | Reproduced vulnerability and rejection |
+| Verified | #31654D | Recorded passing results |
+| Incomplete | #856022 | Incomplete evidence and fixture preview |
 
-Use 8px panel corners, 6px controls, 4px status tags and one-pixel rules.
-These shapes repeat by function. The custom boundary graphic explains object
-ownership. Large color fills are reserved for small semantic surfaces.
+Color supplements explicit text and icons. System sans type avoids a font-network
+dependency; monospace is reserved for code and technical evidence. Body is 16px,
+secondary text generally 14px, section headings 20px. The result headline scales
+from 38px desktop to 32px phone. Presentation Mode uses a 54px desktop headline
+and 21px explanatory text. Spacing follows an 8px rhythm with fine adjustments
+for controls. Rules divide the narrative; containers serve comparisons and inputs.
 
-Typography uses locally available system sans with Inter when installed.
-Use 32px desktop page headings (23px on phones), compact section headings, readable 12–13px working
-text and monospace run IDs, diffs, HTTP status and timestamps. Metadata has
-less emphasis than actions and results. Code is selectable. No font-network
-dependency is required for the demo.
+## Information architecture
 
-## Layout
+Navigation: Verification, History, Analytics, Integrations. Desktop navigation is
+208px wide; phone navigation presents all four destinations. Source selection is
+secondary, but fixture labeling always remains visible. The main content has a
+comfortable maximum width and generous gutters.
 
-Desktop: 216px navigation, 55px top bar, 32px content gutters. The workspace
-context and explicit fixture/live switch remain above the run controls.
+- **First run:** product explanation, the supported LedgerLite synthetic target,
+  Run security verification, and secondary View previous runs.
+- **Running:** Find/Fix/Prove with one active phase, a plain-language description
+  and current recorded activity. Exact lifecycle and metadata remain in Audit trail.
+- **Complete:** outcome headline, state-specific next action, before/after evidence,
+  recorded patch attempts and the scope of the verdict.
+- **Inspector:** Overview, Code changes, Test results, Audit trail, Report. Counts
+  link directly to Test results. Code preserves selectable exact unified diffs,
+  filtering and line numbers. Report preserves evidence references/hashes and JSON.
+- **History:** session-observed runs with last-observed statuses, plus a saved-run ID
+  field. Opening a run fetches its current evidence; no backend listing is implied.
+- **Presentation:** same run and tabs, enlarged outcome, quiet source labels, no
+  sidebar. The actual diff and Challenge remain available. Escape exits, restores
+  the previous view and returns focus to the presentation trigger.
 
-1. Page title and execution actions.
-2. Current run identity and freshness.
-3. Horizontal six-stage pipeline and a compact backend-verdict row.
-4. Equal-width attack and remediation panels. Actual added lines preview the
-   proposal; HTTP behavior is shown only when supplied.
-5. Evidence inspector and chronological event stream. Accessible tabs switch
-   between verification summaries, exact diff and saved report.
+## State and motion semantics
 
-Analytics and history have separate pages. Optional audit tools live in Integrations; report-bound narration also appears
-beside current evidence. At tablet widths the evidence panels stack; at phone widths
-navigation becomes four equal items, the pipeline becomes two rows and the
-arena panels stack. No controls disappear into clipped horizontal navigation.
+Verified, rejected, inconclusive, execution error, running and fixture states have
+distinct copy and actions. Counters never determine a verdict. Starting a challenge
+immediately withholds previous counts, report and narration, including in History
+and Presentation Mode. A failed request reports the error and restores the known
+snapshot. Accepted execution retains the existing stale-response guard.
 
-## Psychology and interaction rationale
+Motion uses the existing Motion library and shared duration/easing tokens. Short
+state-keyed transitions reveal meaningful changes. There are no looping decorative
+animations, fake logs or percentage counters. CSS and Motion respect reduced motion.
+Evidence tabs retain diff filter state while hidden panels remain semantically hidden.
+Radix keyboard navigation, descriptive labels, focus rings and focus restoration
+support inspection. Chart values also appear in a keyboard-accessible exact table.
 
-- Proximity groups the action, current run and its evidence, supporting scanning.
-  The [NN/g proximity guidance](https://www.nngroup.com/articles/gestalt-proximity/)
-  describes how nearby elements are perceived as related. This is a layout
-  rationale, not evidence that this specific screen has been user-tested.
-- Consistent control shapes and state treatments support recognition. A single
-  emphasized start action establishes the first task; secondary actions retain
-  lower visual weight. Detailed evidence is progressively disclosed in tabs.
-- Color provides an additional signal. Text, icons, counts and status labels
-  preserve meaning without hue, following [WCAG use of color](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html).
-- Green is reserved for recorded outcomes; blue distinguishes a proposal from
-  a verdict. Explicit fixture and incomplete states help prevent overconfidence.
-  These are product semantics, not universal claims that a color creates trust.
-- Short event transitions communicate arrival; existing evidence does not move
-  around continuously. Motion respects reduced-motion preferences.
-- Dialogs manage focus, Escape and keyboard interaction. Scope information is
-  available by keyboard. Chart values also appear in a semantic table.
+## Evidence boundaries
 
-## Libraries researched and selected
+LedgerLite is the supported synthetic target. Before/after copy uses actual evidence;
+HTTP 200 is shown only when recorded, and no post-patch status is invented. Only
+explicit executed round metadata establishes earlier failed attempts. Missing prior
+diffs, assertions and provider status remain unavailable. Fixture mode is illustrative
+and cannot execute. ClickHouse/Guild integration success is not inferred from UI.
 
-| Library | Use |
-|---|---|
-| [Radix UI](https://www.radix-ui.com/primitives/docs/overview/introduction) 1.7.0 | Unstyled accessible tabs, dialog, tooltip |
-| [Lucide React](https://lucide.dev/guide/react/) 1.54.0 | Consistent stroke icon system |
-| [Motion](https://motion.dev/docs/react-use-reduced-motion) 14.0.0 | Brief event-entry transitions respecting user settings |
-| [Recharts](https://recharts.github.io/en-US/guide/) 3.10.1 | Lazy-loaded failure-family chart with exact accompanying table |
-| [Vitest](https://vitest.dev/guide/) + [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/) | Trust-boundary and interaction checks |
-
-[shadcn/ui](https://ui.shadcn.com/docs), Base UI and Shiki were evaluated.
-Radix primitives provide the needed behavior while retaining the custom visual
-language. A heavyweight editor is unnecessary for the current exact unified-diff
-contract. React/TypeScript/Vite/Tailwind remain the required foundation.
-
-## Evidence constraints
-
-The merged backend API is live. Its analytics currently come from local run
-storage; the UI does not label them ClickHouse SQL. ClickHouse/Guild remain unverified until connected. Report-bound ElevenLabs
-playback was verified in the UI polish browser run. No fabricated chart series or integration
-success states are introduced. A terminal run with no recorded stage completion
-shows Not recorded, rather than implying a stage is still pending or succeeded.
-
-## Acceptance
-
-Readable desktop and 390px phone layouts; all navigation visible; source labeling
-persists; keyboard tabs/dialog work; real API failures remain errors; accepted
-rechallenge clears stale evidence; build/lint/contracts and relevant tests pass.
-See VALIDATION.md for measured results and local runtime limits.
-
-
-## UI and motion refinement — October 9, 2026
-
-The frontend now uses a complete Discover → Report rail, an independent-verdict
-strip, amber fixture results, retained recorded rounds and report-bound narration
-beside the evidence. Navigation/evidence indicators share Motion layout identity;
-150/220/320ms tokens and reduced-motion guards keep movement restrained. Current
-results are withheld while Challenge Again is pending and invalidated after acceptance.
-Recharts remains the analytics engine after evaluating Bklit registry installation.
-See [UI-MOTION-POLISH.md](UI-MOTION-POLISH.md) for research, measured bundle impact,
-actual execution receipts, matched screenshots and explicit validation limitations.
+No dependencies, backend algorithms, API contracts, verifier rules or provider
+configuration changed in this redesign. Investigation and analytics views load lazily.
+Historical UI motion rationale and measurements remain in
+[UI-MOTION-POLISH.md](UI-MOTION-POLISH.md).

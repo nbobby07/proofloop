@@ -12,7 +12,12 @@ from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from backend.api.schemas import ReportResponse
 from backend.providers.contracts import AudioArtifact
-from backend.reports.evidence import briefing_script, report_digest, require_execution_report
+from backend.reports.evidence import (
+    SCRIPT_VERSION,
+    briefing_script,
+    report_digest,
+    require_execution_report,
+)
 
 
 class NarrationUnavailable(RuntimeError):
@@ -65,7 +70,12 @@ class ElevenLabsClient:
 
     def identity(self, report: ReportResponse) -> str:
         identity = json.dumps(
-            [report_digest(report), self.config.voice_id, self.config.model_id, "script-v1"]
+            [
+                report_digest(report),
+                self.config.voice_id,
+                self.config.model_id,
+                f"script-{SCRIPT_VERSION}",
+            ]
         )
         return "briefing_" + hashlib.sha256(identity.encode()).hexdigest()
 
@@ -130,7 +140,7 @@ class ElevenLabsClient:
             "voice_id": self.config.voice_id,
             "model_id": self.config.model_id,
             "transcript": script,
-            "script_version": "v1",
+            "script_version": SCRIPT_VERSION,
         }
         self._atomic_write(audio_path, audio)
         self._atomic_write(metadata_path, json.dumps(metadata, indent=2).encode())
